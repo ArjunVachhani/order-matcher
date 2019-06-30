@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace OrderMatcher.Performance
 {
+    [MemoryDiagnoser]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class SerializeBenchmark
     {
@@ -159,13 +160,19 @@ namespace OrderMatcher.Performance
         [Benchmark]
         public void orderJsonSerialize()
         {
-            orderJsonString = JsonConvert.SerializeObject(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
+            var orderJsonString = JsonConvert.SerializeObject(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
         }
 
         [Benchmark]
         public void orderBinarySerialize()
         {
             var bytes = OrderSerializer.Serialize(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
+        }
+
+        [Benchmark]
+        public void orderBinarySerializeOptimized()
+        {
+            var bytes = OrderSerializer.SerializeOptimized(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
         }
 
         [Benchmark]

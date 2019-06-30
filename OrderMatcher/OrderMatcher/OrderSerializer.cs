@@ -30,7 +30,6 @@ namespace OrderMatcher
             sizeOfSide = sizeof(bool);
             sizeOfCancelOn = sizeof(ulong);
             sizeOfMessagetType = sizeof(MessageType);
-
             version = 1;
 
             messageTypeOffset = 0;
@@ -72,6 +71,28 @@ namespace OrderMatcher
             CopyBytes(BitConverter.GetBytes(order.TotalQuantity), msg, totalQuantityOffset);
             //Array.Copy(BitConverter.GetBytes(order.CancelOn), 0, msg, cancelOnOffset, sizeOfCancelOn);
             CopyBytes(BitConverter.GetBytes(order.CancelOn), msg, cancelOnOffset);
+            return msg;
+        }
+
+        public static byte[] SerializeOptimized(Order order)
+        {
+            if (order == null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+
+            byte[] msg = new byte[sizeOfMessage];
+            msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
+            WriteShort(msg, versionOffset, version);
+            
+            msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
+            msg[orderConditionOffset] = (byte)order.OrderCondition;
+            WriteULong(msg, orderIdOffset, order.OrderId);
+            WriteInt(msg, priceOffset, order.Price);
+            WriteInt(msg, quantityOffset, order.Quantity);
+            WriteInt(msg, stopPriceOffset, order.StopPrice);
+            WriteInt(msg, totalQuantityOffset, order.TotalQuantity);
+            WriteLong(msg, cancelOnOffset, order.CancelOn);
             return msg;
         }
 

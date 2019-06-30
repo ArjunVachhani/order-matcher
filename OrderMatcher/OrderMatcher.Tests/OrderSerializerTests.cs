@@ -18,6 +18,14 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
+        public void SerializeOptimized_EqualSerialize()
+        {
+            var bytes = OrderSerializer.SerializeOptimized(new Order { CancelOn = long.MaxValue, IsBuy = true, OrderCondition = OrderCondition.FillOrKill, OrderId = ulong.MaxValue, Price = int.MaxValue, Quantity = int.MaxValue, StopPrice = int.MaxValue, TotalQuantity = int.MaxValue });
+            var bytes2 = OrderSerializer.Serialize(new Order { CancelOn = long.MaxValue, IsBuy = true, OrderCondition = OrderCondition.FillOrKill, OrderId = ulong.MaxValue, Price = int.MaxValue, Quantity = int.MaxValue, StopPrice = int.MaxValue, TotalQuantity = int.MaxValue });
+            AssertHelper.SequentiallyEqual(bytes, bytes2);
+        }
+
+        [Fact]
         public void Serialize_ThrowsExecption_IfNullPassed()
         {
             ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => OrderSerializer.Serialize(null));
