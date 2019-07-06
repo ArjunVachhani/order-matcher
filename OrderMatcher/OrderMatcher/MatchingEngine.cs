@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace OrderMatcher
 {
@@ -8,12 +9,10 @@ namespace OrderMatcher
         private readonly Dictionary<ulong, Order> _currentOrders;
         private readonly Dictionary<ulong, Order> _currentIcebergOrders;
         private readonly HashSet<ulong> _acceptedOrders;
-        private readonly ICancelListener _cancelListener;
         private readonly ITradeListener _tradeListener;
-        private readonly IOrderTriggerListener _orderTriggerListener;
         private readonly SortedDictionary<long, HashSet<ulong>> _goodTillDateOrders;
 
-        private ITimeProvider _timeProvider;
+        private readonly ITimeProvider _timeProvider;
         private Price _marketPrice;
 
         public IEnumerable<KeyValuePair<ulong, Order>> CurrentOrders => _currentOrders;
@@ -23,17 +22,23 @@ namespace OrderMatcher
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
-        public MatchingEngine(ITradeListener tradeListener, ICancelListener cancelListener, IOrderTriggerListener orderTriggerListener, ITimeProvider timeProvider)
+        public MatchingEngine(ITradeListener tradeListener, ITimeProvider timeProvider)
         {
             _book = new Book();
             _currentOrders = new Dictionary<ulong, Order>();
             _currentIcebergOrders = new Dictionary<ulong, Order>();
             _goodTillDateOrders = new SortedDictionary<long, HashSet<ulong>>();
             _acceptedOrders = new HashSet<ulong>();
-            _cancelListener = cancelListener;
             _tradeListener = tradeListener;
-            _orderTriggerListener = orderTriggerListener;
             _timeProvider = timeProvider ?? new TimeProvider();
+        }
+
+        public void Run(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+
+            }
         }
 
         public OrderMatchingResult AddOrder(Order incomingOrder)
@@ -94,17 +99,18 @@ namespace OrderMatcher
             }
             _acceptedOrders.Add(incomingOrder.OrderId);
             var timeNow = _timeProvider.GetUpochMilliseconds();
+            CancelExpiredOrders(timeNow);
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
-                _cancelListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.BookOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.BookOrCancel);
             }
             else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
             {
-                _cancelListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.FillOrKill);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.FillOrKill);
             }
             else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timeNow)
             {
-                _cancelListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.ValidityExpired);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.ValidityExpired);
             }
             else
             {
@@ -125,7 +131,6 @@ namespace OrderMatcher
                 }
                 else
                 {
-                    CancelExpiredOrders(timeNow);
                     MatchAndAddOrder(incomingOrder);
                 }
             }
@@ -159,7 +164,7 @@ namespace OrderMatcher
                     RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
                 }
 
-                _cancelListener?.OnCancel(orderId, quantityCancel, cancelReason);
+                _tradeListener?.OnCancel(orderId, quantityCancel, cancelReason);
                 return OrderMatchingResult.CancelAcepted;
             }
             return OrderMatchingResult.OrderDoesNotExists;
@@ -171,7 +176,7 @@ namespace OrderMatcher
             var anyMatch = MatchWithOpenOrders(incomingOrder);
             if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && incomingOrder.OpenQuantity != 0)
             {
-                _cancelListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.ImmediateOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.ImmediateOrCancel);
                 _currentOrders.Remove(incomingOrder.OrderId);
             }
             else if (incomingOrder.OpenQuantity != 0)
@@ -185,7 +190,7 @@ namespace OrderMatcher
                     }
                     else
                     {
-                        _cancelListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.MarketOrderNoLiquidity);
+                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, CancelReason.MarketOrderNoLiquidity);
                         _currentOrders.Remove(incomingOrder.OrderId);
                         if (incomingOrder.CancelOn > 0)
                         {
@@ -230,7 +235,7 @@ namespace OrderMatcher
             {
                 foreach (var order in priceLevels[i])
                 {
-                    _orderTriggerListener?.OnOrderTriggered(order.OrderId);
+                    _tradeListener?.OnOrderTriggered(order.OrderId);
                     MatchAndAddOrder(order);
                 }
             }

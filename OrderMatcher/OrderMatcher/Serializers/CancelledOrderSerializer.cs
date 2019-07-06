@@ -46,17 +46,18 @@ namespace OrderMatcher
             {
                 throw new ArgumentNullException(nameof(cancelledOrder));
             }
+            return Serialize(cancelledOrder.OrderId, cancelledOrder.RemainingQuantity, cancelledOrder.CancelReason, cancelledOrder.Timestamp);
+        }
 
+        public static byte[] Serialize(ulong orderId, Quantity remainingQuantity, CancelReason cancelReason, long timeStamp)
+        {
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.Cancel;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-
-            CopyBytes(BitConverter.GetBytes(cancelledOrder.OrderId), msg, orderIdOffset);
-            CopyBytes(BitConverter.GetBytes(cancelledOrder.RemainingQuantity), msg, remainingQuantityOffset);
-            msg[cancelReasonOffset] = (byte)cancelledOrder.CancelReason;
-            CopyBytes(BitConverter.GetBytes(cancelledOrder.Timestamp), msg, timestampOffset);
+            WriteShort(msg, versionOffset, version);
+            WriteULong(msg, orderIdOffset, orderId);
+            WriteInt(msg, remainingQuantityOffset, remainingQuantity);
+            msg[cancelReasonOffset] = (byte)cancelReason;
+            WriteLong(msg, timestampOffset, timeStamp);
             return msg;
         }
 

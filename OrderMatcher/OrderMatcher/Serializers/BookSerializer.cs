@@ -64,26 +64,18 @@ namespace OrderMatcher
 
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.Book;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-            CopyBytes(BitConverter.GetBytes(timeStamp), msg, timeStampOffset);
-            CopyBytes(BitConverter.GetBytes(ltp ?? 0), msg, ltpOffset);
-
-            var bidCountArray = BitConverter.GetBytes(bidCount);
-            msg[bidCountOffset] = bidCountArray[0];
-            msg[bidCountOffset + 1] = bidCountArray[1];
-
-            var askCountArray = BitConverter.GetBytes(askCount);
-            msg[askCountOffset] = askCountArray[0];
-            msg[askCountOffset + 1] = askCountArray[1];
+            WriteShort(msg, versionOffset, version);
+            WriteLong(msg, timeStampOffset, timeStamp);
+            WriteInt(msg, ltpOffset, ltp ?? 0);
+            WriteShort(msg, bidCountOffset, bidCount);
+            WriteShort(msg, askCountOffset, askCount);
 
             int i = 0;
             foreach (var level in book.BidSide)
             {
                 var start = bidStartOffset + (i * sizeOfLevel);
-                CopyBytes(BitConverter.GetBytes(level.Key), msg, start);
-                CopyBytes(BitConverter.GetBytes(level.Value.Quantity), msg, start + sizeOfPrice);
+                WriteInt(msg, start, level.Key);
+                WriteInt(msg, start + sizeOfPrice, level.Value.Quantity);
                 if (++i == bidCount)
                 {
                     break;
@@ -94,8 +86,8 @@ namespace OrderMatcher
             foreach (var level in book.AskSide)
             {
                 var start = bidStartOffset + (bidCount * sizeOfLevel) + (i * sizeOfLevel);
-                CopyBytes(BitConverter.GetBytes(level.Key), msg, start);
-                CopyBytes(BitConverter.GetBytes(level.Value.Quantity), msg, start + sizeOfPrice);
+                WriteInt(msg, start, level.Key);
+                WriteInt(msg, start + sizeOfPrice, level.Value.Quantity);
                 if (++i == askCount)
                 {
                     break;

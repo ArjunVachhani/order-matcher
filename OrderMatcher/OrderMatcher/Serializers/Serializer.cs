@@ -5,24 +5,14 @@ namespace OrderMatcher
     public abstract class Serializer
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void CopyBytes(byte[] sourceArray, byte[] destinationArray, int destinationStartIndex)
-        {
-            for (int i = 0; i < sourceArray.Length; i++)
-            {
-                destinationArray[destinationStartIndex + i] = sourceArray[i];
-            }
-        }
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void WriteShort(byte[] array, int start, short value)
+        public static void WriteShort(byte[] array, int start, short value)
         {
             array[start] = (byte)value;
             array[start + 1] = (byte)(value >> 8);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void WriteInt(byte[] array, int start, int value)
+        public static void WriteInt(byte[] array, int start, int value)
         {
             array[start] = (byte)value;
             array[start + 1] = (byte)(value >> 8);
@@ -31,7 +21,7 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void WriteLong(byte[] array, int start, long value)
+        public static void WriteLong(byte[] array, int start, long value)
         {
             array[start] = (byte)value;
             array[start + 1] = (byte)(value >> 8);
@@ -44,7 +34,7 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void WriteULong(byte[] array, int start, ulong value)
+        public static void WriteULong(byte[] array, int start, ulong value)
         {
             array[start] = (byte)value;
             array[start + 1] = (byte)(value >> 8);
@@ -57,7 +47,7 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static void WriteBool(byte[] array, int start, bool value)
+        public static void WriteBool(byte[] array, int start, bool value)
         {
             array[start] = (byte)(value ? 1 : 0);
         }

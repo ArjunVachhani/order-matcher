@@ -50,17 +50,19 @@ namespace OrderMatcher
             {
                 throw new ArgumentNullException(nameof(fill));
             }
+            return Serialize(fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.Timestamp);
+        }
 
+        public static byte[] Serialize(ulong makerOrderId, ulong takerOrderId, Price matchRate, Quantity matchQuantity, long timeStamp)
+        {
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.Fill;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-            CopyBytes(BitConverter.GetBytes(fill.MakerOrderId), msg, makerOrderIdOffset);
-            CopyBytes(BitConverter.GetBytes(fill.TakerOrderId), msg, takerOrderIdOffset);
-            CopyBytes(BitConverter.GetBytes(fill.MatchRate), msg, matchRateOffset);
-            CopyBytes(BitConverter.GetBytes(fill.MatchQuantity), msg, matchQuantityOffset);
-            CopyBytes(BitConverter.GetBytes(fill.Timestamp), msg, timestampOffset);
+            WriteShort(msg, versionOffset, version);
+            WriteULong(msg, makerOrderIdOffset, makerOrderId);
+            WriteULong(msg, takerOrderIdOffset, takerOrderId);
+            WriteInt(msg, matchRateOffset, matchRate);
+            WriteInt(msg, matchQuantityOffset, matchQuantity);
+            WriteLong(msg, timestampOffset, timeStamp);
 
             return msg;
         }
