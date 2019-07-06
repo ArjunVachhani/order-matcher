@@ -40,14 +40,16 @@ namespace OrderMatcher
                 throw new ArgumentNullException(nameof(orderTrigger));
             }
 
+            return Serialize(orderTrigger.OrderId, orderTrigger.Timestamp);
+        }
+
+        public static byte[] Serialize(ulong orderId, long timestamp)
+        {
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.OrderTrigger;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-
-            CopyBytes(BitConverter.GetBytes(orderTrigger.OrderId), msg, orderIdOffset);
-            CopyBytes(BitConverter.GetBytes(orderTrigger.Timestamp), msg, timestampOffset);
+            WriteLong(msg, versionOffset, version);
+            WriteULong(msg, orderIdOffset, orderId);
+            WriteLong(msg, timestampOffset, timestamp);
             return msg;
         }
 

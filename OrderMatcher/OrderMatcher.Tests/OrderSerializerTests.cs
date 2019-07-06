@@ -26,6 +26,14 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
+        public void SerializeOptimized_EqualSerialize2()
+        {
+            var bytes = OrderSerializer.SerializeOptimized(new Order { CancelOn = 49812166151, IsBuy = false, OrderCondition = OrderCondition.ImmediateOrCancel, OrderId = 123465713, Price = 78137651, Quantity = 9813212, StopPrice = 132148, TotalQuantity = 81432468 });
+            var bytes2 = OrderSerializer.Serialize(new Order { CancelOn = 49812166151, IsBuy = false, OrderCondition = OrderCondition.ImmediateOrCancel, OrderId = 123465713, Price = 78137651, Quantity = 9813212, StopPrice = 132148, TotalQuantity = 81432468 });
+            AssertHelper.SequentiallyEqual(bytes, bytes2);
+        }
+
+        [Fact]
         public void Serialize_ThrowsExecption_IfNullPassed()
         {
             ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => OrderSerializer.Serialize(null));

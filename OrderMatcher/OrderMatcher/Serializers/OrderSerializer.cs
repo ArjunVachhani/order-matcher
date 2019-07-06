@@ -59,18 +59,12 @@ namespace OrderMatcher
             msg[versionOffset + 1] = versionByteArray[1];
             msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
             msg[orderConditionOffset] = (byte)order.OrderCondition;
-            //Array.Copy(BitConverter.GetBytes(order.OrderId), 0, msg, orderIdOffset, sizeOfOrderId);
-            CopyBytes(BitConverter.GetBytes(order.OrderId), msg, orderIdOffset);
-            //Array.Copy(BitConverter.GetBytes(order.Price), 0, msg, priceOffset, Price.SizeOfPrice);
-            CopyBytes(BitConverter.GetBytes(order.Price), msg, priceOffset);
-            //Array.Copy(BitConverter.GetBytes(order.Quantity), 0, msg, quantityOffset, Quantity.SizeOfQuantity);
-            CopyBytes(BitConverter.GetBytes(order.Quantity), msg, quantityOffset);
-            //Array.Copy(BitConverter.GetBytes(order.StopPrice), 0, msg, stopPriceOffset, Price.SizeOfPrice);
-            CopyBytes(BitConverter.GetBytes(order.StopPrice), msg, stopPriceOffset);
-            //Array.Copy(BitConverter.GetBytes(order.TotalQuantity), 0, msg, totalQuantityOffset, Quantity.SizeOfQuantity);
-            CopyBytes(BitConverter.GetBytes(order.TotalQuantity), msg, totalQuantityOffset);
-            //Array.Copy(BitConverter.GetBytes(order.CancelOn), 0, msg, cancelOnOffset, sizeOfCancelOn);
-            CopyBytes(BitConverter.GetBytes(order.CancelOn), msg, cancelOnOffset);
+            WriteULong(msg, orderIdOffset, order.OrderId);
+            WriteInt(msg, priceOffset, order.Price);
+            WriteInt(msg, quantityOffset, order.Quantity);
+            WriteInt(msg, stopPriceOffset, order.StopPrice);
+            WriteInt(msg, totalQuantityOffset, order.TotalQuantity);
+            WriteLong(msg, cancelOnOffset, order.CancelOn);
             return msg;
         }
 
@@ -84,7 +78,7 @@ namespace OrderMatcher
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
             WriteShort(msg, versionOffset, version);
-            
+
             msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
             msg[orderConditionOffset] = (byte)order.OrderCondition;
             WriteULong(msg, orderIdOffset, order.OrderId);

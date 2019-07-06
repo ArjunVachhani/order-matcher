@@ -40,11 +40,8 @@ namespace OrderMatcher
 
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.CancelRequest;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-
-            CopyBytes(BitConverter.GetBytes(cancelRequest.OrderId), msg, orderIdOffset);
+            WriteShort(msg, versionOffset, version);
+            WriteULong(msg, orderIdOffset, cancelRequest.OrderId);
             return msg;
         }
 

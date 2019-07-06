@@ -17,7 +17,6 @@ namespace OrderMatcher
 
         static BookRequestSerializer()
         {
-
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfLevelCount = sizeof(int);
@@ -40,11 +39,8 @@ namespace OrderMatcher
 
             byte[] msg = new byte[sizeOfMessage];
             msg[messageTypeOffset] = (byte)MessageType.BookRequest;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-
-            CopyBytes(BitConverter.GetBytes(bookRequest.LevelCount), msg, levelCountOffset);
+            WriteInt(msg, versionOffset, version);
+            WriteInt(msg, levelCountOffset, bookRequest.LevelCount);
             return msg;
         }
 

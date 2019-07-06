@@ -7,18 +7,14 @@ namespace OrderMatcher.Tests
     public class MatchingEngineTests
     {
         private Mock<ITradeListener> mockTradeListener;
-        private Mock<ICancelListener> mockCancelListener;
-        private Mock<IOrderTriggerListener> mockOrderTriggerListener;
         private Mock<ITimeProvider> mockTimeProvider;
         private MatchingEngine matchingEngine;
 
         public MatchingEngineTests()
         {
             mockTradeListener = new Mock<ITradeListener>();
-            mockCancelListener = new Mock<ICancelListener>();
-            mockOrderTriggerListener = new Mock<IOrderTriggerListener>();
             mockTimeProvider = new Mock<ITimeProvider>();
-            matchingEngine = new MatchingEngine(mockTradeListener.Object, mockCancelListener.Object, mockOrderTriggerListener.Object, mockTimeProvider.Object);
+            matchingEngine = new MatchingEngine(mockTradeListener.Object, mockTimeProvider.Object);
         }
 
         [Fact]
@@ -29,10 +25,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, result);
-            mockCancelListener.Verify(x => x.OnCancel(1, 1000, CancelReason.UserRequested));
-            mockCancelListener.VerifyNoOtherCalls();
+            mockTradeListener.Verify(x => x.OnCancel(1, 1000, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -40,14 +34,14 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Removes_Orders_No_Cancel_Listener()
         {
-            MatchingEngine matchingEngine = new MatchingEngine(mockTradeListener.Object, null, mockOrderTriggerListener.Object, mockTimeProvider.Object);
+            MatchingEngine matchingEngine = new MatchingEngine(mockTradeListener.Object, mockTimeProvider.Object);
             Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
             matchingEngine.AddOrder(order1);
 
             OrderMatchingResult result = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, result);
+            mockTradeListener.Verify(x => x.OnCancel(1, 1000, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -60,15 +54,13 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult cancelled = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, cancelled);
-            mockCancelListener.Verify(x => x.OnCancel(1, 1000, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(1, 1000, CancelReason.UserRequested));
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
 
             OrderMatchingResult cancelled2 = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.OrderDoesNotExists, cancelled2);
-            mockCancelListener.VerifyNoOtherCalls();
             mockTradeListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -80,8 +72,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -98,8 +88,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -115,10 +103,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result3 = matchingEngine.CancelOrder(2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result3);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -139,8 +125,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -157,8 +141,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -174,10 +156,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result3 = matchingEngine.CancelOrder(2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result3);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -198,8 +178,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -216,8 +194,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -233,8 +209,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -247,10 +221,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)2, order3.Sequnce);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -270,8 +242,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -288,8 +258,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -305,8 +273,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -319,10 +285,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)2, order3.Sequnce);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -342,8 +306,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -360,8 +322,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -377,8 +337,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -391,10 +349,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)2, order3.Sequnce);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -414,8 +370,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -432,8 +386,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -449,8 +401,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -463,10 +413,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)2, order3.Sequnce);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -486,8 +434,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -504,8 +450,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -521,8 +465,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -538,8 +480,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -555,8 +495,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.Contains(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -572,8 +510,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
@@ -589,11 +525,9 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 12, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(4));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(4));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.DoesNotContain(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -611,10 +545,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result8 = matchingEngine.CancelOrder(order4.OrderId);
 
-            mockCancelListener.Verify(x => x.OnCancel(4, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(4, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.DoesNotContain(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -634,12 +566,11 @@ namespace OrderMatcher.Tests
         [Fact]
         public void TriggerWorks_IfNoTriggerListerPassed()
         {
-            var matchingEngine = new MatchingEngine(mockTradeListener.Object, mockCancelListener.Object, null, mockTimeProvider.Object);
+            var matchingEngine = new MatchingEngine(mockTradeListener.Object, mockTimeProvider.Object);
             Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -656,7 +587,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -672,7 +602,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -688,7 +617,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -704,7 +632,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.Contains(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -720,7 +647,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
@@ -736,8 +662,9 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 8, 500));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(4));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.DoesNotContain(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -758,9 +685,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result8 = matchingEngine.CancelOrder(order4.OrderId);
 
-            mockCancelListener.Verify(x => x.OnCancel(4, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(4, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result8);
             Assert.DoesNotContain(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -783,8 +709,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -801,8 +725,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -819,8 +741,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -834,10 +754,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)2, order3.Sequnce);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -858,8 +776,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -876,8 +792,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -894,8 +808,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 11, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -910,10 +822,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
 
-            mockCancelListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(3, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -945,8 +855,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityOrStopPrice, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Empty(matchingEngine.CurrentOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -961,8 +869,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityOrStopPrice, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Empty(matchingEngine.CurrentOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -977,8 +883,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityOrStopPrice, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Empty(matchingEngine.CurrentOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -993,8 +897,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityOrStopPrice, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Empty(matchingEngine.CurrentOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -1010,8 +912,6 @@ namespace OrderMatcher.Tests
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Single(matchingEngine.CurrentOrders);
@@ -1043,8 +943,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Equal((Quantity)0, order1.OpenQuantity);
             Assert.Equal((Quantity)0, order2.OpenQuantity);
@@ -1057,7 +955,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Limit_Matches_With_Pending_Order_Works_If_No_TradeListener_Passed()
         {
-            MatchingEngine matchingEngine = new MatchingEngine(null, mockCancelListener.Object, mockOrderTriggerListener.Object, mockTimeProvider.Object);
+            MatchingEngine matchingEngine = new MatchingEngine(null, mockTimeProvider.Object);
 
             Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
             OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
@@ -1067,8 +965,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult accepted2 = matchingEngine.AddOrder(order2);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
+            mockTradeListener.VerifyNoOtherCalls();
 
             Assert.Equal((Quantity)0, order1.OpenQuantity);
             Assert.Equal((Quantity)0, order2.OpenQuantity);
@@ -1090,8 +987,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
 
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((Quantity)1000, order2.OpenQuantity);
@@ -1109,8 +1004,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1126,8 +1019,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1143,8 +1034,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1162,8 +1051,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order4, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
@@ -1178,8 +1065,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.Contains(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -1196,8 +1081,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(6, 2, 11, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             Assert.DoesNotContain(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
@@ -1214,8 +1097,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.Contains(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -1231,8 +1112,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result8 = matchingEngine.AddOrder(order8);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result8);
             Assert.Contains(order8, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order8.OrderId, matchingEngine.AcceptedOrders);
@@ -1248,8 +1127,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result9 = matchingEngine.AddOrder(order9);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result9);
             Assert.Contains(order9, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order9.OrderId, matchingEngine.AcceptedOrders);
@@ -1265,8 +1142,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result10 = matchingEngine.AddOrder(order10);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result10);
             Assert.Contains(order10, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order10.OrderId, matchingEngine.AcceptedOrders);
@@ -1282,8 +1157,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result11 = matchingEngine.AddOrder(order11);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result11);
             Assert.Contains(order11, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order11.OrderId, matchingEngine.AcceptedOrders);
@@ -1299,8 +1172,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result12 = matchingEngine.AddOrder(order12);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result12);
             Assert.Contains(order12, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order12.OrderId, matchingEngine.AcceptedOrders);
@@ -1316,8 +1187,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result13 = matchingEngine.AddOrder(order13);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result13);
             Assert.Contains(order13, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order13.OrderId, matchingEngine.AcceptedOrders);
@@ -1333,8 +1202,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result14 = matchingEngine.AddOrder(order14);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result14);
             Assert.Contains(order14, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order14.OrderId, matchingEngine.AcceptedOrders);
@@ -1350,8 +1217,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result15 = matchingEngine.AddOrder(order15);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result15);
             Assert.Contains(order15, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order15.OrderId, matchingEngine.AcceptedOrders);
@@ -1366,10 +1231,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result16 = matchingEngine.CancelOrder(2);
 
             Assert.Equal(OrderMatchingResult.CancelAcepted, result16);
+            mockTradeListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.Verify(x => x.OnCancel(2, 500, CancelReason.UserRequested));
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
@@ -1389,8 +1252,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(17, 10, 14, 1000));
             mockTradeListener.Verify(x => x.OnTrade(17, 11, 15, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result17);
             Assert.Contains(order17, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order17.OrderId, matchingEngine.AcceptedOrders);
@@ -1411,8 +1272,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(18, 3, 9, 1000));
             mockTradeListener.Verify(x => x.OnTrade(18, 12, 9, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result18);
             Assert.DoesNotContain(order18, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order18.OrderId, matchingEngine.AcceptedOrders);
@@ -1431,8 +1290,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(19, 14, 7, 1000));
             mockTradeListener.Verify(x => x.OnTrade(19, 15, 7, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result19);
             Assert.DoesNotContain(order19, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order19.OrderId, matchingEngine.AcceptedOrders);
@@ -1452,8 +1309,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1470,8 +1325,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1491,8 +1344,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1509,8 +1360,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1530,8 +1379,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1548,8 +1395,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1566,8 +1411,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1587,8 +1430,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1605,8 +1446,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1623,8 +1462,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1644,8 +1481,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1661,8 +1496,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1680,8 +1513,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 9, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1701,8 +1532,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1718,8 +1547,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1737,8 +1564,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 11, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1757,10 +1582,8 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = true, Quantity = 500, Price = 0, OrderId = 1 };
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.MarketOrderNoLiquidity));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1779,10 +1602,8 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 0, OrderId = 1 };
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.MarketOrderNoLiquidity));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1802,8 +1623,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1820,8 +1639,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1843,8 +1660,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1861,8 +1676,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1884,8 +1697,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -1901,8 +1712,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -1918,8 +1727,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -1937,8 +1744,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order4, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
@@ -1955,8 +1760,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             mockTradeListener.Verify(x => x.OnTrade(5, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order5, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
@@ -1972,8 +1775,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             mockTradeListener.Verify(x => x.OnTrade(6, 3, 9, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
             Assert.Contains(order6, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
@@ -1991,8 +1792,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 9, 500));
             mockTradeListener.Verify(x => x.OnTrade(7, 2, 11, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.Contains(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -2008,8 +1807,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result8 = matchingEngine.AddOrder(order8);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result8);
             Assert.Contains(order8, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order8.OrderId, matchingEngine.AcceptedOrders);
@@ -2025,8 +1822,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result9 = matchingEngine.AddOrder(order9);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result9);
             Assert.Contains(order9, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order9.OrderId, matchingEngine.AcceptedOrders);
@@ -2046,8 +1841,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(10, 8, 12, 1500));
             mockTradeListener.Verify(x => x.OnTrade(10, 9, 13, 1000));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order10, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order10.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order10, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
@@ -2062,10 +1855,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result11 = matchingEngine.AddOrder(order11);
 
             Assert.Equal(OrderMatchingResult.OrderAccepted, result11);
-            mockCancelListener.Verify(x => x.OnCancel(11, 3000, CancelReason.MarketOrderNoLiquidity));
+            mockTradeListener.Verify(x => x.OnCancel(11, 3000, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order11, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order11.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order11, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
@@ -2080,10 +1871,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result12 = matchingEngine.AddOrder(order12);
 
             Assert.Equal(OrderMatchingResult.OrderAccepted, result12);
-            mockCancelListener.Verify(x => x.OnCancel(12, 3000, CancelReason.MarketOrderNoLiquidity));
+            mockTradeListener.Verify(x => x.OnCancel(12, 3000, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order12, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order12.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order12, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
@@ -2098,8 +1887,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result13 = matchingEngine.AddOrder(order13);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result13);
             Assert.Contains(order13, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order13.OrderId, matchingEngine.AcceptedOrders);
@@ -2115,8 +1902,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result14 = matchingEngine.AddOrder(order14);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result14);
             Assert.Contains(order14, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order14.OrderId, matchingEngine.AcceptedOrders);
@@ -2132,8 +1917,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result15 = matchingEngine.AddOrder(order15);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result15);
             Assert.Contains(order15, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order15.OrderId, matchingEngine.AcceptedOrders);
@@ -2151,8 +1934,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result16);
             mockTradeListener.Verify(x => x.OnTrade(16, 13, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order16, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order16.OrderId, matchingEngine.AcceptedOrders);
             Assert.DoesNotContain(order16, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
@@ -2171,8 +1952,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2192,8 +1971,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2213,8 +1990,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2234,8 +2009,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2255,8 +2028,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2273,8 +2044,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2290,8 +2059,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2311,8 +2078,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2329,8 +2094,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2346,8 +2109,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2367,8 +2128,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2385,8 +2144,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2402,8 +2159,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2423,8 +2178,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2441,8 +2194,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2458,8 +2209,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2479,8 +2228,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2497,8 +2244,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2514,8 +2259,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2531,8 +2274,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -2548,8 +2289,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.Contains(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -2565,8 +2304,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
@@ -2582,11 +2319,9 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 12, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(4));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(4));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.DoesNotContain(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -2610,8 +2345,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2628,8 +2361,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2645,8 +2376,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2662,8 +2391,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -2679,8 +2406,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.Contains(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -2696,8 +2421,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
@@ -2713,11 +2436,9 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 8, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(4));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(4));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.DoesNotContain(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
@@ -2744,8 +2465,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2762,8 +2481,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2779,8 +2496,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2800,8 +2515,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2818,8 +2531,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2835,8 +2546,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2856,8 +2565,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2874,8 +2581,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2892,8 +2597,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2914,8 +2617,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2932,8 +2633,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -2950,8 +2649,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 11, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -2972,8 +2669,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -2990,8 +2685,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3007,8 +2700,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -3024,8 +2715,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -3042,10 +2731,8 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 11, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 4, 11, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -3066,8 +2753,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3084,8 +2769,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3101,8 +2784,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -3118,8 +2799,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -3136,10 +2815,8 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 11, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 4, 11, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -3160,8 +2837,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3178,8 +2853,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3195,8 +2868,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -3212,8 +2883,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -3230,10 +2899,8 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 8, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 5, 8, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -3253,8 +2920,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3271,8 +2936,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3288,8 +2951,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -3305,8 +2966,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -3323,10 +2982,8 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 8, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 5, 8, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(3));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(3));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -3346,8 +3003,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3363,8 +3018,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.BookOrCancelCannotBeMarketOrStopOrder, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.DoesNotContain(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3384,8 +3037,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3401,8 +3052,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.BookOrCancelCannotBeMarketOrStopOrder, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.DoesNotContain(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3422,8 +3071,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3438,10 +3085,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 500, CancelReason.BookOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 500, CancelReason.BookOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3461,8 +3106,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3478,8 +3121,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3499,8 +3140,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3520,8 +3159,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3536,10 +3173,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 500, CancelReason.BookOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 500, CancelReason.BookOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3559,8 +3194,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3576,8 +3209,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3597,8 +3228,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3618,8 +3247,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3635,8 +3262,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.ImmediateOrCancelCannotBeStopOrder, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.DoesNotContain(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3656,8 +3281,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3673,10 +3296,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
-            mockCancelListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3696,8 +3317,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3713,10 +3332,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
-            mockCancelListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3736,8 +3353,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3752,10 +3367,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = true, Quantity = 1500, Price = 9, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 1500, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1500, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3775,8 +3388,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3791,10 +3402,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = false, Quantity = 1500, Price = 11, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 1500, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1500, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3814,8 +3423,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3832,8 +3439,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3853,8 +3458,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3871,8 +3474,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3892,8 +3493,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3909,10 +3508,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
-            mockCancelListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3932,8 +3529,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3949,10 +3544,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
-            mockCancelListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 1000, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -3971,10 +3564,8 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = true, Quantity = 1500, Price = 0, OrderId = 1, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 1500, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(1, 1500, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -3993,10 +3584,8 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = false, Quantity = 1500, Price = 0, OrderId = 1, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result1 = matchingEngine.AddOrder(order1);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 1500, CancelReason.ImmediateOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(1, 1500, CancelReason.ImmediateOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4016,8 +3605,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4034,8 +3621,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4055,8 +3640,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4073,8 +3656,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4095,8 +3676,6 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.FillOrKillCannotBeStopOrder, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -4106,8 +3685,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4124,8 +3701,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4141,8 +3716,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4158,8 +3731,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4174,10 +3745,8 @@ namespace OrderMatcher.Tests
             Order order5 = new Order { IsBuy = true, Quantity = 600, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5);
 
-            mockCancelListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
+            mockTradeListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4197,8 +3766,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4215,8 +3782,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4232,8 +3797,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4249,8 +3812,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4265,10 +3826,8 @@ namespace OrderMatcher.Tests
             Order order5 = new Order { IsBuy = true, Quantity = 600, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5);
 
-            mockCancelListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
+            mockTradeListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4288,8 +3847,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4306,8 +3863,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4323,8 +3878,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4340,8 +3893,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4358,8 +3909,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4379,8 +3928,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4397,8 +3944,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4414,8 +3959,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4431,8 +3974,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4449,8 +3990,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4470,8 +4009,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4488,8 +4025,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4505,8 +4040,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4522,8 +4055,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4538,10 +4069,8 @@ namespace OrderMatcher.Tests
             Order order5 = new Order { IsBuy = false, Quantity = 600, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5);
 
-            mockCancelListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
+            mockTradeListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4561,8 +4090,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4579,8 +4106,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4596,8 +4121,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4613,8 +4136,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4629,10 +4150,8 @@ namespace OrderMatcher.Tests
             Order order5 = new Order { IsBuy = false, Quantity = 600, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5);
 
-            mockCancelListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
+            mockTradeListener.Verify(x => x.OnCancel(5, 600, CancelReason.FillOrKill));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4652,8 +4171,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4670,8 +4187,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4687,8 +4202,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4704,8 +4217,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4722,8 +4233,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4743,8 +4252,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4761,8 +4268,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -4778,8 +4283,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -4795,8 +4298,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -4813,8 +4314,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(5, 4, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
@@ -4834,8 +4333,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4849,10 +4346,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)0, order1.Sequnce);
 
             OrderMatchingResult acceptanceResult2 = matchingEngine.CancelOrder(order1.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(1, 5000, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(1, 5000, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, acceptanceResult2);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4871,8 +4366,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4890,8 +4383,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -4912,8 +4403,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 200));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)300, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -4930,10 +4419,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)0, order3.Sequnce);
 
             OrderMatchingResult acceptanceResult4 = matchingEngine.CancelOrder(order1.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(1, 4300, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(1, 4300, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, acceptanceResult4);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4952,8 +4439,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -4971,8 +4456,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -4993,8 +4476,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)200, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5015,8 +4496,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)100, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5033,10 +4512,8 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)0, order4.Sequnce);
 
             OrderMatchingResult acceptanceResult5 = matchingEngine.CancelOrder(order1.OrderId);
-            mockCancelListener.Verify(x => x.OnCancel(1, 100, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(1, 100, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.CancelAcepted, acceptanceResult5);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5055,8 +4532,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5074,8 +4549,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5096,8 +4569,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5118,8 +4589,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
@@ -5136,8 +4605,6 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult acceptanceResult5 = matchingEngine.CancelOrder(order1.OrderId);
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderDoesNotExists, acceptanceResult5);
         }
 
@@ -5148,8 +4615,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5170,8 +4635,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5189,8 +4652,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5214,8 +4675,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5233,8 +4692,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5255,8 +4712,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)200, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5277,8 +4732,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)100, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5302,8 +4755,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5321,8 +4772,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5343,8 +4792,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5365,8 +4812,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 100));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)400, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5390,8 +4835,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5409,8 +4852,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5431,8 +4872,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -5453,8 +4892,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
@@ -5477,8 +4914,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5505,8 +4940,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Empty(matchingEngine.CurrentOrders);
@@ -5527,8 +4960,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Equal(order1, matchingEngine.CurrentIcebergOrders.Single(x => x.Key == order1.OrderId).Value);
@@ -5550,8 +4981,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeFOKorIOC, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5570,8 +4999,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeFOKorIOC, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5590,8 +5017,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5610,8 +5035,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5630,8 +5053,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.InvalidIcebergOrderTotalQuantity, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5650,8 +5071,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.InvalidIcebergOrderTotalQuantity, acceptanceResult);
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5670,8 +5089,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5685,10 +5102,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 2, TotalQuantity = 5000, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 5000, CancelReason.BookOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 5000, CancelReason.BookOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -5707,8 +5122,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5724,8 +5137,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -5746,8 +5157,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5762,8 +5171,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5780,8 +5187,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -5802,8 +5207,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5818,8 +5221,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
@@ -5834,8 +5235,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
@@ -5855,8 +5254,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(4, 3, 10, 100));
             mockTradeListener.Verify(x => x.OnTrade(4, 3, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.DoesNotContain(order4, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
@@ -5875,8 +5272,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5901,8 +5296,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Empty(matchingEngine.CurrentOrders);
@@ -5922,8 +5315,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5938,8 +5329,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -5956,8 +5345,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 10, 400));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
@@ -5972,10 +5359,8 @@ namespace OrderMatcher.Tests
 
             OrderMatchingResult acceptanceResult4 = matchingEngine.CancelOrder(order3.OrderId);
 
-            mockCancelListener.Verify(x => x.OnCancel(order3.OrderId, 600, CancelReason.UserRequested));
+            mockTradeListener.Verify(x => x.OnCancel(order3.OrderId, 600, CancelReason.UserRequested));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
@@ -5990,8 +5375,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6005,10 +5388,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 2, TotalQuantity = 5000, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(2, 5000, CancelReason.BookOrCancel));
+            mockTradeListener.Verify(x => x.OnCancel(2, 5000, CancelReason.BookOrCancel));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
@@ -6028,8 +5409,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6044,8 +5423,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6062,8 +5439,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Contains(order3.OrderId, matchingEngine.CurrentIcebergOrders.Select(x => x.Value.OrderId));
             Assert.Contains(order3.OrderId, matchingEngine.CurrentOrders.Select(x => x.Value.OrderId));
@@ -6083,8 +5458,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6099,8 +5472,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6117,8 +5488,6 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Empty(matchingEngine.CurrentOrders);
@@ -6138,8 +5507,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -6155,8 +5522,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6171,8 +5536,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6189,10 +5552,8 @@ namespace OrderMatcher.Tests
             mockTradeListener.Verify(x => x.OnTrade(4, 2, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(1, 4, 10, 500));
             mockTradeListener.Verify(x => x.OnTrade(4, 3, 10, 500));
-            mockOrderTriggerListener.Verify(x => x.OnOrderTriggered(1));
+            mockTradeListener.Verify(x => x.OnOrderTriggered(1));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult4);
             Assert.Empty(matchingEngine.CurrentIcebergOrders);
             Assert.Empty(matchingEngine.CurrentOrders);
@@ -6213,10 +5574,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -6236,8 +5595,6 @@ namespace OrderMatcher.Tests
 
             mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Single(matchingEngine.Book.BidSide);
@@ -6256,10 +5613,8 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
             Assert.Empty(matchingEngine.Book.BidSide);
@@ -6278,8 +5633,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -6294,10 +5647,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -6318,8 +5669,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -6334,10 +5683,8 @@ namespace OrderMatcher.Tests
             Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
+            mockTradeListener.Verify(x => x.OnCancel(1, 500, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
@@ -6358,8 +5705,6 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -6377,8 +5722,6 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.Equal((Quantity)500, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Where(x => x.OrderId == 1).Single().OpenQuantity);
@@ -6397,10 +5740,8 @@ namespace OrderMatcher.Tests
             Order order3 = new Order { IsBuy = true, Quantity = 200, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3);
 
-            mockCancelListener.Verify(x => x.OnCancel(1, 4500, CancelReason.ValidityExpired));
+            mockTradeListener.Verify(x => x.OnCancel(1, 4500, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
-            mockCancelListener.VerifyNoOtherCalls();
-            mockOrderTriggerListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x.Value).Select(x => x.OrderId).ToList());
             Assert.DoesNotContain(order1, matchingEngine.CurrentIcebergOrders.Select(x => x.Value));
