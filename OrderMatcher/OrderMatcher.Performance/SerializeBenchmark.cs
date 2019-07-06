@@ -170,12 +170,6 @@ namespace OrderMatcher.Performance
         }
 
         [Benchmark]
-        public void orderBinarySerializeOptimized()
-        {
-            var bytes = OrderSerializer.SerializeOptimized(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
-        }
-
-        [Benchmark]
         public void fillJsonSerialize()
         {
             var fill = JsonConvert.SerializeObject(new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 });
