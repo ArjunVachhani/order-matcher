@@ -5,11 +5,13 @@ namespace OrderMatcher
     public class CancelRequestSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int orderIdOffset;
 
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfMessage;
         private static int sizeOfVersion;
         private static int sizeOfMessagetType;
@@ -17,14 +19,15 @@ namespace OrderMatcher
 
         static CancelRequestSerializer()
         {
-
+            sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderId = sizeof(ulong);
 
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             orderIdOffset = versionOffset + sizeOfVersion;
             sizeOfMessage = orderIdOffset + sizeOfOrderId;
@@ -39,6 +42,7 @@ namespace OrderMatcher
             }
 
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.CancelRequest;
             WriteShort(msg, versionOffset, version);
             WriteULong(msg, orderIdOffset, cancelRequest.OrderId);

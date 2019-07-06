@@ -34,23 +34,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[6];
+            var bytes = new byte[10];
             Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Book Request Message must be of Size : 7", ex.Message);
+            Assert.Equal("Book Request Message must be of Size : 11", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[8];
+            var bytes = new byte[12];
             Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Book Request Message must be of Size : 7", ex.Message);
+            Assert.Equal("Book Request Message must be of Size : 11", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[7];
+            var bytes = new byte[11];
             Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -58,8 +58,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[7];
-            bytes[0] = (byte)MessageType.BookRequest;
+            var bytes = new byte[11];
+            bytes[4] = (byte)MessageType.BookRequest;
             Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
         }
@@ -68,6 +68,9 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Min()
         {
             var bytes = BookRequestSerializer.Serialize(new BookRequest { LevelCount = int.MinValue });
+
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(11, messageLength);
             var cancelRequest = BookRequestSerializer.Deserialize(bytes);
             Assert.Equal(int.MinValue, cancelRequest.LevelCount);
         }
@@ -76,6 +79,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Max()
         {
             var bytes = BookRequestSerializer.Serialize(new BookRequest { LevelCount = int.MaxValue });
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(11, messageLength);
             var cancelRequest = BookRequestSerializer.Deserialize(bytes);
             Assert.Equal(int.MaxValue, cancelRequest.LevelCount);
         }
@@ -84,6 +89,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception()
         {
             var bytes = BookRequestSerializer.Serialize(new BookRequest { LevelCount = 12345678 });
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(11, messageLength);
             var cancelRequest = BookRequestSerializer.Deserialize(bytes);
             Assert.Equal(12345678, cancelRequest.LevelCount);
         }

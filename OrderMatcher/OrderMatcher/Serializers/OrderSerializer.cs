@@ -5,6 +5,7 @@ namespace OrderMatcher
     public class OrderSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int sideOffset;
@@ -16,6 +17,7 @@ namespace OrderMatcher
         private static int totalQuantityOffset;
         private static int cancelOnOffset;
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfMessage;
         private static int sizeOfMessagetType;
         private static int sizeOfOrderId;
@@ -25,6 +27,7 @@ namespace OrderMatcher
 
         static OrderSerializer()
         {
+            sizeOfMessageLenght = sizeof(int);
             sizeOfOrderId = sizeof(ulong);
             sizeOfVersion = sizeof(short);
             sizeOfSide = sizeof(bool);
@@ -32,7 +35,8 @@ namespace OrderMatcher
             sizeOfMessagetType = sizeof(MessageType);
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             sideOffset = versionOffset + sizeOfVersion;
             orderConditionOffset = sideOffset + sizeOfSide;
@@ -53,32 +57,11 @@ namespace OrderMatcher
             }
 
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
             var versionByteArray = BitConverter.GetBytes(version);
             msg[versionOffset] = versionByteArray[0];
             msg[versionOffset + 1] = versionByteArray[1];
-            msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
-            msg[orderConditionOffset] = (byte)order.OrderCondition;
-            WriteULong(msg, orderIdOffset, order.OrderId);
-            WriteInt(msg, priceOffset, order.Price);
-            WriteInt(msg, quantityOffset, order.Quantity);
-            WriteInt(msg, stopPriceOffset, order.StopPrice);
-            WriteInt(msg, totalQuantityOffset, order.TotalQuantity);
-            WriteLong(msg, cancelOnOffset, order.CancelOn);
-            return msg;
-        }
-
-        public static byte[] SerializeOptimized(Order order)
-        {
-            if (order == null)
-            {
-                throw new ArgumentNullException(nameof(order));
-            }
-
-            byte[] msg = new byte[sizeOfMessage];
-            msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
-            WriteShort(msg, versionOffset, version);
-
             msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
             msg[orderConditionOffset] = (byte)order.OrderCondition;
             WriteULong(msg, orderIdOffset, order.OrderId);

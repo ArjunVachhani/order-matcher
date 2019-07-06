@@ -5,6 +5,7 @@ namespace OrderMatcher
     public class FillSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int makerOrderIdOffset;
@@ -13,6 +14,7 @@ namespace OrderMatcher
         private static int matchQuantityOffset;
         private static int timestampOffset;
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfMessage;
         private static int sizeOfVersion;
         private static int sizeOfMessagetType;
@@ -24,6 +26,7 @@ namespace OrderMatcher
 
         static FillSerializer()
         {
+            sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfMakerOrderId = sizeof(ulong);
@@ -34,7 +37,8 @@ namespace OrderMatcher
 
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             makerOrderIdOffset = versionOffset + sizeOfVersion;
             takerOrderIdOffset = makerOrderIdOffset + sizeOfMakerOrderId;
@@ -56,6 +60,7 @@ namespace OrderMatcher
         public static byte[] Serialize(ulong makerOrderId, ulong takerOrderId, Price matchRate, Quantity matchQuantity, long timeStamp)
         {
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.Fill;
             WriteShort(msg, versionOffset, version);
             WriteULong(msg, makerOrderIdOffset, makerOrderId);

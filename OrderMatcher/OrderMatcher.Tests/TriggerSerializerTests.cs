@@ -34,23 +34,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[18];
+            var bytes = new byte[22];
             Exception ex = Assert.Throws<Exception>(() => TriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 19", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[20];
+            var bytes = new byte[24];
             Exception ex = Assert.Throws<Exception>(() => TriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 19", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[19];
+            var bytes = new byte[23];
             Exception ex = Assert.Throws<Exception>(() => TriggerSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -58,8 +58,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[19];
-            bytes[0] = (byte)MessageType.OrderTrigger;
+            var bytes = new byte[23];
+            bytes[4] = (byte)MessageType.OrderTrigger;
             Exception ex = Assert.Throws<Exception>(() => TriggerSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
         }
@@ -68,6 +68,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Min()
         {
             var bytes = TriggerSerializer.Serialize(new OrderTrigger { OrderId = ulong.MinValue, Timestamp = long.MinValue });
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(23, messageLength);
             var orderTrigger = TriggerSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MinValue, orderTrigger.OrderId);
             Assert.Equal(long.MinValue, orderTrigger.Timestamp);
@@ -77,6 +79,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Max()
         {
             var bytes = TriggerSerializer.Serialize(new OrderTrigger { OrderId = ulong.MaxValue, Timestamp = long.MaxValue });
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(23, messageLength);
             var orderTrigger = TriggerSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MaxValue, orderTrigger.OrderId);
             Assert.Equal(long.MaxValue, orderTrigger.Timestamp);
@@ -86,6 +90,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception()
         {
             var bytes = TriggerSerializer.Serialize(new OrderTrigger { OrderId = 12345678, Timestamp = 404 });
+            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Assert.Equal(23, messageLength);
             var orderTrigger = TriggerSerializer.Deserialize(bytes);
             Assert.Equal((ulong)12345678, orderTrigger.OrderId);
             Assert.Equal(404, orderTrigger.Timestamp);

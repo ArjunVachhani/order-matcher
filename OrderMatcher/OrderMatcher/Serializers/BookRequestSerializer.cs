@@ -5,11 +5,13 @@ namespace OrderMatcher
     public class BookRequestSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int levelCountOffset;
 
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfMessage;
         private static int sizeOfVersion;
         private static int sizeOfMessagetType;
@@ -17,13 +19,15 @@ namespace OrderMatcher
 
         static BookRequestSerializer()
         {
+            sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfLevelCount = sizeof(int);
 
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             levelCountOffset = versionOffset + sizeOfVersion;
             sizeOfMessage = levelCountOffset + sizeOfLevelCount;
@@ -38,6 +42,7 @@ namespace OrderMatcher
             }
 
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.BookRequest;
             WriteInt(msg, versionOffset, version);
             WriteInt(msg, levelCountOffset, bookRequest.LevelCount);

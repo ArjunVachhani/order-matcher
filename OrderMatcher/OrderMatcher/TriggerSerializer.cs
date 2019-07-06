@@ -5,11 +5,13 @@ namespace OrderMatcher
     public class TriggerSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int orderIdOffset;
         private static int timestampOffset;
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfMessage;
         private static int sizeOfVersion;
         private static int sizeOfMessagetType;
@@ -18,15 +20,16 @@ namespace OrderMatcher
 
         static TriggerSerializer()
         {
-
+            sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderId = sizeof(ulong);
             sizeOfTimestamp = sizeof(long);
-
+            sizeOfMessageLenght = sizeof(int);
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             orderIdOffset = versionOffset + sizeOfVersion;
             timestampOffset = orderIdOffset + sizeOfOrderId;
@@ -46,6 +49,7 @@ namespace OrderMatcher
         public static byte[] Serialize(ulong orderId, long timestamp)
         {
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.OrderTrigger;
             WriteLong(msg, versionOffset, version);
             WriteULong(msg, orderIdOffset, orderId);

@@ -6,6 +6,7 @@ namespace OrderMatcher
     public class BookSerializer : Serializer
     {
         private static short version;
+        private static int messageLengthOffset;
         private static int messageTypeOffset;
         private static int versionOffset;
         private static int timeStampOffset;
@@ -13,6 +14,7 @@ namespace OrderMatcher
         private static int bidCountOffset;
         private static int askCountOffset;
 
+        private static int sizeOfMessageLenght;
         private static int sizeOfVersion;
         private static int sizeOfMessageType;
         private static int sizeOfTimeStamp;
@@ -26,6 +28,7 @@ namespace OrderMatcher
 
         static BookSerializer()
         {
+            sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessageType = sizeof(MessageType);
             sizeOfTimeStamp = sizeof(long);
@@ -37,7 +40,8 @@ namespace OrderMatcher
 
             version = 1;
 
-            messageTypeOffset = 0;
+            messageLengthOffset = 0;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
             versionOffset = messageTypeOffset + sizeOfMessageType;
             timeStampOffset = versionOffset + sizeOfVersion;
             ltpOffset = timeStampOffset + sizeOfTimeStamp;
@@ -60,9 +64,10 @@ namespace OrderMatcher
 
             var bidCount = (short)(book.BidPriceLevelCount < levels ? book.BidPriceLevelCount : levels);
             var askCount = (short)(book.AskPriceLevelCount < levels ? book.AskPriceLevelCount : levels);
-            var sizeOfMessage = sizeOfMessageType + sizeOfVersion + sizeOfTimeStamp + Price.SizeOfPrice + sizeOfAskCount + sizeOfBidCount + (sizeOfLevel * (bidCount + askCount));
+            var sizeOfMessage = sizeOfMessageLenght + sizeOfMessageType + sizeOfVersion + sizeOfTimeStamp + Price.SizeOfPrice + sizeOfAskCount + sizeOfBidCount + (sizeOfLevel * (bidCount + askCount));
 
             byte[] msg = new byte[sizeOfMessage];
+            WriteInt(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.Book;
             WriteShort(msg, versionOffset, version);
             WriteLong(msg, timeStampOffset, timeStamp);
