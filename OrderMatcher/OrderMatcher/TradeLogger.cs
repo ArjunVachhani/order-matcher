@@ -1,114 +1,115 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace OrderMatcher
 {
-    class TradeLogger : ITradeLogger
+    class TradeLogger 
     {
+        private BlockingCollection<byte[]> _logInput;
+        private BlockingCollection<byte[]> _internalBuffer;
         private const int CHUNK_SIZE = 4096;
         private object _lock;
         private bool _disposed;
         private byte[] _buffer;
         private int _offset;
-        private int _bufferEmpty => _buffer.Length - _offset;
-        private readonly LinkedList<byte[]> _queuedBuffer;
+        private int BufferRemaining => _buffer.Length - _offset;
         private readonly FileStream _filestream;
-        public TradeLogger(string filePath)
+        Task _logReader;
+        Task _logSaver;
+        public bool SaveRemaining => _internalBuffer.Count > 0 || _logInput.Count > 0 || _buffer != null;
+        public TradeLogger(string filePath, BlockingCollection<byte[]> logInput)
         {
+            _logInput = logInput;
             _lock = new object();
             _disposed = false;
             _filestream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            _queuedBuffer = new LinkedList<byte[]>();
-            _buffer = new byte[CHUNK_SIZE];
+            _internalBuffer = new BlockingCollection<byte[]>();
             _offset = 0;
+            _logReader = new Task(LogReader);
+            _logSaver = new Task(() => LogSaver());
+            _logReader.Start();
+            _logSaver.Start();
         }
 
         public void Dispose()
         {
-            lock (_lock)
+            if (!_disposed)
             {
-                if (!_disposed)
-                {
-                    FlushToFile(true);
-                    _filestream.Dispose();
-                    _disposed = true;
-                }
+                _logReader.Wait();
+                _logSaver.Wait();
+                _disposed = true;
             }
         }
 
-        public void Flush()
+        public void LogReader()
         {
-            FlushToFile(true);
-            _filestream.Flush();
-        }
-
-        public void Log(byte[] bytes)
-        {
-            int inputOffset = 0;
-            WriteToBuffer(BitConverter.GetBytes(bytes.Length), 0, 4);
-            while (inputOffset < bytes.Length)
+            while (!_logInput.IsCompleted)
             {
-                int length = bytes.Length < _bufferEmpty ? bytes.Length : _bufferEmpty;
-                WriteToBuffer(bytes, inputOffset, length);
-                inputOffset += length;
+                var bytes = _logInput.Take();
+                if (bytes.Length == 0)
+                {
+                    if (_buffer != null)
+                    {
+                        byte[] data = new byte[_offset];
+                        Array.Copy(_buffer, 0, data, 0, _offset);
+                        _buffer = null;
+                        _internalBuffer.Add(data);
+                    }
+                    else
+                    {
+                        _filestream.Flush();
+                    }
+                }
+                else
+                {
+                    int inputOffset = 0;
+                    while (inputOffset < bytes.Length)
+                    {
+                        int length = bytes.Length < BufferRemaining ? bytes.Length : BufferRemaining;
+                        WriteToBuffer(bytes, inputOffset, length);
+                        inputOffset += length;
+                    }
+                }
             }
         }
 
         private void WriteToBuffer(byte[] bytes, int inputOffset, int length)
         {
+            if (_buffer == null)
+                _buffer = new byte[CHUNK_SIZE];
+
             Array.Copy(bytes, inputOffset, _buffer, _offset, length);
             _offset += length;
             if (_offset == CHUNK_SIZE)
             {
+                _internalBuffer.Add(_buffer);
                 _offset = 0;
-                lock (_lock)
-                {
-                    _queuedBuffer.AddLast(_buffer);
-                }
-                _buffer = new byte[CHUNK_SIZE];
+                _buffer = null;
             }
         }
 
-        private void KeepFlushing()
+        private void LogSaver()
         {
-            FlushToFile(false);
-        }
-
-        private void FlushToFile(bool returnAfterFlush)
-        {
-            while (true)
+            while (!_internalBuffer.IsCompleted)
             {
-                bool allFlushed = false;
                 try
                 {
-                    lock (_lock)
-                    {
-                        if (_queuedBuffer.First != null)
-                        {
-                            _filestream.Write(_queuedBuffer.First.Value, 0, _queuedBuffer.First.Value.Length);
-                            _queuedBuffer.RemoveFirst();
-                        }
-                        else
-                        {
-                            allFlushed = true;
-                        }
-                    }
-                    if (allFlushed && returnAfterFlush)
-                    {
-                        break;
-                    }
-                    else if (allFlushed)
-                    {
-                        Thread.Sleep(10);
-                    }
+                    var chunk = _internalBuffer.Take();
+                    _filestream.Write(chunk, 0, chunk.Length);
+                    if (chunk.Length != CHUNK_SIZE)
+                        _filestream.Flush();
                 }
                 catch (Exception)
                 {
                     //todo 
                 }
             }
+            _filestream.Flush();
+            _filestream.Dispose();
         }
     }
 }
