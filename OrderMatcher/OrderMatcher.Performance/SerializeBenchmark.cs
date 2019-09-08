@@ -9,30 +9,23 @@ namespace OrderMatcher.Performance
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class SerializeBenchmark
     {
-        Book book;
-        List<KeyValuePair<Price, Quantity>> bid;
-        List<KeyValuePair<Price, Quantity>> ask;
-
-        string orderJsonString;
-        byte[] orderBinarySerialized;
-
-        string fillJsonString;
-        byte[] fillBinary;
-
-        string cancelJsonString;
-        byte[] cancelBinary;
-
-        string cancelRequestJsonString;
-        byte[] cancelRequestBinary;
-
-        string orderTriggerJsonString;
-        byte[] orderTriggerBinary;
-
-        string bookRequestJsonString;
-        byte[] bookRequestBinary;
-
-        string bookJsonString;
-        byte[] bookBinary;
+        readonly Book book;
+        readonly List<KeyValuePair<Price, Quantity>> bid;
+        readonly List<KeyValuePair<Price, Quantity>> ask;
+        readonly string orderJsonString;
+        readonly byte[] orderBinarySerialized;
+        readonly string fillJsonString;
+        readonly byte[] fillBinary;
+        readonly string cancelJsonString;
+        readonly byte[] cancelBinary;
+        readonly string cancelRequestJsonString;
+        readonly byte[] cancelRequestBinary;
+        readonly string orderTriggerJsonString;
+        readonly byte[] orderTriggerBinary;
+        readonly string bookRequestJsonString;
+        readonly byte[] bookRequestBinary;
+        readonly string bookJsonString;
+        readonly byte[] bookBinary;
 
         public SerializeBenchmark()
         {

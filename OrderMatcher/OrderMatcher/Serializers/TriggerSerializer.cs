@@ -4,19 +4,19 @@ namespace OrderMatcher
 {
     public class TriggerSerializer : Serializer
     {
-        private static short version;
-        private static int messageLengthOffset;
-        private static int messageTypeOffset;
-        private static int versionOffset;
-        private static int orderIdOffset;
-        private static int timestampOffset;
+        private static readonly short version;
+        private static readonly int messageLengthOffset;
+        private static readonly int messageTypeOffset;
+        private static readonly int versionOffset;
+        private static readonly int orderIdOffset;
+        private static readonly int timestampOffset;
 
-        private static int sizeOfMessageLenght;
-        private static int sizeOfMessage;
-        private static int sizeOfVersion;
-        private static int sizeOfMessagetType;
-        private static int sizeOfOrderId;
-        private static int sizeOfTimestamp;
+        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessage;
+        private static readonly int sizeOfVersion;
+        private static readonly int sizeOfMessagetType;
+        private static readonly int sizeOfOrderId;
+        private static readonly int sizeOfTimestamp;
 
         static TriggerSerializer()
         {
@@ -49,11 +49,11 @@ namespace OrderMatcher
         public static byte[] Serialize(ulong orderId, long timestamp)
         {
             byte[] msg = new byte[sizeOfMessage];
-            WriteInt(msg, messageLengthOffset, sizeOfMessage);
+            Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.OrderTrigger;
-            WriteLong(msg, versionOffset, version);
-            WriteULong(msg, orderIdOffset, orderId);
-            WriteLong(msg, timestampOffset, timestamp);
+            Write(msg, versionOffset, (long)version);
+            Write(msg, orderIdOffset, orderId);
+            Write(msg, timestampOffset, timestamp);
             return msg;
         }
 
