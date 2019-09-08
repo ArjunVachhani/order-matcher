@@ -8,9 +8,12 @@ namespace OrderMatcher.Tests
         [Fact]
         public void WriteIntTest()
         {
-            byte[] arr = new byte[4];
-            Serializer.WriteInt(arr, 0, 5);
-            var c = arr [0];
+            var arr1 = new byte[4];
+            Serializer.Write(arr1, 0, 5);
+            var arr2 = BitConverter.GetBytes(5);
+            AssertHelper.SequentiallyEqual(arr1, arr2);
         }
+
+        //TODO write remaining unit test
     }
 }

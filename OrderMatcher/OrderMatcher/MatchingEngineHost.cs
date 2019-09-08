@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OrderMatcher
 {
@@ -17,13 +13,12 @@ namespace OrderMatcher
 
         public void Start(string market)
         {
-            var eventListener = new EventListener(null, null);
+            var eventListener = new EventListener(null, null, null);
             if (!_matchingEngines.ContainsKey(market))
             {
                 var matchingEngine = new MatchingEngine(eventListener, new TimeProvider());
                 var cancellationTokenSource = new CancellationTokenSource();
                 _matchingEngines.Add(market, (matchingEngine, cancellationTokenSource));
-                matchingEngine.Run(cancellationTokenSource.Token);
             }
         }
     }

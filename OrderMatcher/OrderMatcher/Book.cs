@@ -11,7 +11,7 @@ namespace OrderMatcher
         private readonly PriceComparerAscending _priceComparerAscending;
         private readonly PriceComparerDescending _priceComparerDescending;
         private readonly PriceComparerDescendingZeroFirst _priceComparerDescendingZeroFirst;
-        private readonly KeyValuePair<Price, QuantityTrackingPriceLevel> _defaultPriceLevel = default(KeyValuePair<Price, QuantityTrackingPriceLevel>);
+        private readonly KeyValuePair<Price, QuantityTrackingPriceLevel> _defaultPriceLevel = default;
         private ulong _sequence;
         private PriceLevel _bestStopBidPriceLevel;
         private PriceLevel _bestStopAskPriceLevel;

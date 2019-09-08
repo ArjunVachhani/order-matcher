@@ -4,23 +4,23 @@ namespace OrderMatcher
 {
     public class CancelledOrderSerializer : Serializer
     {
-        private static short version;
-        private static int messageLengthOffset;
-        private static int messageTypeOffset;
-        private static int versionOffset;
-        private static int orderIdOffset;
-        private static int remainingQuantityOffset;
-        private static int cancelReasonOffset;
-        private static int timestampOffset;
+        private static readonly short version;
+        private static readonly int messageLengthOffset;
+        private static readonly int messageTypeOffset;
+        private static readonly int versionOffset;
+        private static readonly int orderIdOffset;
+        private static readonly int remainingQuantityOffset;
+        private static readonly int cancelReasonOffset;
+        private static readonly int timestampOffset;
 
-        private static int sizeOfMessageLenght;
-        private static int sizeOfMessage;
-        private static int sizeOfVersion;
-        private static int sizeOfMessagetType;
-        private static int sizeOfOrderId;
-        private static int sizeOfRemainingQuantity;
-        private static int sizeOfCancelReason;
-        private static int sizeOfTimestamp;
+        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessage;
+        private static readonly int sizeOfVersion;
+        private static readonly int sizeOfMessagetType;
+        private static readonly int sizeOfOrderId;
+        private static readonly int sizeOfRemainingQuantity;
+        private static readonly int sizeOfCancelReason;
+        private static readonly int sizeOfTimestamp;
 
         static CancelledOrderSerializer()
         {
@@ -56,13 +56,13 @@ namespace OrderMatcher
         public static byte[] Serialize(ulong orderId, Quantity remainingQuantity, CancelReason cancelReason, long timeStamp)
         {
             byte[] msg = new byte[sizeOfMessage];
-            WriteInt(msg, messageLengthOffset, sizeOfMessage);
+            Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.Cancel;
-            WriteShort(msg, versionOffset, version);
-            WriteULong(msg, orderIdOffset, orderId);
-            WriteInt(msg, remainingQuantityOffset, remainingQuantity);
+            Write(msg, versionOffset, version);
+            Write(msg, orderIdOffset, orderId);
+            Write(msg, remainingQuantityOffset, remainingQuantity);
             msg[cancelReasonOffset] = (byte)cancelReason;
-            WriteLong(msg, timestampOffset, timeStamp);
+            Write(msg, timestampOffset, timeStamp);
             return msg;
         }
 

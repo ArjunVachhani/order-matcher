@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Concurrent;
 
 namespace OrderMatcher
 {
@@ -17,7 +14,7 @@ namespace OrderMatcher
             _fileActionBlock = fileActionBlock;
         }
 
-        public void OnCancel(ulong orderId, Quantity remainingQuantity, CancelReason cancelReason)
+        public void OnCancel(ulong orderId, Quantity remainingQuantity, Quantity remainingLockedAmount, CancelReason cancelReason)
         {
             var msg = CancelledOrderSerializer.Serialize(orderId, remainingQuantity, cancelReason, _timeProvider.GetUpochMilliseconds());
             _outputActionBlock.Add(msg);

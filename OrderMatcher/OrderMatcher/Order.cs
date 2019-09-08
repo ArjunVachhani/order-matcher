@@ -1,19 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace OrderMatcher
+﻿namespace OrderMatcher
 {
     public class Order
     {
         public bool IsBuy { get; set; }
         public ulong OrderId { get; set; }
-        public ulong Sequnce
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
+        public ulong Sequnce { get; set; }
         public Quantity Quantity { get; set; }
         public Quantity OpenQuantity { get; set; }
         public Price Price { get; set; }
@@ -22,5 +13,27 @@ namespace OrderMatcher
         public Quantity TotalQuantity { get; set; }
         public bool IsTip { get; set; }
         public long CancelOn { get; set; }
+        public Quantity LockedAmount { get; set; }
+        public bool IsFilled
+        {
+            get
+            {
+                if (IsBuy == true && Price == 0)
+                {
+                    if (LockedAmount == 0 && OpenQuantity == 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return OpenQuantity == 0;
+                }
+            }
+        }
     }
 }

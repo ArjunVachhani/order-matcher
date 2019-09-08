@@ -4,26 +4,26 @@ namespace OrderMatcher
 {
     public class OrderSerializer : Serializer
     {
-        private static short version;
-        private static int messageLengthOffset;
-        private static int messageTypeOffset;
-        private static int versionOffset;
-        private static int sideOffset;
-        private static int orderConditionOffset;
-        private static int orderIdOffset;
-        private static int priceOffset;
-        private static int quantityOffset;
-        private static int stopPriceOffset;
-        private static int totalQuantityOffset;
-        private static int cancelOnOffset;
+        private static readonly short version;
+        private static readonly int messageLengthOffset;
+        private static readonly int messageTypeOffset;
+        private static readonly int versionOffset;
+        private static readonly int sideOffset;
+        private static readonly int orderConditionOffset;
+        private static readonly int orderIdOffset;
+        private static readonly int priceOffset;
+        private static readonly int quantityOffset;
+        private static readonly int stopPriceOffset;
+        private static readonly int totalQuantityOffset;
+        private static readonly int cancelOnOffset;
 
-        private static int sizeOfMessageLenght;
-        private static int sizeOfMessage;
-        private static int sizeOfMessagetType;
-        private static int sizeOfOrderId;
-        private static int sizeOfVersion;
-        private static int sizeOfSide;
-        private static int sizeOfCancelOn;
+        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessage;
+        private static readonly int sizeOfMessagetType;
+        private static readonly int sizeOfOrderId;
+        private static readonly int sizeOfVersion;
+        private static readonly int sizeOfSide;
+        private static readonly int sizeOfCancelOn;
 
         static OrderSerializer()
         {
@@ -57,19 +57,19 @@ namespace OrderMatcher
             }
 
             byte[] msg = new byte[sizeOfMessage];
-            WriteInt(msg, messageLengthOffset, sizeOfMessage);
+            Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
             var versionByteArray = BitConverter.GetBytes(version);
             msg[versionOffset] = versionByteArray[0];
             msg[versionOffset + 1] = versionByteArray[1];
             msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
             msg[orderConditionOffset] = (byte)order.OrderCondition;
-            WriteULong(msg, orderIdOffset, order.OrderId);
-            WriteInt(msg, priceOffset, order.Price);
-            WriteInt(msg, quantityOffset, order.Quantity);
-            WriteInt(msg, stopPriceOffset, order.StopPrice);
-            WriteInt(msg, totalQuantityOffset, order.TotalQuantity);
-            WriteLong(msg, cancelOnOffset, order.CancelOn);
+            Write(msg, orderIdOffset, order.OrderId);
+            Write(msg, priceOffset, order.Price);
+            Write(msg, quantityOffset, order.Quantity);
+            Write(msg, stopPriceOffset, order.StopPrice);
+            Write(msg, totalQuantityOffset, order.TotalQuantity);
+            Write(msg, cancelOnOffset, order.CancelOn);
             return msg;
         }
 

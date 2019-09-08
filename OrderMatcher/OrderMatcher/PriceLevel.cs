@@ -39,7 +39,7 @@ namespace OrderMatcher
             if (order.OpenQuantity >= quantity)
             {
                 order.OpenQuantity = order.OpenQuantity - quantity;
-                if (order.OpenQuantity == 0)
+                if (order.IsFilled)
                 {
                     return _orders.Remove(order);
                 }

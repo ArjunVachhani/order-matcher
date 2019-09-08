@@ -5,26 +5,26 @@ namespace OrderMatcher
 {
     public class BookSerializer : Serializer
     {
-        private static short version;
-        private static int messageLengthOffset;
-        private static int messageTypeOffset;
-        private static int versionOffset;
-        private static int timeStampOffset;
-        private static int ltpOffset;
-        private static int bidCountOffset;
-        private static int askCountOffset;
+        private static readonly short version;
+        private static readonly int messageLengthOffset;
+        private static readonly int messageTypeOffset;
+        private static readonly int versionOffset;
+        private static readonly int timeStampOffset;
+        private static readonly int ltpOffset;
+        private static readonly int bidCountOffset;
+        private static readonly int askCountOffset;
 
-        private static int sizeOfMessageLenght;
-        private static int sizeOfVersion;
-        private static int sizeOfMessageType;
-        private static int sizeOfTimeStamp;
-        private static int sizeOfPrice;
-        private static int sizeOfBidCount;
-        private static int sizeOfAskCount;
-        private static int bidStartOffset;
+        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfVersion;
+        private static readonly int sizeOfMessageType;
+        private static readonly int sizeOfTimeStamp;
+        private static readonly int sizeOfPrice;
+        private static readonly int sizeOfBidCount;
+        private static readonly int sizeOfAskCount;
+        private static readonly int bidStartOffset;
 
-        private static int sizeOfLevel;
-        private static int minMessageSize;
+        private static readonly int sizeOfLevel;
+        private static readonly int minMessageSize;
 
         static BookSerializer()
         {
@@ -67,20 +67,20 @@ namespace OrderMatcher
             var sizeOfMessage = sizeOfMessageLenght + sizeOfMessageType + sizeOfVersion + sizeOfTimeStamp + Price.SizeOfPrice + sizeOfAskCount + sizeOfBidCount + (sizeOfLevel * (bidCount + askCount));
 
             byte[] msg = new byte[sizeOfMessage];
-            WriteInt(msg, messageLengthOffset, sizeOfMessage);
+            Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.Book;
-            WriteShort(msg, versionOffset, version);
-            WriteLong(msg, timeStampOffset, timeStamp);
-            WriteInt(msg, ltpOffset, ltp ?? 0);
-            WriteShort(msg, bidCountOffset, bidCount);
-            WriteShort(msg, askCountOffset, askCount);
+            Write(msg, versionOffset, version);
+            Write(msg, timeStampOffset, timeStamp);
+            Write(msg, ltpOffset, ltp ?? 0);
+            Write(msg, bidCountOffset, bidCount);
+            Write(msg, askCountOffset, askCount);
 
             int i = 0;
             foreach (var level in book.BidSide)
             {
                 var start = bidStartOffset + (i * sizeOfLevel);
-                WriteInt(msg, start, level.Key);
-                WriteInt(msg, start + sizeOfPrice, level.Value.Quantity);
+                Write(msg, start, level.Key);
+                Write(msg, start + sizeOfPrice, level.Value.Quantity);
                 if (++i == bidCount)
                 {
                     break;
@@ -91,8 +91,8 @@ namespace OrderMatcher
             foreach (var level in book.AskSide)
             {
                 var start = bidStartOffset + (bidCount * sizeOfLevel) + (i * sizeOfLevel);
-                WriteInt(msg, start, level.Key);
-                WriteInt(msg, start + sizeOfPrice, level.Value.Quantity);
+                Write(msg, start, level.Key);
+                Write(msg, start + sizeOfPrice, level.Value.Quantity);
                 if (++i == askCount)
                 {
                     break;

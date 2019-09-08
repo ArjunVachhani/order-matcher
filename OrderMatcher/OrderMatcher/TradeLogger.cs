@@ -1,30 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OrderMatcher
 {
-    class TradeLogger 
+    class TradeLogger
     {
-        private BlockingCollection<byte[]> _logInput;
-        private BlockingCollection<byte[]> _internalBuffer;
+        private readonly BlockingCollection<byte[]> _logInput;
+        private readonly BlockingCollection<byte[]> _internalBuffer;
         private const int CHUNK_SIZE = 4096;
-        private object _lock;
         private bool _disposed;
         private byte[] _buffer;
         private int _offset;
         private int BufferRemaining => _buffer.Length - _offset;
         private readonly FileStream _filestream;
-        Task _logReader;
-        Task _logSaver;
+        readonly Task _logReader;
+        readonly Task _logSaver;
         public bool SaveRemaining => _internalBuffer.Count > 0 || _logInput.Count > 0 || _buffer != null;
         public TradeLogger(string filePath, BlockingCollection<byte[]> logInput)
         {
             _logInput = logInput;
-            _lock = new object();
             _disposed = false;
             _filestream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             _internalBuffer = new BlockingCollection<byte[]>();
@@ -105,7 +101,7 @@ namespace OrderMatcher
                 }
                 catch (Exception)
                 {
-                    //todo 
+                    //TODO
                 }
             }
             _filestream.Flush();
