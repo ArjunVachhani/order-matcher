@@ -31,15 +31,15 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[18];
+            var bytes = new byte[30];
             Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
-            Assert.Equal("Book Message must be greater than of Size : 19", ex.Message);
+            Assert.Equal("Book Message must be greater than of Size : 31", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[19];
+            var bytes = new byte[31];
             Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -47,7 +47,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[19];
+            var bytes = new byte[31];
             bytes[4] = (byte)MessageType.Book;
             Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
@@ -91,7 +91,7 @@ namespace OrderMatcher.Tests
             var book = new Book();
             var bytes = BookSerializer.Serialize(book, 10, 1010, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(23, messageLength);
+            Assert.Equal(35, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(1010, bookDepth.LTP);
             Assert.NotEqual(0, bookDepth.TimeStamp);
@@ -108,7 +108,7 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, Quantity = 10, OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(47, messageLength);
+            Assert.Equal(131, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
@@ -129,7 +129,7 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, Quantity = 9, OpenQuantity = 9 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(39, messageLength);
+            Assert.Equal(99, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
@@ -147,7 +147,7 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, Quantity = 10, OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(31, messageLength);
+            Assert.Equal(67, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Empty(bookDepth.Bid);
@@ -184,7 +184,7 @@ namespace OrderMatcher.Tests
 
             var bytes = BookSerializer.Serialize(book, 5, 10, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(103, messageLength);
+            Assert.Equal(355, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(10, bookDepth.LTP);
             Assert.Equal(5, bookDepth.Bid.Count);

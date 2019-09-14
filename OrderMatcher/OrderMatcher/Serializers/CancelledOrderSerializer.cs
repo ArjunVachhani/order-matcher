@@ -93,7 +93,7 @@ namespace OrderMatcher
             var cancelledOrder = new CancelledOrder();
 
             cancelledOrder.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
-            cancelledOrder.RemainingQuantity = BitConverter.ToInt32(bytes, remainingQuantityOffset);
+            cancelledOrder.RemainingQuantity = ReadQuantity(bytes, remainingQuantityOffset);
             cancelledOrder.CancelReason = (CancelReason)bytes[cancelReasonOffset];
             cancelledOrder.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
 

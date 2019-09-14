@@ -4,21 +4,21 @@ namespace OrderMatcher
 {
     public struct Price
     {
-        public const int SizeOfPrice = sizeof(int);
-        private readonly int _price;
-        public Price(int price)
+        public const int SizeOfPrice = sizeof(decimal);
+        private readonly decimal _price;
+        public Price(decimal price)
         {
             _price = price;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Price(int price)
+        public static implicit operator Price(decimal price)
         {
             return new Price(price);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator int(Price c)
+        public static implicit operator decimal(Price c)
         {
             return c._price;
         }

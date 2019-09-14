@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OrderMatcher
 {
+    [Obsolete("pending design implementation", true)]
     public class TradeFeeProvider : ITradeFeeProvider
     {
         private readonly SortedList<short, TradeFee> _tradeFee;
@@ -34,7 +36,6 @@ namespace OrderMatcher
 
         private TradeFee FetchFromDb(short tradeFeeId)
         {
-            //TODO fetch from db
             return new TradeFee { TradeFeeId = tradeFeeId, FeeCurreny = FeeCurreny.AlwaysQuoteCurrency, MakerFee = 0.1m, TakerFee = 0.2m };
         }
     }

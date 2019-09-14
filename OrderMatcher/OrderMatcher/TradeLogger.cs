@@ -26,7 +26,7 @@ namespace OrderMatcher
             _internalBuffer = new BlockingCollection<byte[]>();
             _offset = 0;
             _logReader = new Task(LogReader);
-            _logSaver = new Task(() => LogSaver());
+            _logSaver = new Task(LogSaver);
             _logReader.Start();
             _logSaver.Start();
         }

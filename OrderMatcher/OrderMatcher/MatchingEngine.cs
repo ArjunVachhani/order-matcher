@@ -243,7 +243,7 @@ namespace OrderMatcher
                 }
             }
         }
-
+        
         private bool MatchWithOpenOrders(Order incomingOrder)
         {
             bool anyMatchHappend = false;

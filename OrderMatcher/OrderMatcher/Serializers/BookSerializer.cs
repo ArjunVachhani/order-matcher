@@ -127,7 +127,7 @@ namespace OrderMatcher
 
             var book = new BookDepth();
             book.TimeStamp = BitConverter.ToInt64(bytes, timeStampOffset);
-            book.LTP = BitConverter.ToInt32(bytes, ltpOffset);
+            book.LTP = ReadPrice(bytes, ltpOffset);
             if (book.LTP == 0)
             {
                 book.LTP = null;
@@ -140,15 +140,15 @@ namespace OrderMatcher
             List<KeyValuePair<Price, Quantity>> ask = new List<KeyValuePair<Price, Quantity>>(askCount);
             for (int i = 0; i < bidCount; i++)
             {
-                var price = BitConverter.ToInt32(bytes, bidStartOffset + (i * sizeOfLevel));
-                var quantity = BitConverter.ToInt32(bytes, bidStartOffset + (i * sizeOfLevel) + sizeOfPrice);
+                var price = ReadPrice(bytes, bidStartOffset + (i * sizeOfLevel));
+                var quantity = ReadQuantity(bytes, bidStartOffset + (i * sizeOfLevel) + sizeOfPrice);
                 bid.Add(new KeyValuePair<Price, Quantity>(price, quantity));
             }
             var askStartOffset = bidStartOffset + (bidCount * sizeOfLevel);
             for (int i = 0; i < askCount; i++)
             {
-                var price = BitConverter.ToInt32(bytes, askStartOffset + (i * sizeOfLevel));
-                var quantity = BitConverter.ToInt32(bytes, askStartOffset + (i * sizeOfLevel) + sizeOfPrice);
+                var price = ReadPrice(bytes, askStartOffset + (i * sizeOfLevel));
+                var quantity = ReadQuantity(bytes, askStartOffset + (i * sizeOfLevel) + sizeOfPrice);
                 ask.Add(new KeyValuePair<Price, Quantity>(price, quantity));
             }
             book.Bid = bid;
