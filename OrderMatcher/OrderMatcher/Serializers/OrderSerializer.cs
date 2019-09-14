@@ -59,10 +59,8 @@ namespace OrderMatcher
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
-            var versionByteArray = BitConverter.GetBytes(version);
-            msg[versionOffset] = versionByteArray[0];
-            msg[versionOffset + 1] = versionByteArray[1];
-            msg[sideOffset] = BitConverter.GetBytes(order.IsBuy)[0];
+            Write(msg, versionOffset, version);
+            Write(msg, sideOffset, order.IsBuy);
             msg[orderConditionOffset] = (byte)order.OrderCondition;
             Write(msg, orderIdOffset, order.OrderId);
             Write(msg, priceOffset, order.Price);
@@ -102,10 +100,10 @@ namespace OrderMatcher
             order.IsBuy = BitConverter.ToBoolean(bytes, sideOffset);
             order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
             order.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
-            order.Price = BitConverter.ToInt32(bytes, priceOffset);
-            order.Quantity = BitConverter.ToInt32(bytes, quantityOffset);
-            order.StopPrice = BitConverter.ToInt32(bytes, stopPriceOffset);
-            order.TotalQuantity = BitConverter.ToInt32(bytes, totalQuantityOffset);
+            order.Price = ReadPrice(bytes, priceOffset);
+            order.Quantity = ReadQuantity(bytes, quantityOffset);
+            order.StopPrice = ReadPrice(bytes, stopPriceOffset);
+            order.TotalQuantity = ReadQuantity(bytes, totalQuantityOffset);
             order.CancelOn = BitConverter.ToInt64(bytes, cancelOnOffset);
             return order;
         }

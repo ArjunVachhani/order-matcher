@@ -81,5 +81,25 @@ namespace OrderMatcher
             array[start + 14] = (byte)(flags >> 16);
             array[start + 15] = (byte)(flags >> 24);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Price ReadPrice(byte[] array, int start)
+        {
+            int lo = (array[start + 0]) | (array[start + 1] << 8) | (array[start + 2] << 16) | (array[start + 3] << 24);
+            int mid = (array[start + 4]) | (array[start + 5] << 8) | (array[start + 6] << 16) | (array[start + 7] << 24);
+            int hi = (array[start + 8]) | (array[start + 9] << 8) | (array[start + 10] << 16) | (array[start + 11] << 24);
+            int flags = (array[start + 12]) | (array[start + 13] << 8) | (array[start + 14] << 16) | (array[start + 15] << 24);
+            return new decimal(new[] { lo, mid, hi, flags });
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Quantity ReadQuantity(byte[] array, int start)
+        {
+            int lo = (array[start + 0]) | (array[start + 1] << 8) | (array[start + 2] << 16) | (array[start + 3] << 24);
+            int mid = (array[start + 4]) | (array[start + 5] << 8) | (array[start + 6] << 16) | (array[start + 7] << 24);
+            int hi = (array[start + 8]) | (array[start + 9] << 8) | (array[start + 10] << 16) | (array[start + 11] << 24);
+            int flags = (array[start + 12]) | (array[start + 13] << 8) | (array[start + 14] << 16) | (array[start + 15] << 24);
+            return new decimal(new[] { lo, mid, hi, flags });
+        }
     }
 }

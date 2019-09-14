@@ -99,8 +99,8 @@ namespace OrderMatcher
             var fill = new Fill();
             fill.MakerOrderId = BitConverter.ToUInt64(bytes, makerOrderIdOffset);
             fill.TakerOrderId = BitConverter.ToUInt64(bytes, takerOrderIdOffset);
-            fill.MatchRate = BitConverter.ToInt32(bytes, matchRateOffset);
-            fill.MatchQuantity = BitConverter.ToInt32(bytes, matchQuantityOffset);
+            fill.MatchRate = ReadPrice(bytes, matchRateOffset);
+            fill.MatchQuantity = ReadQuantity(bytes, matchQuantityOffset);
             fill.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
             return fill;
         }

@@ -2,9 +2,9 @@
 {
     public struct Quantity
     {
-        public const int SizeOfQuantity = sizeof(int);
-        private readonly int _quantity;
-        public Quantity(int quantity)
+        public const int SizeOfQuantity = sizeof(decimal);
+        private readonly decimal _quantity;
+        public Quantity(decimal quantity)
         {
             _quantity = quantity;
         }
@@ -19,12 +19,12 @@
             return (a._quantity + b._quantity);
         }
 
-        public static implicit operator Quantity(int quantity)
+        public static implicit operator Quantity(decimal quantity)
         {
             return new Quantity(quantity);
         }
 
-        public static implicit operator int(Quantity c)
+        public static implicit operator decimal(Quantity c)
         {
             return c._quantity;
         }

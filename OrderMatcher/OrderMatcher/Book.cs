@@ -11,7 +11,6 @@ namespace OrderMatcher
         private readonly PriceComparerAscending _priceComparerAscending;
         private readonly PriceComparerDescending _priceComparerDescending;
         private readonly PriceComparerDescendingZeroFirst _priceComparerDescendingZeroFirst;
-        private readonly KeyValuePair<Price, QuantityTrackingPriceLevel> _defaultPriceLevel = default;
         private ulong _sequence;
         private PriceLevel _bestStopBidPriceLevel;
         private PriceLevel _bestStopAskPriceLevel;
@@ -188,7 +187,7 @@ namespace OrderMatcher
 
             if (bestPriceLevel != null)
             {
-                return bestPriceLevel.FirstOrDefault();
+                return bestPriceLevel.First;
             }
             return null;
         }
@@ -257,18 +256,18 @@ namespace OrderMatcher
                 if (isBuy && _bestBidPriceLevel.Price == priceLevel.Price)
                 {
                     _bestBidPriceLevel = null;
-                    var keyval = side.FirstOrDefault();
-                    if (!keyval.Equals(_defaultPriceLevel))
+                    if (side.Count > 0)
                     {
+                        var keyval = side.FirstOrDefault();
                         _bestBidPriceLevel = keyval.Value;
                     }
                 }
                 else if (!isBuy && _bestAskPriceLevel.Price == priceLevel.Price)
                 {
                     _bestAskPriceLevel = null;
-                    var keyval = side.FirstOrDefault();
-                    if (!keyval.Equals(_defaultPriceLevel))
+                    if (side.Count > 0)
                     {
+                        var keyval = side.FirstOrDefault();
                         _bestAskPriceLevel = keyval.Value;
                     }
                 }

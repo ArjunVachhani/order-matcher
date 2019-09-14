@@ -56,6 +56,11 @@ namespace OrderMatcher
             }
         }
 
+        public Order First
+        {
+            get { return _orders.Min; }
+        }
+
         public IEnumerator<Order> GetEnumerator()
         {
             return _orders.GetEnumerator();
