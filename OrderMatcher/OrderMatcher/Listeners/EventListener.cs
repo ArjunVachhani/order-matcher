@@ -14,23 +14,23 @@ namespace OrderMatcher
             _fileActionBlock = fileActionBlock;
         }
 
-        public void OnCancel(ulong orderId, Quantity remainingQuantity, Quantity remainingLockedAmount, CancelReason cancelReason)
+        public void OnCancel(ulong orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason)
         {
-            var msg = CancelledOrderSerializer.Serialize(orderId, remainingQuantity, cancelReason, _timeProvider.GetUpochMilliseconds());
+            var msg = CancelledOrderSerializer.Serialize(orderId, remainingQuantity, remainingOrderAmount, cancelReason, _timeProvider.GetUpochMilliseconds());
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }
 
         public void OnOrderTriggered(ulong orderId)
         {
-            var msg = TriggerSerializer.Serialize(orderId, _timeProvider.GetUpochMilliseconds());
+            var msg = OrderTriggerSerializer.Serialize(orderId, _timeProvider.GetUpochMilliseconds());
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }
 
-        public void OnTrade(ulong incomingOrderId, ulong restingOrderId, Price matchPrice, Quantity matchQuantiy)
+        public void OnTrade(ulong incomingOrderId, ulong restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderFilled)
         {
-            var msg = FillSerializer.Serialize(restingOrderId, incomingOrderId, matchPrice, matchQuantiy, _timeProvider.GetUpochMilliseconds());
+            var msg = FillSerializer.Serialize(restingOrderId, incomingOrderId, matchPrice, matchQuantiy, _timeProvider.GetUpochMilliseconds(), incomingOrderFilled);
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }

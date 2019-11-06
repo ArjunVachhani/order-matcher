@@ -73,5 +73,9 @@ namespace OrderMatcher
         {
             return 326187671 + _price.GetHashCode();
         }
+        public override string ToString()
+        {
+            return _price.ToString();
+        }
     }
 }

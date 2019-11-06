@@ -7,6 +7,7 @@
         ImmediateOrCancel = 3,
         FillOrKill = 4,
         BookOrCancel = 5,
-        ValidityExpired = 6
+        ValidityExpired = 6,
+        MarketOrderCannotMatchLessThanStepSize = 7
     }
 }

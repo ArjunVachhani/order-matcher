@@ -8,13 +8,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = true });
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = false });
         }
 
         [Fact]
@@ -34,23 +34,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[62];
+            var bytes = new byte[63];
             Exception ex = Assert.Throws<Exception>(() => FillSerializer.Deserialize(bytes));
-            Assert.Equal("Fill Message must be of Size : 63", ex.Message);
+            Assert.Equal("Fill Message must be of Size : 64", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[64];
+            var bytes = new byte[65];
             Exception ex = Assert.Throws<Exception>(() => FillSerializer.Deserialize(bytes));
-            Assert.Equal("Fill Message must be of Size : 63", ex.Message);
+            Assert.Equal("Fill Message must be of Size : 64", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[63];
+            var bytes = new byte[64];
             Exception ex = Assert.Throws<Exception>(() => FillSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -58,7 +58,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[63];
+            var bytes = new byte[64];
             bytes[4] = (byte)MessageType.Fill;
             Exception ex = Assert.Throws<Exception>(() => FillSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
@@ -67,43 +67,46 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = false });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(63, messageLength);
+            Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MinValue, fill.MakerOrderId);
             Assert.Equal(ulong.MinValue, fill.TakerOrderId);
             Assert.Equal((Price)int.MinValue, fill.MatchRate);
             Assert.Equal((Quantity)int.MinValue, fill.MatchQuantity);
             Assert.Equal(long.MinValue, fill.Timestamp);
+            Assert.False(fill.IncomingOrderFilled);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = true });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(63, messageLength);
+            Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MaxValue, fill.MakerOrderId);
             Assert.Equal(ulong.MaxValue, fill.TakerOrderId);
             Assert.Equal((Price)int.MaxValue, fill.MatchRate);
             Assert.Equal((Quantity)int.MaxValue, fill.MatchQuantity);
             Assert.Equal(long.MaxValue, fill.Timestamp);
+            Assert.True(fill.IncomingOrderFilled);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534 });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, IncomingOrderFilled = true });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(63, messageLength);
+            Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal((ulong)12345678, fill.MakerOrderId);
             Assert.Equal((ulong)56789, fill.TakerOrderId);
             Assert.Equal((Price)9534, fill.MatchRate);
             Assert.Equal((Quantity)2356, fill.MatchQuantity);
             Assert.Equal(404, fill.Timestamp);
+            Assert.True(fill.IncomingOrderFilled);
         }
     }
 }

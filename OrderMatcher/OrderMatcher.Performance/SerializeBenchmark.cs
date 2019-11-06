@@ -56,7 +56,7 @@ namespace OrderMatcher.Performance
             cancelRequestJsonString = JsonConvert.SerializeObject(new CancelRequest { OrderId = 1023 });
             cancelRequestBinary = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = 1023 });
 
-            orderTriggerBinary = TriggerSerializer.Serialize(new OrderTrigger { OrderId = 3453, Timestamp = 35345 });
+            orderTriggerBinary = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 3453, Timestamp = 35345 });
             orderTriggerJsonString = JsonConvert.SerializeObject(new OrderTrigger { OrderId = 3453, Timestamp = 35345 });
 
             bookRequestBinary = BookRequestSerializer.Serialize(new BookRequest { });
@@ -111,7 +111,7 @@ namespace OrderMatcher.Performance
         [Benchmark]
         public void orderTriggerBinaryDeserialize()
         {
-            var trigger = TriggerSerializer.Deserialize(orderTriggerBinary);
+            var trigger = OrderTriggerSerializer.Deserialize(orderTriggerBinary);
         }
 
         [Benchmark]
@@ -201,7 +201,7 @@ namespace OrderMatcher.Performance
         [Benchmark]
         public void triggerBinarySerialize()
         {
-            var msg = TriggerSerializer.Serialize(new OrderTrigger { OrderId = 3453, Timestamp = 35345 });
+            var msg = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 3453, Timestamp = 35345 });
         }
 
         [Benchmark]

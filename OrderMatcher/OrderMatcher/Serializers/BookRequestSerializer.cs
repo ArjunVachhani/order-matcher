@@ -11,15 +11,17 @@ namespace OrderMatcher
         private static readonly int levelCountOffset;
 
 
-        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
         private static readonly int sizeOfVersion;
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfLevelCount;
 
+        public static int MessageSize => sizeOfMessage;
+
         static BookRequestSerializer()
         {
-            sizeOfMessageLenght = sizeof(int);
+            sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfLevelCount = sizeof(int);
@@ -27,7 +29,7 @@ namespace OrderMatcher
             version = 1;
 
             messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             levelCountOffset = versionOffset + sizeOfVersion;
             sizeOfMessage = levelCountOffset + sizeOfLevelCount;

@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace OrderMatcher
 {
-    class TradeLogger
+    [Obsolete("pending design implementation", true)]
+    class TradeLogger : IDisposable
     {
         private readonly BlockingCollection<byte[]> _logInput;
         private readonly BlockingCollection<byte[]> _internalBuffer;
@@ -37,6 +38,8 @@ namespace OrderMatcher
             {
                 _logReader.Wait();
                 _logSaver.Wait();
+                _internalBuffer.Dispose();
+                _filestream.Dispose();
                 _disposed = true;
             }
         }

@@ -75,5 +75,10 @@
         {
             return -5579697 + _quantity.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return _quantity.ToString();
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace OrderMatcher
 {
-    public class TriggerSerializer : Serializer
+    public class OrderTriggerSerializer : Serializer
     {
         private static readonly short version;
         private static readonly int messageLengthOffset;
@@ -18,7 +18,9 @@ namespace OrderMatcher
         private static readonly int sizeOfOrderId;
         private static readonly int sizeOfTimestamp;
 
-        static TriggerSerializer()
+        public static int MessageSize => sizeOfMessage;
+
+        static OrderTriggerSerializer()
         {
             sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
@@ -76,7 +78,7 @@ namespace OrderMatcher
             }
 
             var version = BitConverter.ToInt16(bytes, versionOffset);
-            if (version != TriggerSerializer.version)
+            if (version != OrderTriggerSerializer.version)
             {
                 throw new Exception("version mismatch");
             }

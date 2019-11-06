@@ -13,14 +13,14 @@
         public Quantity TotalQuantity { get; set; }
         public bool IsTip { get; set; }
         public long CancelOn { get; set; }
-        public Quantity LockedAmount { get; set; }
+        public Quantity OrderAmount { get; set; }
         public bool IsFilled
         {
             get
             {
                 if (IsBuy == true && Price == 0)
                 {
-                    if (LockedAmount == 0 && OpenQuantity == 0)
+                    if (OrderAmount == 0 && OpenQuantity == 0)
                     {
                         return true;
                     }
