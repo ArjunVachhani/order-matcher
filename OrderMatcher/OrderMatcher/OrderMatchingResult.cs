@@ -8,7 +8,7 @@
 
         //Failure Result
         OrderDoesNotExists = 11,
-        InvalidPriceQuantityOrStopPrice = 12,
+        InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity = 12,
         DuplicateOrder = 13,
         BookOrCancelCannotBeMarketOrStopOrder = 14,
         ImmediateOrCancelCannotBeStopOrder = 15,
@@ -17,6 +17,9 @@
         InvalidIcebergOrderTotalQuantity = 18,
         FillOrKillCannotBeStopOrder = 19,
         InvalidCancelOnForGTD = 20,
-        GoodTillDateCannotBeIOCorFOK = 21
+        GoodTillDateCannotBeIOCorFOK = 21,
+        MarketOrderOnlySupportedOrderAmountOrQuantityNoBoth = 22,
+        OrderAmountOnlySupportedForMarketBuyOrder = 23,
+        QuantityAndTotalQuantityShouldBeMultipleOfStepSize = 24
     }
 }

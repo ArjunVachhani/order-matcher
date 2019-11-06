@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 namespace OrderMatcher
 {
@@ -44,6 +45,9 @@ namespace OrderMatcher
 
         public void RemoveOrder(Order order)
         {
+            if (order == null)
+                throw new ArgumentNullException(nameof(order));
+
             if (order.IsBuy)
             {
                 bool removed = false;
@@ -197,6 +201,11 @@ namespace OrderMatcher
             return isBuy ? CheckBuyOrderCanBeFilled(requestedQuantity, limitPrice) : CheckSellOrderCanBeFilled(requestedQuantity, limitPrice);
         }
 
+        public bool CheckCanFillMarketOrderAmount(bool isBuy, Quantity orderAmount)
+        {
+            return isBuy ? CheckMarketOrderAmountCanBeFilled(orderAmount, _askSide) : CheckMarketOrderAmountCanBeFilled(orderAmount, _bidSide);
+        }
+
         private bool CheckBuyOrderCanBeFilled(Quantity requestedQuantity, Price limitPrice)
         {
             Quantity cummulativeQuantity = 0;
@@ -233,6 +242,28 @@ namespace OrderMatcher
                 }
             }
             if (cummulativeQuantity >= requestedQuantity)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool CheckMarketOrderAmountCanBeFilled(Quantity orderAmount, SortedDictionary<Price, QuantityTrackingPriceLevel> side)
+        {
+            Quantity cummulativeOrderAmount = 0;
+            foreach (var priceLevel in side)
+            {
+                if (cummulativeOrderAmount <= orderAmount)
+                {
+                    cummulativeOrderAmount += (priceLevel.Value.Quantity * priceLevel.Key);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cummulativeOrderAmount >= orderAmount)
             {
                 return true;
             }

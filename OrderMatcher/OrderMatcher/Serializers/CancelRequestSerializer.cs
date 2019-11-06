@@ -11,15 +11,16 @@ namespace OrderMatcher
         private static readonly int orderIdOffset;
 
 
-        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
         private static readonly int sizeOfVersion;
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfOrderId;
 
+        public static int MessageSize => sizeOfMessage;
         static CancelRequestSerializer()
         {
-            sizeOfMessageLenght = sizeof(int);
+            sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderId = sizeof(ulong);
@@ -27,7 +28,7 @@ namespace OrderMatcher
             version = 1;
 
             messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             orderIdOffset = versionOffset + sizeOfVersion;
             sizeOfMessage = orderIdOffset + sizeOfOrderId;

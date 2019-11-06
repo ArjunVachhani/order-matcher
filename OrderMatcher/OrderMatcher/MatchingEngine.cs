@@ -14,6 +14,8 @@ namespace OrderMatcher
         private readonly SortedDictionary<long, HashSet<ulong>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
         private readonly ITimeProvider _timeProvider;
+        private readonly int _quoteCurrencyDecimalPlaces;
+        private readonly decimal _power;
         private Price _marketPrice;
         private KeyValuePair<long, HashSet<ulong>>? _firstGoodTillDate;
 
@@ -24,8 +26,14 @@ namespace OrderMatcher
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
-        public MatchingEngine(ITradeListener tradeListener, ITimeProvider timeProvider)
+        public MatchingEngine(int quoteCurrencyDecimalPlaces, Quantity stepSize, ITradeListener tradeListener, ITimeProvider timeProvider)
         {
+            if (quoteCurrencyDecimalPlaces < 0)
+                throw new NotSupportedException($"Invalid value of {nameof(quoteCurrencyDecimalPlaces)}");
+
+            if (stepSize < 0)
+                throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
+
             _book = new Book();
             _currentOrders = new Dictionary<ulong, Order>();
             _currentIcebergOrders = new Dictionary<ulong, Order>();
@@ -33,17 +41,22 @@ namespace OrderMatcher
             _acceptedOrders = new HashSet<ulong>();
             _tradeListener = tradeListener;
             _timeProvider = timeProvider;
-            _stepSize = 1;
+            _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
+            _power = (decimal)Math.Pow(10, _quoteCurrencyDecimalPlaces);
+            _stepSize = stepSize;
         }
 
-        public OrderMatchingResult AddOrder(Order incomingOrder)
+        public OrderMatchingResult AddOrder(Order incomingOrder, bool isOrderTriggered = false)
         {
+            if (incomingOrder == null)
+                throw new ArgumentNullException(nameof(incomingOrder));
+
             incomingOrder.OpenQuantity = incomingOrder.Quantity;
             incomingOrder.IsTip = false;
 
-            if (incomingOrder.Price < 0 || incomingOrder.Quantity <= 0 || incomingOrder.StopPrice < 0)
+            if (incomingOrder.Price < 0 || (incomingOrder.Quantity <= 0 && incomingOrder.OrderAmount == 0) || (incomingOrder.Quantity == 0 && incomingOrder.OrderAmount <= 0) || incomingOrder.StopPrice < 0 || incomingOrder.TotalQuantity < 0)
             {
-                return OrderMatchingResult.InvalidPriceQuantityOrStopPrice;
+                return OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity;
             }
 
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && (incomingOrder.Price == 0 || incomingOrder.StopPrice != 0))
@@ -51,12 +64,17 @@ namespace OrderMatcher
                 return OrderMatchingResult.BookOrCancelCannotBeMarketOrStopOrder;
             }
 
+            if (incomingOrder.Quantity % _stepSize != 0 || incomingOrder.TotalQuantity % _stepSize != 0)
+            {
+                return OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize;
+            }
+
             if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && (incomingOrder.StopPrice != 0))
             {
                 return OrderMatchingResult.ImmediateOrCancelCannotBeStopOrder;
             }
 
-            if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && (incomingOrder.StopPrice != 0))
+            if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.StopPrice != 0)
             {
                 return OrderMatchingResult.FillOrKillCannotBeStopOrder;
             }
@@ -69,6 +87,16 @@ namespace OrderMatcher
             if (incomingOrder.CancelOn > 0 && (incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
             {
                 return OrderMatchingResult.GoodTillDateCannotBeIOCorFOK;
+            }
+
+            if (incomingOrder.Price == 0 && incomingOrder.OrderAmount != 0 && incomingOrder.OpenQuantity != 0)
+            {
+                return OrderMatchingResult.MarketOrderOnlySupportedOrderAmountOrQuantityNoBoth;
+            }
+
+            if (incomingOrder.OrderAmount != 0 && (incomingOrder.Price != 0 || !incomingOrder.IsBuy))
+            {
+                return OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder;
             }
 
             if (incomingOrder.TotalQuantity > 0)
@@ -97,15 +125,19 @@ namespace OrderMatcher
             CancelExpiredOrders(timeNow);
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.LockedAmount, CancelReason.BookOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.BookOrCancel);
             }
-            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
+            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount == 0 && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.LockedAmount, CancelReason.FillOrKill);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.FillOrKill);
+            }
+            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount != 0 && !_book.CheckCanFillMarketOrderAmount(incomingOrder.IsBuy, incomingOrder.OrderAmount))
+            {
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.FillOrKill);
             }
             else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timeNow)
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.LockedAmount, CancelReason.ValidityExpired);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.ValidityExpired);
             }
             else
             {
@@ -120,7 +152,7 @@ namespace OrderMatcher
                 }
                 _currentOrders.Add(incomingOrder.OrderId, incomingOrder);
 
-                if (incomingOrder.StopPrice != 0 && ((incomingOrder.IsBuy && incomingOrder.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (incomingOrder.StopPrice < _marketPrice || _marketPrice == 0))))
+                if (incomingOrder.StopPrice != 0 && !isOrderTriggered && ((incomingOrder.IsBuy && incomingOrder.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (incomingOrder.StopPrice < _marketPrice || _marketPrice == 0))))
                 {
                     _book.AddStopOrder(incomingOrder);
                 }
@@ -149,7 +181,7 @@ namespace OrderMatcher
             if (_currentOrders.TryGetValue(orderId, out Order order))
             {
                 var quantityCancel = order.OpenQuantity;
-                var remainingLockedAmount = order.LockedAmount;
+                var remainingLockedAmount = order.OrderAmount;
                 _book.RemoveOrder(order);
                 _currentOrders.Remove(orderId);
                 if (order.IsTip)
@@ -157,7 +189,7 @@ namespace OrderMatcher
                     if (_currentIcebergOrders.TryGetValue(orderId, out Order iceBergOrder))
                     {
                         quantityCancel += iceBergOrder.OpenQuantity;
-                        remainingLockedAmount += iceBergOrder.LockedAmount;
+                        remainingLockedAmount += iceBergOrder.OrderAmount;
                         _currentIcebergOrders.Remove(orderId);
                     }
                 }
@@ -176,24 +208,24 @@ namespace OrderMatcher
         private void MatchAndAddOrder(Order incomingOrder)
         {
             Price previousMarketPrice = _marketPrice;
-            var anyMatch = MatchWithOpenOrders(incomingOrder);
+            var matchResult = MatchWithOpenOrders(incomingOrder);
             if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.LockedAmount, CancelReason.ImmediateOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.ImmediateOrCancel);
                 _currentOrders.Remove(incomingOrder.OrderId);
             }
             else if (!incomingOrder.IsFilled)
             {
                 if (incomingOrder.Price == 0)
                 {
-                    if (anyMatch)
+                    if (matchResult.anyMatch && incomingOrder.OpenQuantity > 0)
                     {
                         incomingOrder.Price = _marketPrice;
                         _book.AddOrderOpenBook(incomingOrder);
                     }
                     else
                     {
-                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.LockedAmount, CancelReason.MarketOrderNoLiquidity);
+                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, matchResult.isMarketOrderLessThanStepSize ? CancelReason.MarketOrderCannotMatchLessThanStepSize : CancelReason.MarketOrderNoLiquidity);
                         _currentOrders.Remove(incomingOrder.OrderId);
                         if (incomingOrder.CancelOn > 0)
                         {
@@ -234,7 +266,7 @@ namespace OrderMatcher
 
         private void AddStopToOrderBook(List<PriceLevel> priceLevels)
         {
-            for (int i = 0; i <  priceLevels.Count; i++)
+            for (int i = 0; i < priceLevels.Count; i++)
             {
                 foreach (var order in priceLevels[i])
                 {
@@ -243,10 +275,11 @@ namespace OrderMatcher
                 }
             }
         }
-        
-        private bool MatchWithOpenOrders(Order incomingOrder)
+
+        private (bool anyMatch, bool isMarketOrderLessThanStepSize) MatchWithOpenOrders(Order incomingOrder)
         {
             bool anyMatchHappend = false;
+            bool isMarketOrderLessThanStepSize = false;
             while (true)
             {
                 Order restingOrder = _book.GetBestBuyOrderToMatch(!incomingOrder.IsBuy);
@@ -259,16 +292,25 @@ namespace OrderMatcher
                 {
                     Price matchPrice = restingOrder.Price;
                     Quantity maxQuantity = 0;
-                    if (incomingOrder.Price == 0 && incomingOrder.IsBuy == true && incomingOrder.OpenQuantity == 0 && incomingOrder.LockedAmount != 0)
+                    if (incomingOrder.Price == 0 && incomingOrder.IsBuy == true && incomingOrder.OpenQuantity == 0 && incomingOrder.OrderAmount != 0)
                     {
-                        Quantity quantity = incomingOrder.LockedAmount / matchPrice;
+                        Quantity quantity = incomingOrder.OrderAmount / matchPrice;
                         quantity = quantity - (quantity % _stepSize);
                         if (quantity == 0)
                         {
+                            isMarketOrderLessThanStepSize = true;
                             break;
                         }
+
                         maxQuantity = quantity >= restingOrder.OpenQuantity ? restingOrder.OpenQuantity : quantity;
-                        incomingOrder.LockedAmount -= maxQuantity * matchPrice;
+                        var tradeAmount = decimal.Round(maxQuantity * matchPrice * _power) / _power;
+                        if (tradeAmount == 0)
+                        {
+                            isMarketOrderLessThanStepSize = true;
+                            break;
+                        }
+
+                        incomingOrder.OrderAmount -= tradeAmount;
                     }
                     else if (incomingOrder.OpenQuantity != 0)
                     {
@@ -294,7 +336,13 @@ namespace OrderMatcher
                         }
                     }
 
-                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, matchPrice, maxQuantity);
+                    bool isIncomingOrderFilled = incomingOrder.IsFilled;
+                    if (incomingOrder.IsTip == true)
+                    {
+                        isIncomingOrderFilled = !_currentIcebergOrders.ContainsKey(incomingOrder.OrderId);
+                    }
+
+                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, matchPrice, maxQuantity, isIncomingOrderFilled);
                     _marketPrice = matchPrice;
                     anyMatchHappend = true;
                 }
@@ -308,7 +356,7 @@ namespace OrderMatcher
                     break;
                 }
             }
-            return anyMatchHappend;
+            return (anyMatchHappend, isMarketOrderLessThanStepSize);
         }
 
         private void AddTip(ulong orderId)
@@ -408,5 +456,3 @@ namespace OrderMatcher
         }
     }
 }
-//TODO add decimal places for quote currency
-//TODO : Trade Logger unit test + Trade Deserializer + Unit test

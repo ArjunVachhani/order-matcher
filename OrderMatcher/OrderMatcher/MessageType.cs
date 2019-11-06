@@ -8,9 +8,10 @@
         BookRequest = 3,
 
         //Output from order matcher
-        Fill = 101,
-        Cancel = 102,
-        Book = 103,
-        OrderTrigger = 104
+        OrderMatchingResult = 101,
+        Fill = 102,
+        Cancel = 103,
+        Book = 104,
+        OrderTrigger = 105
     }
 }

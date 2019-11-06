@@ -1654,5 +1654,177 @@ namespace OrderMatcher.Tests
             var result = book.CheckCanFillOrder(true, 31, 0);
             Assert.False(result);
         }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Enough_Qty_Available_Buy_Side_NoOrders()
+        {
+            Book book = new Book();
+
+            var result = book.CheckCanFillMarketOrderAmount(false, 0);
+            Assert.True(result);
+
+            var result2 = book.CheckCanFillMarketOrderAmount(false, 1);
+            Assert.False(result2);
+
+            var result3 = book.CheckCanFillMarketOrderAmount(false, 2);
+            Assert.False(result3);
+        }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Enough_Qty_Available_Buy_Side_One_Order()
+        {
+            Book book = new Book();
+
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 10, Quantity = 10, Price = 9 };
+            book.AddOrderOpenBook(order1);
+
+            Assert.Equal(9, book.BestBidPrice);
+            Assert.Equal(10, book.BestBidQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+
+            var result = book.CheckCanFillMarketOrderAmount(false, 90);
+            Assert.True(result);
+
+
+            var result2 = book.CheckCanFillMarketOrderAmount(false, 89);
+            Assert.True(result2);
+
+
+            var result3 = book.CheckCanFillMarketOrderAmount(false, 91);
+            Assert.False(result3);
+        }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Enough_Qty_Available_Buy_Side()
+        {
+            Book book = new Book();
+
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 10, Quantity = 10, Price = 9 };
+            book.AddOrderOpenBook(order1);
+
+            Assert.Equal(9, book.BestBidPrice);
+            Assert.Equal(10, book.BestBidQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+
+            Order order2 = new Order { IsBuy = true, OrderId = 2, OpenQuantity = 10, Quantity = 10, Price = 10 };
+            book.AddOrderOpenBook(order2);
+
+            Assert.Equal(10, book.BestBidPrice);
+            Assert.Equal(10, book.BestBidQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+
+            Order order3 = new Order { IsBuy = true, OrderId = 3, OpenQuantity = 10, Quantity = 10, Price = 7 };
+            book.AddOrderOpenBook(order3);
+
+            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequnce);
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+
+            Assert.Equal(10, book.BestBidPrice);
+            Assert.Equal(10, book.BestBidQuantity);
+            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> expectedResult = new List<Order> { order2, order1, order3 };
+            AssertHelper.SequentiallyEqual(expectedResult, orders);
+
+            var result = book.CheckCanFillMarketOrderAmount(false, 260);
+            Assert.True(result);
+
+
+            var result2 = book.CheckCanFillMarketOrderAmount(false, 259);
+            Assert.True(result2);
+
+
+            var result3 = book.CheckCanFillMarketOrderAmount(false, 261);
+            Assert.False(result3);
+        }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Not_Enough_Qty_Available_Buy_Side_NoOrders()
+        {
+            Book book = new Book();
+
+            var result = book.CheckCanFillMarketOrderAmount(true, 0);
+            Assert.True(result);
+
+            var result2 = book.CheckCanFillMarketOrderAmount(true, 1);
+            Assert.False(result2);
+
+            var result3 = book.CheckCanFillMarketOrderAmount(true, 2);
+            Assert.False(result3);
+        }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Not_Enough_Qty_Available_Buy_Side_OneOrder()
+        {
+            Book book = new Book();
+
+            Order order1 = new Order { IsBuy = false, OrderId = 1, OpenQuantity = 10, Quantity = 10, Price = 9 };
+            book.AddOrderOpenBook(order1);
+
+            Assert.Equal(9, book.BestAskPrice);
+            Assert.Equal(10, book.BestAskQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+
+            var result = book.CheckCanFillMarketOrderAmount(true, 90);
+            Assert.True(result);
+
+            var result2 = book.CheckCanFillMarketOrderAmount(true, 89);
+            Assert.True(result2);
+
+            var result3 = book.CheckCanFillMarketOrderAmount(true, 91);
+            Assert.False(result3);
+        }
+
+        [Fact]
+        public void CheckCanFillMarketOrderAmount_For_Not_Enough_Qty_Available_Buy_Side()
+        {
+            Book book = new Book();
+
+            Order order1 = new Order { IsBuy = false, OrderId = 1, OpenQuantity = 10, Quantity = 10, Price = 9 };
+            book.AddOrderOpenBook(order1);
+
+            Assert.Equal(9, book.BestAskPrice);
+            Assert.Equal(10, book.BestAskQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+
+            Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 10, Quantity = 10, Price = 10 };
+            book.AddOrderOpenBook(order2);
+
+            Assert.Equal(9, book.BestAskPrice);
+            Assert.Equal(10, book.BestAskQuantity);
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+
+            Order order3 = new Order { IsBuy = false, OrderId = 3, OpenQuantity = 10, Quantity = 10, Price = 7 };
+            book.AddOrderOpenBook(order3);
+
+            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequnce);
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+
+            Assert.Equal(7, book.BestAskPrice);
+            Assert.Equal(10, book.BestAskQuantity);
+            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> expectedResult = new List<Order> { order3, order1, order2 };
+            AssertHelper.SequentiallyEqual(expectedResult, orders);
+
+            var result = book.CheckCanFillMarketOrderAmount(true, 260);
+            Assert.True(result);
+
+            var result2 = book.CheckCanFillMarketOrderAmount(true, 259);
+            Assert.True(result2);
+
+            var result3 = book.CheckCanFillMarketOrderAmount(true, 261);
+            Assert.False(result3);
+        }
     }
 }

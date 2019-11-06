@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using OrderMatcher.Serializers;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace OrderMatcher
 {
@@ -100,6 +102,38 @@ namespace OrderMatcher
             int hi = (array[start + 8]) | (array[start + 9] << 8) | (array[start + 10] << 16) | (array[start + 11] << 24);
             int flags = (array[start + 12]) | (array[start + 13] << 8) | (array[start + 14] << 16) | (array[start + 15] << 24);
             return new decimal(new[] { lo, mid, hi, flags });
+        }
+
+        public static  MessageType? GetMessageType(byte[] data)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            if (data.Length < 7)
+                return null;
+
+            var messageSize = BitConverter.ToInt32(data, 0);
+            if (messageSize != data.Length)
+                return null;
+
+            if ((MessageType)data[4] == MessageType.NewOrderRequest && messageSize == OrderSerializer.MessageSize)
+                return MessageType.NewOrderRequest;
+            else if ((MessageType)data[4] == MessageType.CancelRequest && messageSize == CancelRequestSerializer.MessageSize)
+                return MessageType.CancelRequest;
+            else if ((MessageType)data[4] == MessageType.BookRequest && messageSize == BookRequestSerializer.MessageSize)
+                return MessageType.BookRequest;
+            else if ((MessageType)data[4] == MessageType.OrderMatchingResult && messageSize == MatchingEngineResultSerializer.MessageSize)
+                return MessageType.OrderMatchingResult;
+            else if ((MessageType)data[4] == MessageType.Fill && messageSize == FillSerializer.MessageSize)
+                return MessageType.Fill;
+            else if ((MessageType)data[4] == MessageType.Cancel && messageSize == CancelledOrderSerializer.MessageSize)
+                return MessageType.Cancel;
+            else if ((MessageType)data[4] == MessageType.OrderTrigger && messageSize == OrderTriggerSerializer.MessageSize)
+                return MessageType.OrderTrigger;
+            else if ((MessageType)data[4] == MessageType.Book)
+                return MessageType.Book;
+
+            return null;
         }
     }
 }

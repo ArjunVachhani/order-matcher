@@ -16,27 +16,32 @@ namespace OrderMatcher
         private static readonly int stopPriceOffset;
         private static readonly int totalQuantityOffset;
         private static readonly int cancelOnOffset;
+        private static readonly int orderAmountOffset;
 
-        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfOrderId;
         private static readonly int sizeOfVersion;
         private static readonly int sizeOfSide;
         private static readonly int sizeOfCancelOn;
+        private static readonly int sizeOfOrderAmount;
+        
+        public static int MessageSize => sizeOfMessage;
 
         static OrderSerializer()
         {
-            sizeOfMessageLenght = sizeof(int);
+            sizeOfMessageLength = sizeof(int);
             sizeOfOrderId = sizeof(ulong);
             sizeOfVersion = sizeof(short);
             sizeOfSide = sizeof(bool);
-            sizeOfCancelOn = sizeof(ulong);
+            sizeOfCancelOn = sizeof(long);
             sizeOfMessagetType = sizeof(MessageType);
+            sizeOfOrderAmount = Quantity.SizeOfQuantity;
             version = 1;
 
             messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             sideOffset = versionOffset + sizeOfVersion;
             orderConditionOffset = sideOffset + sizeOfSide;
@@ -46,7 +51,8 @@ namespace OrderMatcher
             stopPriceOffset = quantityOffset + Quantity.SizeOfQuantity;
             totalQuantityOffset = stopPriceOffset + Price.SizeOfPrice;
             cancelOnOffset = totalQuantityOffset + Quantity.SizeOfQuantity;
-            sizeOfMessage = cancelOnOffset + sizeOfCancelOn;
+            orderAmountOffset = cancelOnOffset + sizeOfCancelOn;
+            sizeOfMessage = orderAmountOffset + sizeOfOrderAmount;
         }
 
         public static byte[] Serialize(Order order)
@@ -68,6 +74,7 @@ namespace OrderMatcher
             Write(msg, stopPriceOffset, order.StopPrice);
             Write(msg, totalQuantityOffset, order.TotalQuantity);
             Write(msg, cancelOnOffset, order.CancelOn);
+            Write(msg, orderAmountOffset, order.OrderAmount);
             return msg;
         }
 
@@ -105,6 +112,7 @@ namespace OrderMatcher
             order.StopPrice = ReadPrice(bytes, stopPriceOffset);
             order.TotalQuantity = ReadQuantity(bytes, totalQuantityOffset);
             order.CancelOn = BitConverter.ToInt64(bytes, cancelOnOffset);
+            order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
             return order;
         }
     }

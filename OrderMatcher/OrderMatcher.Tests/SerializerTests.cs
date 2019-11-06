@@ -174,5 +174,25 @@ namespace OrderMatcher.Tests
             var arr2 = BitConverter.GetBytes(false);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
+
+        [Fact]
+        public void GetMessageType_ThrowsExceptionForNullArguement()
+        {
+            Assert.Throws<ArgumentNullException>(() => Serializer.GetMessageType(null));
+        }
+
+        [Fact]
+        public void GetMessageType_ReturnsNullForLengthLess7()
+        {
+            Assert.Null(Serializer.GetMessageType(new byte[6]));
+        }
+
+        [Fact]
+        public void GetMessageType_ReturnsIfSizeDoesNotMatchLength()
+        {
+            var bytes = new byte[10];
+            Serializer.Write(bytes, 0, bytes.Length);
+            Assert.Null(Serializer.GetMessageType(bytes));
+        }
     }
 }
