@@ -1,6 +1,8 @@
 
 # order-matcher
 
+![](https://github.com/ArjunVachhani/order-matcher/workflows/.NET%20Core/badge.svg?branch=master)
+
 Order Matching Engine
 
  built with .Net Core, supports **linux and windows**
@@ -17,3 +19,5 @@ Order Matching Engine
 **supports integer & real numbers/decimal**
 
 **Fast serialization & deserialization**
+
+
