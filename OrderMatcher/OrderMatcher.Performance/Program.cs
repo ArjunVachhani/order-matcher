@@ -1,4 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
+using MessagePack;
+using System;
 
 namespace OrderMatcher.Performance
 {
@@ -21,5 +23,75 @@ namespace OrderMatcher.Performance
             //TODO check use of property should be avoided as much as possible
             //TODO GC ??
         }
+    }
+
+    [MessagePackObject]
+    public class Order2
+    {
+        [Key(0)]
+        public bool IsBuy { get; set; }
+
+        [Key(1)]
+        public ulong OrderId { get; set; }
+
+        [IgnoreMember]
+        public ulong Sequnce { get; set; }
+
+        [Key(2)]
+        public decimal Quantity { get; set; }
+
+        [IgnoreMember]
+        public decimal OpenQuantity { get; set; }
+
+        [Key(3)]
+        public decimal Price { get; set; }
+
+        [Key(4)]
+        public decimal StopPrice { get; set; }
+
+        [Key(5)]
+        public OrderCondition OrderCondition { get; set; }
+
+        [Key(6)]
+        public decimal TotalQuantity { get; set; }
+
+        [Key(7)]
+        public bool IsTip { get; set; }
+
+        [Key(8)]
+        public long CancelOn { get; set; }
+
+        [Key(9)]
+        public decimal OrderAmount { get; set; }
+
+        [IgnoreMember]
+        public bool IsFilled
+        {
+            get
+            {
+                if (IsBuy == true && Price == 0)
+                {
+                    if (OrderAmount == 0 && OpenQuantity == 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return OpenQuantity == 0;
+                }
+            }
+        }
+    }
+
+    [MessagePackObject]
+    public class BookRequest2
+    {
+        [Key(0)]
+        public int LevelCount { get; set; }
     }
 }
