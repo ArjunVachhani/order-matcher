@@ -104,7 +104,7 @@ namespace OrderMatcher
             return new decimal(new[] { lo, mid, hi, flags });
         }
 
-        public static  MessageType? GetMessageType(byte[] data)
+        public static MessageType? GetMessageType(byte[] data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));

@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using MessagePack;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,8 @@ namespace OrderMatcher.Performance
         readonly byte[] bookRequestBinary;
         readonly string bookJsonString;
         readonly byte[] bookBinary;
-
+        readonly byte[] orderMsgPck;
+        readonly byte[] bookRequest2;
         public SerializeBenchmark()
         {
             book = new Book();
@@ -46,6 +48,7 @@ namespace OrderMatcher.Performance
 
             orderJsonString = JsonConvert.SerializeObject(new Order { CancelOn = 12345678, IsBuy = true, OrderCondition = OrderCondition.ImmediateOrCancel, OrderId = 56789, Price = 404, Quantity = 2356, StopPrice = 9534, TotalQuantity = 7878234 });
             orderBinarySerialized = OrderSerializer.Serialize(new Order { CancelOn = 12345678, IsBuy = true, OrderCondition = OrderCondition.ImmediateOrCancel, OrderId = 56789, Price = 404, Quantity = 2356, StopPrice = 9534, TotalQuantity = 7878234 });
+            orderMsgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
 
             fillJsonString = JsonConvert.SerializeObject(new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 });
             fillBinary = FillSerializer.Serialize(new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 });
@@ -61,6 +64,7 @@ namespace OrderMatcher.Performance
 
             bookRequestBinary = BookRequestSerializer.Serialize(new BookRequest { });
             bookRequestJsonString = JsonConvert.SerializeObject(new BookRequest { });
+            bookRequest2 = MessagePackSerializer.Serialize(new BookRequest2 { });
 
             bookJsonString = JsonConvert.SerializeObject(new BookDepth { Bid = bid, Ask = ask, LTP = 100, TimeStamp = 1234 });
             bookBinary = BookSerializer.Serialize(book, 5, 100, 1234);
@@ -70,6 +74,12 @@ namespace OrderMatcher.Performance
         public void orderJsonDeserialize()
         {
             var order = JsonConvert.DeserializeObject<Order>(orderJsonString);
+        }
+
+        [Benchmark]
+        public void orderMsgpckDeserialize()
+        {
+            var order = MessagePackSerializer.Deserialize<Order2>(orderMsgPck);
         }
 
         [Benchmark]
@@ -133,6 +143,13 @@ namespace OrderMatcher.Performance
         }
 
         [Benchmark]
+        public void bookRequestMsgPckDeserialize()
+        {
+            var bookrequest = MessagePackSerializer.Deserialize<BookRequest2>(bookRequest2);
+        }
+
+
+        [Benchmark]
         public void bookRequestBinaryDeserialize()
         {
             var bookrequest = BookRequestSerializer.Deserialize(bookRequestBinary);
@@ -154,6 +171,12 @@ namespace OrderMatcher.Performance
         public void orderJsonSerialize()
         {
             var orderJsonString = JsonConvert.SerializeObject(new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
+        }
+
+        [Benchmark]
+        public void orderMsgPckSerialize()
+        {
+            var msgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderCondition = OrderCondition.None, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
         }
 
         [Benchmark]
@@ -214,6 +237,12 @@ namespace OrderMatcher.Performance
         public void bookRequestBinarySerialize()
         {
             var msg = BookRequestSerializer.Serialize(new BookRequest { });
+        }
+
+        [Benchmark]
+        public void bookRequestMsgPckSerialize()
+        {
+            var msg = MessagePackSerializer.Serialize(new BookRequest2 { });
         }
 
         [Benchmark]
