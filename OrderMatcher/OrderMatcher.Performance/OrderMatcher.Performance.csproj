@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.11.1" />
-    <PackageReference Include="MessagePack" Version="1.8.74" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <ProjectReference Include="..\OrderMatcher\OrderMatcher.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OrderMatcher\OrderMatcher.csproj" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <PackageReference Include="MessagePack" Version="2.1.80" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>

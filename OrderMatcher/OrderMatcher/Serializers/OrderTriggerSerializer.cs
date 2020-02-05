@@ -48,7 +48,7 @@ namespace OrderMatcher
             return Serialize(orderTrigger.OrderId, orderTrigger.Timestamp);
         }
 
-        public static byte[] Serialize(ulong orderId, long timestamp)
+        public static byte[] Serialize(OrderId orderId, long timestamp)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -85,7 +85,7 @@ namespace OrderMatcher
 
             var orderTrigger = new OrderTrigger();
 
-            orderTrigger.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
+            orderTrigger.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
             orderTrigger.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
 
             return orderTrigger;

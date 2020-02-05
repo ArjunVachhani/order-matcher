@@ -106,7 +106,7 @@ namespace OrderMatcher
 
             order.IsBuy = BitConverter.ToBoolean(bytes, sideOffset);
             order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
-            order.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
+            order.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
             order.Price = ReadPrice(bytes, priceOffset);
             order.Quantity = ReadQuantity(bytes, quantityOffset);
             order.StopPrice = ReadPrice(bytes, stopPriceOffset);

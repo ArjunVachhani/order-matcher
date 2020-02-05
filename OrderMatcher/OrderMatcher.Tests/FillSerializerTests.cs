@@ -8,13 +8,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = true });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = true });
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = false });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = false });
         }
 
         [Fact]
@@ -67,12 +67,12 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MinValue, TakerOrderId = ulong.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = false });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, Timestamp = long.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, IncomingOrderFilled = false });
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
-            Assert.Equal(ulong.MinValue, fill.MakerOrderId);
-            Assert.Equal(ulong.MinValue, fill.TakerOrderId);
+            Assert.Equal(OrderId.MinValue, fill.MakerOrderId);
+            Assert.Equal(OrderId.MinValue, fill.TakerOrderId);
             Assert.Equal((Price)int.MinValue, fill.MatchRate);
             Assert.Equal((Quantity)int.MinValue, fill.MatchQuantity);
             Assert.Equal(long.MinValue, fill.Timestamp);
@@ -82,12 +82,12 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = ulong.MaxValue, TakerOrderId = ulong.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = true });
+            var bytes = FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, Timestamp = long.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, IncomingOrderFilled = true });
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
-            Assert.Equal(ulong.MaxValue, fill.MakerOrderId);
-            Assert.Equal(ulong.MaxValue, fill.TakerOrderId);
+            Assert.Equal(OrderId.MaxValue, fill.MakerOrderId);
+            Assert.Equal(OrderId.MaxValue, fill.TakerOrderId);
             Assert.Equal((Price)int.MaxValue, fill.MatchRate);
             Assert.Equal((Quantity)int.MaxValue, fill.MatchQuantity);
             Assert.Equal(long.MaxValue, fill.Timestamp);
@@ -101,8 +101,8 @@ namespace OrderMatcher.Tests
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(64, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
-            Assert.Equal((ulong)12345678, fill.MakerOrderId);
-            Assert.Equal((ulong)56789, fill.TakerOrderId);
+            Assert.Equal((OrderId)12345678, fill.MakerOrderId);
+            Assert.Equal((OrderId)56789, fill.TakerOrderId);
             Assert.Equal((Price)9534, fill.MatchRate);
             Assert.Equal((Quantity)2356, fill.MatchQuantity);
             Assert.Equal(404, fill.Timestamp);

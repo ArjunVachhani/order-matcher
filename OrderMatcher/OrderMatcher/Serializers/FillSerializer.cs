@@ -62,7 +62,7 @@ namespace OrderMatcher
             return Serialize(fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.Timestamp, fill.IncomingOrderFilled);
         }
 
-        public static byte[] Serialize(ulong makerOrderId, ulong takerOrderId, Price matchRate, Quantity matchQuantity, long timeStamp, bool incomingOrderFilled)
+        public static byte[] Serialize(OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, long timeStamp, bool incomingOrderFilled)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -102,8 +102,8 @@ namespace OrderMatcher
             }
 
             var fill = new Fill();
-            fill.MakerOrderId = BitConverter.ToUInt64(bytes, makerOrderIdOffset);
-            fill.TakerOrderId = BitConverter.ToUInt64(bytes, takerOrderIdOffset);
+            fill.MakerOrderId = BitConverter.ToInt32(bytes, makerOrderIdOffset);
+            fill.TakerOrderId = BitConverter.ToInt32(bytes, takerOrderIdOffset);
             fill.MatchRate = ReadPrice(bytes, matchRateOffset);
             fill.MatchQuantity = ReadQuantity(bytes, matchQuantityOffset);
             fill.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);

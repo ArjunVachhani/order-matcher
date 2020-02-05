@@ -3,7 +3,7 @@
     public class Order
     {
         public bool IsBuy { get; set; }
-        public ulong OrderId { get; set; }
+        public OrderId OrderId { get; set; }
         public ulong Sequnce { get; set; }
         public Quantity Quantity { get; set; }
         public Quantity OpenQuantity { get; set; }
