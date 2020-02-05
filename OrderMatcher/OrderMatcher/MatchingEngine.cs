@@ -7,22 +7,22 @@ namespace OrderMatcher
     public class MatchingEngine
     {
         private readonly Book _book;
-        private readonly Dictionary<ulong, Order> _currentOrders;
-        private readonly Dictionary<ulong, Order> _currentIcebergOrders;
-        private readonly HashSet<ulong> _acceptedOrders;
+        private readonly Dictionary<OrderId, Order> _currentOrders;
+        private readonly Dictionary<OrderId, Order> _currentIcebergOrders;
+        private readonly HashSet<OrderId> _acceptedOrders;
         private readonly ITradeListener _tradeListener;
-        private readonly SortedDictionary<long, HashSet<ulong>> _goodTillDateOrders;
+        private readonly SortedDictionary<long, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
         private readonly ITimeProvider _timeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
         private readonly decimal _power;
         private Price _marketPrice;
-        private KeyValuePair<long, HashSet<ulong>>? _firstGoodTillDate;
+        private KeyValuePair<long, HashSet<OrderId>>? _firstGoodTillDate;
 
-        public IEnumerable<KeyValuePair<ulong, Order>> CurrentOrders => _currentOrders;
-        public IEnumerable<KeyValuePair<ulong, Order>> CurrentIcebergOrders => _currentIcebergOrders;
-        public IEnumerable<KeyValuePair<long, HashSet<ulong>>> GoodTillDateOrders => _goodTillDateOrders;
-        public IEnumerable<ulong> AcceptedOrders => _acceptedOrders;
+        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
+        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentIcebergOrders => _currentIcebergOrders;
+        public IEnumerable<KeyValuePair<long, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
+        public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
@@ -35,10 +35,10 @@ namespace OrderMatcher
                 throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
 
             _book = new Book();
-            _currentOrders = new Dictionary<ulong, Order>();
-            _currentIcebergOrders = new Dictionary<ulong, Order>();
-            _goodTillDateOrders = new SortedDictionary<long, HashSet<ulong>>();
-            _acceptedOrders = new HashSet<ulong>();
+            _currentOrders = new Dictionary<OrderId, Order>();
+            _currentIcebergOrders = new Dictionary<OrderId, Order>();
+            _goodTillDateOrders = new SortedDictionary<long, HashSet<OrderId>>();
+            _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
             _timeProvider = timeProvider;
             _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
@@ -165,7 +165,7 @@ namespace OrderMatcher
             return OrderMatchingResult.OrderAccepted;
         }
 
-        public OrderMatchingResult CancelOrder(ulong orderId)
+        public OrderMatchingResult CancelOrder(OrderId orderId)
         {
             return CancelOrder(orderId, CancelReason.UserRequested);
         }
@@ -176,7 +176,7 @@ namespace OrderMatcher
             CancelExpiredOrders(timeNow);
         }
 
-        private OrderMatchingResult CancelOrder(ulong orderId, CancelReason cancelReason)
+        private OrderMatchingResult CancelOrder(OrderId orderId, CancelReason cancelReason)
         {
             if (_currentOrders.TryGetValue(orderId, out Order order))
             {
@@ -359,7 +359,7 @@ namespace OrderMatcher
             return (anyMatchHappend, isMarketOrderLessThanStepSize);
         }
 
-        private void AddTip(ulong orderId)
+        private void AddTip(OrderId orderId)
         {
             if (_currentIcebergOrders.TryGetValue(orderId, out Order order))
             {
@@ -379,7 +379,7 @@ namespace OrderMatcher
         {
             if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
             {
-                List<HashSet<ulong>> expiredOrderIds = new List<HashSet<ulong>>();
+                List<HashSet<OrderId>> expiredOrderIds = new List<HashSet<OrderId>>();
                 List<long> timeCollection = new List<long>();
                 foreach (var time in _goodTillDateOrders)
                 {
@@ -407,15 +407,15 @@ namespace OrderMatcher
                     }
                 }
 
-                _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<ulong>>?)null;
+                _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<OrderId>>?)null;
             }
         }
 
-        private void AddGoodTillDateOrder(long time, ulong orderId)
+        private void AddGoodTillDateOrder(long time, OrderId orderId)
         {
-            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<ulong> orderIds))
+            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId> orderIds))
             {
-                orderIds = new HashSet<ulong>();
+                orderIds = new HashSet<OrderId>();
                 _goodTillDateOrders.Add(time, orderIds);
             }
             orderIds.Add(orderId);
@@ -426,7 +426,7 @@ namespace OrderMatcher
             }
         }
 
-        private void RemoveGoodTillDateOrder(long time, ulong orderId)
+        private void RemoveGoodTillDateOrder(long time, OrderId orderId)
         {
             if (_goodTillDateOrders.TryGetValue(time, out var orderIds))
             {
@@ -437,7 +437,7 @@ namespace OrderMatcher
 
                     if (time == _firstGoodTillDate.Value.Key)
                     {
-                        _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<ulong>>?)null;
+                        _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<OrderId>>?)null;
                     }
                 }
             }
