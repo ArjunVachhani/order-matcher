@@ -8,13 +8,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = ulong.MinValue });
+            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MinValue });
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = ulong.MaxValue });
+            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MaxValue });
         }
 
         [Fact]
@@ -34,23 +34,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[14];
+            var bytes = new byte[10];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Cancel Request Message must be of Size : 15", ex.Message);
+            Assert.Equal("Cancel Request Message must be of Size : 11", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[16];
+            var bytes = new byte[12];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Cancel Request Message must be of Size : 15", ex.Message);
+            Assert.Equal("Cancel Request Message must be of Size : 11", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[15];
+            var bytes = new byte[11];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -58,7 +58,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[15];
+            var bytes = new byte[11];
             bytes[4] = (byte)MessageType.CancelRequest;
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
@@ -67,21 +67,21 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = ulong.MinValue });
+            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MinValue });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(15, messageLength);
+            Assert.Equal(11, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
-            Assert.Equal(ulong.MinValue, cancelRequest.OrderId);
+            Assert.Equal(OrderId.MinValue, cancelRequest.OrderId);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = ulong.MaxValue });
+            var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MaxValue });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(15, messageLength);
+            Assert.Equal(11, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
-            Assert.Equal(ulong.MaxValue, cancelRequest.OrderId);
+            Assert.Equal(OrderId.MaxValue, cancelRequest.OrderId);
         }
 
         [Fact]
@@ -89,9 +89,9 @@ namespace OrderMatcher.Tests
         {
             var bytes = CancelRequestSerializer.Serialize(new CancelRequest { OrderId = 12345678 });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(15, messageLength);
+            Assert.Equal(11, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
-            Assert.Equal((ulong)12345678, cancelRequest.OrderId);
+            Assert.Equal((OrderId)12345678, cancelRequest.OrderId);
         }
     }
 }

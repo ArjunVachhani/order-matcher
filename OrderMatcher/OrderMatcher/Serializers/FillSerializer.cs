@@ -37,7 +37,7 @@ namespace OrderMatcher
             sizeOfTakerOrderId = sizeof(ulong);
             sizeOfMatchRate = Price.SizeOfPrice;
             sizeOfMatchQuantity = Quantity.SizeOfQuantity;
-            sizeOfTimestamp = sizeof(ulong);
+            sizeOfTimestamp = sizeof(int);
             sizeOfIncomingOrderFilled = sizeof(bool);
             version = 1;
 
@@ -62,7 +62,7 @@ namespace OrderMatcher
             return Serialize(fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.Timestamp, fill.IncomingOrderFilled);
         }
 
-        public static byte[] Serialize(OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, long timeStamp, bool incomingOrderFilled)
+        public static byte[] Serialize(OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, int timeStamp, bool incomingOrderFilled)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -106,7 +106,7 @@ namespace OrderMatcher
             fill.TakerOrderId = BitConverter.ToInt32(bytes, takerOrderIdOffset);
             fill.MatchRate = ReadPrice(bytes, matchRateOffset);
             fill.MatchQuantity = ReadQuantity(bytes, matchQuantityOffset);
-            fill.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
+            fill.Timestamp = BitConverter.ToInt32(bytes, timestampOffset);
             fill.IncomingOrderFilled = BitConverter.ToBoolean(bytes, incomingOrderFilledOffset);
             return fill;
         }

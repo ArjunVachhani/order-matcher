@@ -5672,11 +5672,11 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Cancels_AlreadyPassedCancelledOn()
         {
-            mockTimeProvider.Setup(x => x.GetUpochMilliseconds()).Returns(10);
+            mockTimeProvider.Setup(x => x.GetSecondsFromEpoch()).Returns(10);
             Order order1 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 1, CancelOn = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
-            mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
+            mockTimeProvider.Verify(x => x.GetSecondsFromEpoch());
             mockTradeListener.Verify(x => x.OnCancel(1, 500, 0, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -5692,11 +5692,11 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Accepts_CancelledOnFuture()
         {
-            mockTimeProvider.Setup(x => x.GetUpochMilliseconds()).Returns(10);
+            mockTimeProvider.Setup(x => x.GetSecondsFromEpoch()).Returns(10);
             Order order1 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 1, CancelOn = 11 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
-            mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
+            mockTimeProvider.Verify(x => x.GetSecondsFromEpoch());
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
@@ -5711,11 +5711,11 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Cancels_AlreadyEqualCancelledOn()
         {
-            mockTimeProvider.Setup(x => x.GetUpochMilliseconds()).Returns(10);
+            mockTimeProvider.Setup(x => x.GetSecondsFromEpoch()).Returns(10);
             Order order1 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 1, CancelOn = 10 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
-            mockTimeProvider.Verify(x => x.GetUpochMilliseconds());
+            mockTimeProvider.Verify(x => x.GetSecondsFromEpoch());
             mockTradeListener.Verify(x => x.OnCancel(1, 500, 0, CancelReason.ValidityExpired));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -5731,7 +5731,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_CancelsPendingOrderBeforeMatch()
         {
-            mockTimeProvider.SetupSequence(x => x.GetUpochMilliseconds()).Returns(0).Returns(10);
+            mockTimeProvider.SetupSequence(x => x.GetSecondsFromEpoch()).Returns(0).Returns(10);
             Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1, CancelOn = 10 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
@@ -5767,7 +5767,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_CancelsPendingStopOrderBeforeMatch()
         {
-            mockTimeProvider.SetupSequence(x => x.GetUpochMilliseconds()).Returns(0).Returns(10);
+            mockTimeProvider.SetupSequence(x => x.GetSecondsFromEpoch()).Returns(0).Returns(10);
             Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1, StopPrice = 10, CancelOn = 10 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 
@@ -5803,7 +5803,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Cancels_PendingIcebergOrder()
         {
-            mockTimeProvider.SetupSequence(x => x.GetUpochMilliseconds()).Returns(1).Returns(2).Returns(10);
+            mockTimeProvider.SetupSequence(x => x.GetSecondsFromEpoch()).Returns(1).Returns(2).Returns(10);
             Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1, TotalQuantity = 5000, CancelOn = 10 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
 

@@ -8,13 +8,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = long.MinValue });
+            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue });
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = long.MaxValue });
+            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue });
         }
 
         [Fact]
@@ -34,23 +34,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[22];
+            var bytes = new byte[14];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 15", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[24];
+            var bytes = new byte[16];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 15", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[23];
+            var bytes = new byte[15];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal("Invalid Message", ex.Message);
         }
@@ -58,7 +58,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[23];
+            var bytes = new byte[15];
             bytes[4] = (byte)MessageType.OrderTrigger;
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal("version mismatch", ex.Message);
@@ -67,23 +67,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = long.MinValue });
+            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(23, messageLength);
+            Assert.Equal(15, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, orderTrigger.OrderId);
-            Assert.Equal(long.MinValue, orderTrigger.Timestamp);
+            Assert.Equal(int.MinValue, orderTrigger.Timestamp);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = long.MaxValue });
+            var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(23, messageLength);
+            Assert.Equal(15, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, orderTrigger.OrderId);
-            Assert.Equal(long.MaxValue, orderTrigger.Timestamp);
+            Assert.Equal(int.MaxValue, orderTrigger.Timestamp);
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 12345678, Timestamp = 404 });
             var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(23, messageLength);
+            Assert.Equal(15, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, orderTrigger.OrderId);
             Assert.Equal(404, orderTrigger.Timestamp);

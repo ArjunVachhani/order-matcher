@@ -350,3 +350,4 @@ MigrationBackup/
 OrderMatcher/.vscode/launch.json
 OrderMatcher/.vscode/tasks.json
 **/.vscode/*
+**/.idea/*

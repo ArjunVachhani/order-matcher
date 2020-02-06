@@ -2,6 +2,6 @@
 {
     public class CancelRequest
     {
-        public ulong OrderId { get; set; }
+        public OrderId OrderId { get; set; }
     }
 }

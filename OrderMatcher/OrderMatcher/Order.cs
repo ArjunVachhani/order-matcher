@@ -12,7 +12,7 @@
         public OrderCondition OrderCondition { get; set; }
         public Quantity TotalQuantity { get; set; }
         public bool IsTip { get; set; }
-        public long CancelOn { get; set; }
+        public int CancelOn { get; set; }
         public Quantity OrderAmount { get; set; }
         public bool IsFilled
         {
