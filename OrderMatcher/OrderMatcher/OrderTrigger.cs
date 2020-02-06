@@ -3,6 +3,6 @@
     public class OrderTrigger
     {
         public OrderId OrderId { get; set; }
-        public long Timestamp { get; set; }
+        public int Timestamp { get; set; }
     }
 }

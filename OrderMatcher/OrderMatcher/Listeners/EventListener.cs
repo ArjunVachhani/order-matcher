@@ -16,21 +16,21 @@ namespace OrderMatcher
 
         public void OnCancel(OrderId orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason)
         {
-            var msg = CancelledOrderSerializer.Serialize(orderId, remainingQuantity, remainingOrderAmount, cancelReason, _timeProvider.GetUpochMilliseconds());
+            var msg = CancelledOrderSerializer.Serialize(orderId, remainingQuantity, remainingOrderAmount, cancelReason, _timeProvider.GetSecondsFromEpoch());
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }
 
         public void OnOrderTriggered(OrderId orderId)
         {
-            var msg = OrderTriggerSerializer.Serialize(orderId, _timeProvider.GetUpochMilliseconds());
+            var msg = OrderTriggerSerializer.Serialize(orderId, _timeProvider.GetSecondsFromEpoch());
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }
 
         public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderFilled)
         {
-            var msg = FillSerializer.Serialize(restingOrderId, incomingOrderId, matchPrice, matchQuantiy, _timeProvider.GetUpochMilliseconds(), incomingOrderFilled);
+            var msg = FillSerializer.Serialize(restingOrderId, incomingOrderId, matchPrice, matchQuantiy, _timeProvider.GetSecondsFromEpoch(), incomingOrderFilled);
             _outputActionBlock.Add(msg);
             _fileActionBlock.Add(msg);
         }

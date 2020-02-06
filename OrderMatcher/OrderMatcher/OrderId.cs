@@ -4,7 +4,7 @@ namespace OrderMatcher
 {
     public struct  OrderId
     {
-        public const int SizeOfInt = sizeof(int);
+        public const int SizeOfOrderId = sizeof(int);
         public static readonly OrderId MaxValue = (OrderId)int.MaxValue;
         public static readonly OrderId MinValue = (OrderId)int.MinValue;
         private int _orderId;

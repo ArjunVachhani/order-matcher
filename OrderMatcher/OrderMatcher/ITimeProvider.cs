@@ -5,6 +5,6 @@ namespace OrderMatcher
     public interface ITimeProvider
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        long GetUpochMilliseconds();
+        int GetSecondsFromEpoch();
     }
 }

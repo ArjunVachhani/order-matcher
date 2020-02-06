@@ -32,10 +32,10 @@ namespace OrderMatcher
         static OrderSerializer()
         {
             sizeOfMessageLength = sizeof(int);
-            sizeOfOrderId = sizeof(ulong);
+            sizeOfOrderId = OrderId.SizeOfOrderId;
             sizeOfVersion = sizeof(short);
             sizeOfSide = sizeof(bool);
-            sizeOfCancelOn = sizeof(long);
+            sizeOfCancelOn = sizeof(int);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderAmount = Quantity.SizeOfQuantity;
             version = 1;
@@ -111,7 +111,7 @@ namespace OrderMatcher
             order.Quantity = ReadQuantity(bytes, quantityOffset);
             order.StopPrice = ReadPrice(bytes, stopPriceOffset);
             order.TotalQuantity = ReadQuantity(bytes, totalQuantityOffset);
-            order.CancelOn = BitConverter.ToInt64(bytes, cancelOnOffset);
+            order.CancelOn = BitConverter.ToInt32(bytes, cancelOnOffset);
             order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
             return order;
         }

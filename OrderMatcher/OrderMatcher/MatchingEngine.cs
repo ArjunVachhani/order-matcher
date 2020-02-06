@@ -11,17 +11,17 @@ namespace OrderMatcher
         private readonly Dictionary<OrderId, Order> _currentIcebergOrders;
         private readonly HashSet<OrderId> _acceptedOrders;
         private readonly ITradeListener _tradeListener;
-        private readonly SortedDictionary<long, HashSet<OrderId>> _goodTillDateOrders;
+        private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
         private readonly ITimeProvider _timeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
         private readonly decimal _power;
         private Price _marketPrice;
-        private KeyValuePair<long, HashSet<OrderId>>? _firstGoodTillDate;
+        private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
 
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentIcebergOrders => _currentIcebergOrders;
-        public IEnumerable<KeyValuePair<long, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
+        public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
@@ -37,7 +37,7 @@ namespace OrderMatcher
             _book = new Book();
             _currentOrders = new Dictionary<OrderId, Order>();
             _currentIcebergOrders = new Dictionary<OrderId, Order>();
-            _goodTillDateOrders = new SortedDictionary<long, HashSet<OrderId>>();
+            _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
             _timeProvider = timeProvider;
@@ -121,7 +121,7 @@ namespace OrderMatcher
                 return OrderMatchingResult.DuplicateOrder;
             }
             _acceptedOrders.Add(incomingOrder.OrderId);
-            var timeNow = _timeProvider.GetUpochMilliseconds();
+            var timeNow = _timeProvider.GetSecondsFromEpoch();
             CancelExpiredOrders(timeNow);
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
@@ -172,7 +172,7 @@ namespace OrderMatcher
 
         public void CancelExpiredOrder()
         {
-            var timeNow = _timeProvider.GetUpochMilliseconds();
+            var timeNow = _timeProvider.GetSecondsFromEpoch();
             CancelExpiredOrders(timeNow);
         }
 
@@ -375,12 +375,12 @@ namespace OrderMatcher
             }
         }
 
-        private void CancelExpiredOrders(long timeNow)
+        private void CancelExpiredOrders(int timeNow)
         {
             if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
             {
                 List<HashSet<OrderId>> expiredOrderIds = new List<HashSet<OrderId>>();
-                List<long> timeCollection = new List<long>();
+                List<int> timeCollection = new List<int>();
                 foreach (var time in _goodTillDateOrders)
                 {
                     if (time.Key <= timeNow)
@@ -407,11 +407,11 @@ namespace OrderMatcher
                     }
                 }
 
-                _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<OrderId>>?)null;
+                _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
             }
         }
 
-        private void AddGoodTillDateOrder(long time, OrderId orderId)
+        private void AddGoodTillDateOrder(int time, OrderId orderId)
         {
             if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId> orderIds))
             {
@@ -426,7 +426,7 @@ namespace OrderMatcher
             }
         }
 
-        private void RemoveGoodTillDateOrder(long time, OrderId orderId)
+        private void RemoveGoodTillDateOrder(int time, OrderId orderId)
         {
             if (_goodTillDateOrders.TryGetValue(time, out var orderIds))
             {
@@ -437,7 +437,7 @@ namespace OrderMatcher
 
                     if (time == _firstGoodTillDate.Value.Key)
                     {
-                        _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<long, HashSet<OrderId>>?)null;
+                        _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
                     }
                 }
             }
