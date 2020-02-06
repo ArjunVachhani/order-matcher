@@ -55,7 +55,7 @@ namespace OrderMatcher
             sizeOfMessage = orderAmountOffset + sizeOfOrderAmount;
         }
 
-        public static byte[] Serialize(Order order)
+        public static byte[] Serialize(OrderWrapper order)
         {
             if (order == null)
             {
@@ -66,19 +66,24 @@ namespace OrderMatcher
             Write(msg, messageLengthOffset, sizeOfMessage);
             msg[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
             Write(msg, versionOffset, version);
-            Write(msg, sideOffset, order.IsBuy);
+            Write(msg, sideOffset, order.Order.IsBuy);
             msg[orderConditionOffset] = (byte)order.OrderCondition;
-            Write(msg, orderIdOffset, order.OrderId);
-            Write(msg, priceOffset, order.Price);
-            Write(msg, quantityOffset, order.Quantity);
+            Write(msg, orderIdOffset, order.Order.OrderId);
+            Write(msg, priceOffset, order.Order.Price);
+            
+            if(order.TipQuantity > 0 && order.TotalQuantity > 0)
+                Write(msg, quantityOffset, order.TipQuantity);
+            else
+                Write(msg, quantityOffset, order.Order.OpenQuantity);
+            
             Write(msg, stopPriceOffset, order.StopPrice);
             Write(msg, totalQuantityOffset, order.TotalQuantity);
-            Write(msg, cancelOnOffset, order.CancelOn);
-            Write(msg, orderAmountOffset, order.OrderAmount);
+            Write(msg, cancelOnOffset, order.Order.CancelOn);
+            Write(msg, orderAmountOffset, order.Order.OrderAmount);
             return msg;
         }
 
-        public static Order Deserialize(byte[] bytes)
+        public static OrderWrapper Deserialize(byte[] bytes)
         {
             if (bytes == null)
             {
@@ -102,17 +107,24 @@ namespace OrderMatcher
                 throw new Exception("version mismatch");
             }
 
-            var order = new Order();
-
-            order.IsBuy = BitConverter.ToBoolean(bytes, sideOffset);
+            var order = new OrderWrapper();
+            order.Order = new Order();
+            
+            order.Order.IsBuy = BitConverter.ToBoolean(bytes, sideOffset);
             order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
-            order.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
-            order.Price = ReadPrice(bytes, priceOffset);
-            order.Quantity = ReadQuantity(bytes, quantityOffset);
+            order.Order.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
+            order.Order.Price = ReadPrice(bytes, priceOffset);
+            order.Order.OpenQuantity = ReadQuantity(bytes, quantityOffset);
             order.StopPrice = ReadPrice(bytes, stopPriceOffset);
+            if (order.StopPrice > 0)
+                order.Order.IsStop = true;
+            
             order.TotalQuantity = ReadQuantity(bytes, totalQuantityOffset);
-            order.CancelOn = BitConverter.ToInt32(bytes, cancelOnOffset);
-            order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
+            if (order.TotalQuantity > 0)
+                order.TipQuantity = order.Order.OpenQuantity;
+            
+            order.Order.CancelOn = BitConverter.ToInt32(bytes, cancelOnOffset);
+            order.Order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
             return order;
         }
     }
