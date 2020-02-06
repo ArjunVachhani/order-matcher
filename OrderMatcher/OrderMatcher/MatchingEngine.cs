@@ -8,7 +8,7 @@ namespace OrderMatcher
     {
         private readonly Book _book;
         private readonly Dictionary<OrderId, Order> _currentOrders;
-        private readonly Dictionary<OrderId, Order> _currentIcebergOrders;
+        private readonly Dictionary<OrderId, Iceberg> _currentIcebergOrders;
         private readonly HashSet<OrderId> _acceptedOrders;
         private readonly ITradeListener _tradeListener;
         private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
@@ -20,7 +20,7 @@ namespace OrderMatcher
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
 
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
-        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentIcebergOrders => _currentIcebergOrders;
+        public IEnumerable<KeyValuePair<OrderId, Iceberg>> CurrentIcebergOrders => _currentIcebergOrders;
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
@@ -36,7 +36,7 @@ namespace OrderMatcher
 
             _book = new Book();
             _currentOrders = new Dictionary<OrderId, Order>();
-            _currentIcebergOrders = new Dictionary<OrderId, Order>();
+            _currentIcebergOrders = new Dictionary<OrderId, Iceberg>();
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
@@ -46,35 +46,35 @@ namespace OrderMatcher
             _stepSize = stepSize;
         }
 
-        public OrderMatchingResult AddOrder(Order incomingOrder, bool isOrderTriggered = false)
+        public OrderMatchingResult AddOrder(OrderWrapper orderWrapper, bool isOrderTriggered = false)
         {
+            var incomingOrder = orderWrapper.Order;
             if (incomingOrder == null)
                 throw new ArgumentNullException(nameof(incomingOrder));
 
-            incomingOrder.OpenQuantity = incomingOrder.Quantity;
             incomingOrder.IsTip = false;
 
-            if (incomingOrder.Price < 0 || (incomingOrder.Quantity <= 0 && incomingOrder.OrderAmount == 0) || (incomingOrder.Quantity == 0 && incomingOrder.OrderAmount <= 0) || incomingOrder.StopPrice < 0 || incomingOrder.TotalQuantity < 0)
+            if (incomingOrder.Price < 0 || (incomingOrder.OpenQuantity <= 0 && incomingOrder.OrderAmount == 0) || (incomingOrder.OpenQuantity == 0 && incomingOrder.OrderAmount <= 0) || orderWrapper.StopPrice < 0 || orderWrapper.TotalQuantity < 0)
             {
                 return OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity;
             }
 
-            if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && (incomingOrder.Price == 0 || incomingOrder.StopPrice != 0))
+            if (orderWrapper.OrderCondition == OrderCondition.BookOrCancel && (incomingOrder.Price == 0 || orderWrapper.StopPrice != 0))
             {
                 return OrderMatchingResult.BookOrCancelCannotBeMarketOrStopOrder;
             }
 
-            if (incomingOrder.Quantity % _stepSize != 0 || incomingOrder.TotalQuantity % _stepSize != 0)
+            if (incomingOrder.OpenQuantity % _stepSize != 0 || orderWrapper.TotalQuantity % _stepSize != 0)
             {
                 return OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize;
             }
 
-            if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && (incomingOrder.StopPrice != 0))
+            if (orderWrapper.OrderCondition == OrderCondition.ImmediateOrCancel && (orderWrapper.StopPrice != 0))
             {
                 return OrderMatchingResult.ImmediateOrCancelCannotBeStopOrder;
             }
 
-            if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.StopPrice != 0)
+            if (orderWrapper.OrderCondition == OrderCondition.FillOrKill && orderWrapper.StopPrice != 0)
             {
                 return OrderMatchingResult.FillOrKillCannotBeStopOrder;
             }
@@ -84,7 +84,7 @@ namespace OrderMatcher
                 return OrderMatchingResult.InvalidCancelOnForGTD;
             }
 
-            if (incomingOrder.CancelOn > 0 && (incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
+            if (incomingOrder.CancelOn > 0 && (orderWrapper.OrderCondition == OrderCondition.FillOrKill || orderWrapper.OrderCondition == OrderCondition.ImmediateOrCancel))
             {
                 return OrderMatchingResult.GoodTillDateCannotBeIOCorFOK;
             }
@@ -99,18 +99,18 @@ namespace OrderMatcher
                 return OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder;
             }
 
-            if (incomingOrder.TotalQuantity > 0)
+            if (orderWrapper.TotalQuantity > 0)
             {
-                incomingOrder.OpenQuantity = incomingOrder.TotalQuantity;
-                if (incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel)
+                incomingOrder.OpenQuantity = orderWrapper.TipQuantity;
+                if (orderWrapper.OrderCondition == OrderCondition.FillOrKill || orderWrapper.OrderCondition == OrderCondition.ImmediateOrCancel)
                 {
                     return OrderMatchingResult.IcebergOrderCannotBeFOKorIOC;
                 }
-                if (incomingOrder.StopPrice != 0 || incomingOrder.Price == 0)
+                if (orderWrapper.StopPrice != 0 || incomingOrder.Price == 0)
                 {
                     return OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder;
                 }
-                if (incomingOrder.TotalQuantity <= incomingOrder.Quantity)
+                if (orderWrapper.TotalQuantity <= orderWrapper.TipQuantity)
                 {
                     return OrderMatchingResult.InvalidIcebergOrderTotalQuantity;
                 }
@@ -123,15 +123,15 @@ namespace OrderMatcher
             _acceptedOrders.Add(incomingOrder.OrderId);
             var timeNow = _timeProvider.GetSecondsFromEpoch();
             CancelExpiredOrders(timeNow);
-            if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
+            if (orderWrapper.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.BookOrCancel);
             }
-            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount == 0 && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
+            else if (orderWrapper.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount == 0 && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.FillOrKill);
             }
-            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount != 0 && !_book.CheckCanFillMarketOrderAmount(incomingOrder.IsBuy, incomingOrder.OrderAmount))
+            else if (orderWrapper.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount != 0 && !_book.CheckCanFillMarketOrderAmount(incomingOrder.IsBuy, incomingOrder.OrderAmount))
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.FillOrKill);
             }
@@ -141,10 +141,11 @@ namespace OrderMatcher
             }
             else
             {
-                if (incomingOrder.TotalQuantity > 0)
+                if (orderWrapper.TotalQuantity > 0)
                 {
-                    _currentIcebergOrders.Add(incomingOrder.OrderId, incomingOrder);
-                    incomingOrder = GetTip(incomingOrder);
+                    var iceberg = new Iceberg() { TipQuantity =  orderWrapper.TipQuantity, TotalQuantity = orderWrapper.TotalQuantity };
+                    _currentIcebergOrders.Add(incomingOrder.OrderId, iceberg);
+                    incomingOrder = GetTip(incomingOrder, iceberg);
                 }
                 if (incomingOrder.CancelOn > 0)
                 {
@@ -152,9 +153,9 @@ namespace OrderMatcher
                 }
                 _currentOrders.Add(incomingOrder.OrderId, incomingOrder);
 
-                if (incomingOrder.StopPrice != 0 && !isOrderTriggered && ((incomingOrder.IsBuy && incomingOrder.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (incomingOrder.StopPrice < _marketPrice || _marketPrice == 0))))
+                if (orderWrapper.StopPrice != 0 && !isOrderTriggered && ((incomingOrder.IsBuy && orderWrapper.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (orderWrapper.StopPrice < _marketPrice || _marketPrice == 0))))
                 {
-                    _book.AddStopOrder(incomingOrder);
+                    _book.AddStopOrder(incomingOrder, orderWrapper.StopPrice);
                 }
                 else
                 {
@@ -186,10 +187,9 @@ namespace OrderMatcher
                 _currentOrders.Remove(orderId);
                 if (order.IsTip)
                 {
-                    if (_currentIcebergOrders.TryGetValue(orderId, out Order iceBergOrder))
+                    if (_currentIcebergOrders.TryGetValue(orderId, out Iceberg iceBergOrder))
                     {
-                        quantityCancel += iceBergOrder.OpenQuantity;
-                        remainingLockedAmount += iceBergOrder.OrderAmount;
+                        quantityCancel += iceBergOrder.TotalQuantity;
                         _currentIcebergOrders.Remove(orderId);
                     }
                 }
@@ -205,11 +205,11 @@ namespace OrderMatcher
             return OrderMatchingResult.OrderDoesNotExists;
         }
 
-        private void MatchAndAddOrder(Order incomingOrder)
+        private void MatchAndAddOrder(Order incomingOrder, OrderCondition? orderCondition = null)
         {
             Price previousMarketPrice = _marketPrice;
             var matchResult = MatchWithOpenOrders(incomingOrder);
-            if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
+            if (orderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.OrderAmount, CancelReason.ImmediateOrCancel);
                 _currentOrders.Remove(incomingOrder.OrderId);
@@ -243,7 +243,7 @@ namespace OrderMatcher
                 _currentOrders.Remove(incomingOrder.OrderId);
                 if (incomingOrder.IsTip)
                 {
-                    AddTip(incomingOrder.OrderId);
+                    AddTip(incomingOrder);
                 }
 
                 if (incomingOrder.CancelOn > 0)
@@ -327,7 +327,7 @@ namespace OrderMatcher
                         _currentOrders.Remove(restingOrder.OrderId);
                         if (restingOrder.IsTip)
                         {
-                            AddTip(restingOrder.OrderId);
+                            AddTip(restingOrder);
                         }
 
                         if (restingOrder.CancelOn > 0)
@@ -359,11 +359,11 @@ namespace OrderMatcher
             return (anyMatchHappend, isMarketOrderLessThanStepSize);
         }
 
-        private void AddTip(OrderId orderId)
+        private void AddTip(Order order)
         {
-            if (_currentIcebergOrders.TryGetValue(orderId, out Order order))
+            if (_currentIcebergOrders.TryGetValue(order.OrderId, out Iceberg iceberg))
             {
-                var tip = GetTip(order);
+                var tip = GetTip(order, iceberg);
                 _currentOrders.Add(tip.OrderId, tip);
 
                 if (order.CancelOn > 0)
@@ -443,16 +443,16 @@ namespace OrderMatcher
             }
         }
 
-        private Order GetTip(Order order)
+        private Order GetTip(Order order, Iceberg iceberg)
         {
-            var quantity = order.OpenQuantity < order.Quantity ? order.OpenQuantity : order.Quantity;
-            order.OpenQuantity -= quantity;
-            if (order.IsFilled)
+            var quantity = iceberg.TipQuantity < iceberg.TotalQuantity ? iceberg.TipQuantity : iceberg.TotalQuantity;
+            iceberg.TotalQuantity -= quantity;
+            if (iceberg.TotalQuantity == 0)
             {
                 _currentIcebergOrders.Remove(order.OrderId);
             }
 
-            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, IsTip = true, OpenQuantity = quantity, Quantity = quantity };
+            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, IsTip = true, OpenQuantity = quantity, CancelOn =  order.CancelOn};
         }
     }
 }
