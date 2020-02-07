@@ -1,6 +1,6 @@
 ﻿namespace OrderMatcher
 {
-    public struct Quantity
+    public readonly struct Quantity : System.IEquatable<Quantity>
     {
         public const int SizeOfQuantity = sizeof(decimal);
         private readonly decimal _quantity;
@@ -79,6 +79,11 @@
         public override string ToString()
         {
             return _quantity.ToString();
+        }
+
+        public bool Equals(Quantity other)
+        {
+            return _quantity == other._quantity;
         }
     }
 }
