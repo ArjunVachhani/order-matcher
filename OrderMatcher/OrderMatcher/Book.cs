@@ -151,6 +151,10 @@ namespace OrderMatcher
                 for (var i = 0; i < priceLevels.Count; i++)
                 {
                     _stopAsk.Remove(priceLevels[i].Price);
+                    foreach (var order in priceLevels[i])
+                    {
+                        _stopDictionary.Remove(order.OrderId);
+                    }
                 }
             }
             return priceLevels;
@@ -177,6 +181,10 @@ namespace OrderMatcher
                 for (var i = 0; i < priceLevels.Count; i++)
                 {
                     _stopBid.Remove(priceLevels[i].Price);
+                    foreach (var order in priceLevels[i])
+                    {
+                        _stopDictionary.Remove(order.OrderId);
+                    }
                 }
             }
             return priceLevels;

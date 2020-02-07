@@ -103,9 +103,9 @@ namespace OrderMatcher.Tests
         public void Deserialize_CheckCorrectBidCountAskCountWithPriceLevel()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, Quantity = 10, OpenQuantity = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, Quantity = 9, OpenQuantity = 9 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, Quantity = 10, OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9,  OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8,  OpenQuantity = 9 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10,  OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(131, messageLength);
@@ -125,8 +125,8 @@ namespace OrderMatcher.Tests
         public void Deserialize_CheckCorrectOnlyBuy()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, Quantity = 10, OpenQuantity = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, Quantity = 9, OpenQuantity = 9 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 9 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(99, messageLength);
@@ -144,7 +144,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_CheckCorrectOnlyAsk()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, Quantity = 10, OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10,  OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(67, messageLength);
@@ -160,27 +160,27 @@ namespace OrderMatcher.Tests
         public void Deserialize_CheckCorrectBidCountAskFullBook()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10, Quantity = 1, OpenQuantity = 1 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, Quantity = 2, OpenQuantity = 2 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, Quantity = 3, OpenQuantity = 3 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 7, Quantity = 4, OpenQuantity = 4 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 6, Quantity = 5, OpenQuantity = 5 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 5, Quantity = 6, OpenQuantity = 6 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 4, Quantity = 7, OpenQuantity = 7 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 3, Quantity = 8, OpenQuantity = 8 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 2, Quantity = 9, OpenQuantity = 9 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 1, Quantity = 10, OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10, OpenQuantity = 1 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9,  OpenQuantity = 2 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8,  OpenQuantity = 3 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 7, OpenQuantity = 4 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 6, OpenQuantity = 5 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 5, OpenQuantity = 6 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 4, OpenQuantity = 7 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 3, OpenQuantity = 8 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 2, OpenQuantity = 9 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 1, OpenQuantity = 10 });
 
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 11, Quantity = 11, OpenQuantity = 11 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 12, Quantity = 12, OpenQuantity = 12 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 13, Quantity = 13, OpenQuantity = 13 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 14, Quantity = 14, OpenQuantity = 14 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 15, Quantity = 15, OpenQuantity = 15 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 16, Quantity = 16, OpenQuantity = 16 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 17, Quantity = 17, OpenQuantity = 17 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 18, Quantity = 18, OpenQuantity = 18 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 19, Quantity = 19, OpenQuantity = 19 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 20, Quantity = 20, OpenQuantity = 20 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 11,  OpenQuantity = 11 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 12,  OpenQuantity = 12 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 13,  OpenQuantity = 13 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 14,  OpenQuantity = 14 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 15,  OpenQuantity = 15 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 16,  OpenQuantity = 16 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 17, OpenQuantity = 17 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 18,  OpenQuantity = 18 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 19,  OpenQuantity = 19 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 20,  OpenQuantity = 20 });
 
             var bytes = BookSerializer.Serialize(book, 5, 10, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);

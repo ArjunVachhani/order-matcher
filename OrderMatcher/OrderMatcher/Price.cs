@@ -2,7 +2,7 @@
 
 namespace OrderMatcher
 {
-    public struct Price
+    public readonly struct Price : System.IEquatable<Price>
     {
         public const int SizeOfPrice = sizeof(decimal);
         private readonly decimal _price;
@@ -76,6 +76,11 @@ namespace OrderMatcher
         public override string ToString()
         {
             return _price.ToString();
+        }
+
+        public bool Equals(Price other)
+        {
+            return _price == other._price;
         }
     }
 }
