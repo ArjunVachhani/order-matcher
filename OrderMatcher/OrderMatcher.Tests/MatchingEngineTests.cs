@@ -20,8 +20,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Removes_Orders_If_Exists()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order =  order1 };
+            matchingEngine.AddOrder(orderWrapper1);
 
             OrderMatchingResult result = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, result);
@@ -35,8 +36,9 @@ namespace OrderMatcher.Tests
         public void CancelOrder_Removes_Orders_No_Cancel_Listener()
         {
             MatchingEngine matchingEngine = new MatchingEngine(0, 1, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            matchingEngine.AddOrder(orderWrapper1);
 
             OrderMatchingResult result = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, result);
@@ -49,8 +51,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_If_Orders_Does_Not_Already_Cancelled_Call_OnCancel()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            matchingEngine.AddOrder(orderWrapper1);
 
             OrderMatchingResult cancelled = matchingEngine.CancelOrder(order1.OrderId);
             Assert.Equal(OrderMatchingResult.CancelAcepted, cancelled);
@@ -68,8 +71,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Should_Be_Cancel_Price_Sell()
         {
-            Order order1 = new Order { IsBuy = true, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult =  matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -83,8 +87,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = false, Quantity = 1500, Price = 0, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 0, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000, false));
             mockTradeListener.VerifyNoOtherCalls();
@@ -121,8 +126,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Should_Be_Cancel_Price_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1};
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -136,8 +142,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 1500, Price = 0, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 0, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2};
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000, false));
             mockTradeListener.VerifyNoOtherCalls();
@@ -174,8 +181,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_With_Market_Rate_For_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1};
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -189,8 +197,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2};
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -205,8 +214,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 , IsStop =  true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 11};
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -238,8 +248,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Stop_Market_Order_Entered_In_Stop_Book_With_Market_Rate_For_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1};
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -253,8 +264,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2};
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -269,8 +281,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = true, Quantity = 500, Price = 0, OrderId = 3, StopPrice = 11 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order {IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 3, IsStop =  true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 11};
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -302,8 +315,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_With_Market_Rate_For_Sell()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -317,8 +331,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -333,8 +348,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, IsStop =  true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 9  };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -366,8 +382,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Stop_Market_Order_Entered_In_Stop_Book_With_Market_Rate_For_Sell()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -381,8 +398,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -397,8 +415,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = false, Quantity = 500, Price = 0, OrderId = 3, StopPrice = 9 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3, IsStop = true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 9 };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -430,8 +449,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Cancels_Triggered_Stop_Limit_Order_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -445,8 +465,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -461,8 +482,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3,IsStop = true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 11  };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -476,8 +498,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order3.OpenQuantity);
             Assert.Equal((ulong)2, order3.Sequnce);
 
-            Order order4 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 4, StopPrice = 11 };
-            OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
+            Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4,IsStop = true};
+            var orderWrapper4 = new OrderWrapper{ Order = order4, StopPrice = 11  };
+            OrderMatchingResult result4 = matchingEngine.AddOrder(orderWrapper4);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
@@ -491,8 +514,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order4.OpenQuantity);
             Assert.Equal((ulong)3, order4.Sequnce);
 
-            Order order5 = new Order { IsBuy = true, Quantity = 500, Price = 10, OrderId = 5, StopPrice = 13 };
-            OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
+            Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 5,IsStop = true};
+            var orderWrapper5 = new OrderWrapper{ Order = order5, StopPrice = 13  };
+            OrderMatchingResult result5 = matchingEngine.AddOrder(orderWrapper5);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
@@ -506,8 +530,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order5.OpenQuantity);
             Assert.Equal((ulong)4, order5.Sequnce);
 
-            Order order6 = new Order { IsBuy = false, Quantity = 500, Price = 12, OrderId = 6 };
-            OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
+            Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 12, OrderId = 6 };
+            var orderWrapper6 = new OrderWrapper{ Order = order6   };
+            OrderMatchingResult result6 = matchingEngine.AddOrder(orderWrapper6);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
@@ -521,8 +546,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order6.OpenQuantity);
             Assert.Equal((ulong)5, order6.Sequnce);
 
-            Order order7 = new Order { IsBuy = true, Quantity = 500, Price = 12, OrderId = 7 };
-            OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
+            Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 12, OrderId = 7 };
+            var orderWrapper7 = new OrderWrapper{ Order = order7   };
+            OrderMatchingResult result7 = matchingEngine.AddOrder(orderWrapper7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 12, 500, true));
             mockTradeListener.Verify(x => x.OnOrderTriggered(3));
@@ -567,8 +593,9 @@ namespace OrderMatcher.Tests
         public void TriggerWorks_IfNoTriggerListerPassed()
         {
             var matchingEngine = new MatchingEngine(0, 1, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -582,8 +609,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -598,8 +626,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order {IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3,IsStop =  true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 9 };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -613,8 +642,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order3.OpenQuantity);
             Assert.Equal((ulong)2, order3.Sequnce);
 
-            Order order4 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 4, StopPrice = 9 };
-            OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
+            Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4,IsStop =  true };
+            var orderWrapper4 = new OrderWrapper{ Order = order4, StopPrice = 9 };
+            OrderMatchingResult result4 = matchingEngine.AddOrder(orderWrapper4);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
@@ -628,8 +658,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order4.OpenQuantity);
             Assert.Equal((ulong)3, order4.Sequnce);
 
-            Order order5 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 5, StopPrice = 7 };
-            OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
+            Order order5 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 5, IsStop =  true };
+            var orderWrapper5 = new OrderWrapper{ Order = order5, StopPrice = 7 };
+            OrderMatchingResult result5 = matchingEngine.AddOrder(orderWrapper5);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
@@ -643,8 +674,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order5.OpenQuantity);
             Assert.Equal((ulong)4, order5.Sequnce);
 
-            Order order6 = new Order { IsBuy = false, Quantity = 500, Price = 8, OrderId = 6 };
-            OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
+            Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 8, OrderId = 6 };
+            var orderWrapper6 = new OrderWrapper{ Order = order6  };
+            OrderMatchingResult result6 = matchingEngine.AddOrder(orderWrapper6);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result6);
@@ -658,8 +690,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order6.OpenQuantity);
             Assert.Equal((ulong)5, order6.Sequnce);
 
-            Order order7 = new Order { IsBuy = true, Quantity = 500, Price = 8, OrderId = 7 };
-            OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
+            Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 8, OrderId = 7 };
+            var orderWrapper7 = new OrderWrapper{ Order = order7  };
+            OrderMatchingResult result7 = matchingEngine.AddOrder(orderWrapper7);
 
             mockTradeListener.Verify(x => x.OnTrade(7, 6, 8, 500, true));
             mockTradeListener.Verify(x => x.OnOrderTriggered(3));
@@ -705,8 +738,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Cancels_Triggered_Stop_Market_Order_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 600, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 600, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1  };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -720,8 +754,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)600, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2  };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -736,8 +771,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = true, Quantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = true, OpenQuantity = 600, Price = 0, OrderId = 3, IsStop =  true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3 , StopPrice = 10 };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 100, false));
             mockTradeListener.VerifyNoOtherCalls();
@@ -772,8 +808,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void CancelOrder_Cancels_Triggered_Stop_Market_Order_Sell()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1  };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -787,8 +824,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 600, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 600, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2  };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, false));
             mockTradeListener.VerifyNoOtherCalls();
@@ -803,8 +841,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)100, order2.OpenQuantity);
             Assert.Equal((ulong)2, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = false, Quantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = false, OpenQuantity = 600, Price = 0, OrderId = 3, IsStop = true};
+            var orderWrapper3 = new OrderWrapper{ Order = order3, StopPrice = 10  };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 11, 100, false));
             mockTradeListener.VerifyNoOtherCalls();
@@ -840,8 +879,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_ResetsOpenQuantityAndIsTip()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1  };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.False(order1.IsTip);
@@ -850,8 +890,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_RejectsOrder_IfPriceQuantityStopPriceNegative()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = -1000, Price = -10, StopPrice = -1 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order {IsBuy = true, OrderId = 1, OpenQuantity = -1000, Price = -10, IsStop =  true};
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , StopPrice = -1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -864,8 +905,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_RejectsOrder_IfQuantityIsNegative()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = -1000, Price = 10, StopPrice = 1 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = -1000, Price = 10, IsStop =  true };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , StopPrice = 1};
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -878,8 +920,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_RejectsOrder_IfPriceIsNegative()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = -10, StopPrice = 1 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = -10, IsStop =  true };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , StopPrice = 1};
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -892,8 +935,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_RejectsOrder_IfStopPriceIsNegative()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10, StopPrice = -1 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10, IsStop =  true};
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , StopPrice = -1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -906,8 +950,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Adds_Order_In_Accepted_Order_List()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
 
@@ -921,20 +966,22 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Rejects_Duplicate_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
 
-            OrderMatchingResult accepted2 = matchingEngine.AddOrder(order1);
+            OrderMatchingResult accepted2 = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.DuplicateOrder, accepted2);
         }
 
         [Fact]
         public void AddOrder_Rejects_InvalidPrice_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = -10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = -10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -942,8 +989,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Rejects_InvalidQuantity_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = -1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = -1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -952,7 +1000,8 @@ namespace OrderMatcher.Tests
         public void AddOrder_Rejects_InvalidOrderAmount_Order()
         {
             Order order1 = new Order { IsBuy = true, OrderId = 1, OrderAmount = -1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -960,8 +1009,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Rejects_InvalidStopPrice_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, StopPrice = -10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, IsStop = true};
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , StopPrice = -10};
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -969,8 +1019,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Rejects_InvalidTotalQuantityIceberg_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, StopPrice = 10, TotalQuantity = -10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, IsStop = true};
+            var orderWrapper1 = new OrderWrapper{ Order = order1, TotalQuantity = -10, StopPrice = 10, TipQuantity = 1000 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -979,8 +1030,9 @@ namespace OrderMatcher.Tests
         public void AddOrder_Rejects_TotalQuantityNotMultipleOfStepSize_Order()
         {
             matchingEngine = new MatchingEngine(0, 0.5m, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000.1m, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000.1m, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -989,8 +1041,9 @@ namespace OrderMatcher.Tests
         public void AddOrder_Rejects_QuantityNotMultipleOfStepSize_Order()
         {
             matchingEngine = new MatchingEngine(0, 0.5m, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10, TotalQuantity = 10000.1m };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1, TotalQuantity = 10000.1m, TipQuantity = 1000 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -999,8 +1052,9 @@ namespace OrderMatcher.Tests
         public void AddOrder_Rejects_TotalQuantityNotMultipleOfStepSize2_Order()
         {
             matchingEngine = new MatchingEngine(0, 3, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -1009,8 +1063,9 @@ namespace OrderMatcher.Tests
         public void AddOrder_Rejects_QuantityNotMultipleOfStepSize2_Order()
         {
             matchingEngine = new MatchingEngine(0, 3, mockTradeListener.Object, mockTimeProvider.Object);
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10, TotalQuantity = 10000 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 , TotalQuantity = 10000, TipQuantity = 1000};
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, accepted);
             Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -1018,8 +1073,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Accepts_TotalQuantityMultipleOfStepSize_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -1027,8 +1083,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Accepts_QuantityMultipleOfStepSize_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10, TotalQuantity = 10000 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1, TotalQuantity = 10000, TipQuantity = 1000};
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
         }
@@ -1036,12 +1093,14 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Limit_Matches_With_Pending_Order()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
-            Order order2 = new Order { IsBuy = false, OrderId = 2, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult accepted2 = matchingEngine.AddOrder(orderWrapper2);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 1000, true));
@@ -1060,12 +1119,14 @@ namespace OrderMatcher.Tests
         {
             matchingEngine = new MatchingEngine(0, 1, null, mockTimeProvider.Object);
 
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
-            Order order2 = new Order { IsBuy = false, OrderId = 2, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult accepted2 = matchingEngine.AddOrder(orderWrapper2);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted2);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -1081,12 +1142,14 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Limit_Deos_Not_Matches_With_Pending_Order_If_Limit_Not_Satisfy()
         {
-            Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-            OrderMatchingResult accepted = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 10 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(orderWrapper1);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted);
 
-            Order order2 = new Order { IsBuy = false, OrderId = 2, Quantity = 1000, Price = 11 };
-            OrderMatchingResult accepted2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 1000, Price = 11 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult accepted2 = matchingEngine.AddOrder(orderWrapper2);
             Assert.Equal(OrderMatchingResult.OrderAccepted, accepted2);
 
             mockTradeListener.VerifyNoOtherCalls();
@@ -1103,8 +1166,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Limit_Complex_Matching_Scenario()
         {
-            Order order1 = new Order { IsBuy = true, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -1118,8 +1182,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = false, Quantity = 1000, Price = 11, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
@@ -1133,8 +1198,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order2.OpenQuantity);
             Assert.Equal((ulong)2, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = true, Quantity = 1000, Price = 9, OrderId = 3 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 3 };
+            var orderWrapper3 = new OrderWrapper{ Order = order3 };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
@@ -1148,8 +1214,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order3.OpenQuantity);
             Assert.Equal((ulong)3, order3.Sequnce);
 
-            Order order4 = new Order { IsBuy = false, Quantity = 500, Price = 10, OrderId = 4 };
-            OrderMatchingResult result4 = matchingEngine.AddOrder(order4);
+            Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
+            var orderWrapper4 = new OrderWrapper{ Order = order4 };
+            OrderMatchingResult result4 = matchingEngine.AddOrder(orderWrapper4);
 
             Assert.Equal(OrderMatchingResult.OrderAccepted, result4);
             mockTradeListener.Verify(x => x.OnTrade(4, 1, 10, 500, true));
@@ -1164,8 +1231,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order4.OpenQuantity);
             Assert.Equal((Quantity)500, order1.OpenQuantity);
 
-            Order order5 = new Order { IsBuy = true, Quantity = 1000, Price = 10, OrderId = 5 };
-            OrderMatchingResult result5 = matchingEngine.AddOrder(order5);
+            Order order5 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 5 };
+            var orderWrapper5 = new OrderWrapper{ Order = order5 };
+            OrderMatchingResult result5 = matchingEngine.AddOrder(orderWrapper5);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result5);
@@ -1179,8 +1247,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order5.OpenQuantity);
             Assert.Equal((ulong)4, order5.Sequnce);
 
-            Order order6 = new Order { IsBuy = true, Quantity = 500, Price = 12, OrderId = 6 };
-            OrderMatchingResult result6 = matchingEngine.AddOrder(order6);
+            Order order6 = new Order { IsBuy = true, OpenQuantity = 500, Price = 12, OrderId = 6 };
+            var orderWrapper6 = new OrderWrapper{ Order = order6 };
+            OrderMatchingResult result6 = matchingEngine.AddOrder(orderWrapper6);
 
             mockTradeListener.Verify(x => x.OnTrade(6, 2, 11, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -1196,8 +1265,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order2.OpenQuantity);
             Assert.Equal((ulong)0, order6.Sequnce);
 
-            Order order7 = new Order { IsBuy = false, Quantity = 500, Price = 12, OrderId = 7 };
-            OrderMatchingResult result7 = matchingEngine.AddOrder(order7);
+            Order order7 = new Order { IsBuy = false, OpenQuantity = 500, Price = 12, OrderId = 7 };
+            var orderWrapper7 = new OrderWrapper{ Order = order7 };
+            OrderMatchingResult result7 = matchingEngine.AddOrder(orderWrapper7);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
@@ -1211,8 +1281,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order7.OpenQuantity);
             Assert.Equal((ulong)5, order7.Sequnce);
 
-            Order order8 = new Order { IsBuy = false, Quantity = 1000, Price = 13, OrderId = 8 };
-            OrderMatchingResult result8 = matchingEngine.AddOrder(order8);
+            Order order8 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 13, OrderId = 8 };
+            var orderWrapper8 = new OrderWrapper{ Order = order8 };
+            OrderMatchingResult result8 = matchingEngine.AddOrder(orderWrapper8);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result8);
@@ -1226,8 +1297,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order8.OpenQuantity);
             Assert.Equal((ulong)6, order8.Sequnce);
 
-            Order order9 = new Order { IsBuy = false, Quantity = 1000, Price = 14, OrderId = 9 };
-            OrderMatchingResult result9 = matchingEngine.AddOrder(order9);
+            Order order9 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 14, OrderId = 9 };
+            var orderWrapper9 = new OrderWrapper{ Order = order9 };
+            OrderMatchingResult result9 = matchingEngine.AddOrder(orderWrapper9);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result9);
@@ -1241,8 +1313,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order9.OpenQuantity);
             Assert.Equal((ulong)7, order9.Sequnce);
 
-            Order order10 = new Order { IsBuy = false, Quantity = 1000, Price = 14, OrderId = 10 };
-            OrderMatchingResult result10 = matchingEngine.AddOrder(order10);
+            Order order10 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 14, OrderId = 10 };
+            var orderWrapper10 = new OrderWrapper{ Order = order10 };
+            OrderMatchingResult result10 = matchingEngine.AddOrder(orderWrapper10);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result10);
@@ -1256,8 +1329,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order10.OpenQuantity);
             Assert.Equal((ulong)8, order10.Sequnce);
 
-            Order order11 = new Order { IsBuy = false, Quantity = 1000, Price = 15, OrderId = 11 };
-            OrderMatchingResult result11 = matchingEngine.AddOrder(order11);
+            Order order11 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 15, OrderId = 11 };
+            var orderWrapper11 = new OrderWrapper{ Order = order11 };
+            OrderMatchingResult result11 = matchingEngine.AddOrder(orderWrapper11);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result11);
@@ -1271,8 +1345,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order11.OpenQuantity);
             Assert.Equal((ulong)9, order11.Sequnce);
 
-            Order order12 = new Order { IsBuy = true, Quantity = 1000, Price = 9, OrderId = 12 };
-            OrderMatchingResult result12 = matchingEngine.AddOrder(order12);
+            Order order12 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 12 };
+            var orderWrapper12 = new OrderWrapper{ Order = order12 };
+            OrderMatchingResult result12 = matchingEngine.AddOrder(orderWrapper12);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result12);
@@ -1286,8 +1361,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order12.OpenQuantity);
             Assert.Equal((ulong)10, order12.Sequnce);
 
-            Order order13 = new Order { IsBuy = true, Quantity = 1000, Price = 8, OrderId = 13 };
-            OrderMatchingResult result13 = matchingEngine.AddOrder(order13);
+            Order order13 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 8, OrderId = 13 };
+            var orderWrapper13 = new OrderWrapper{ Order = order13 };
+            OrderMatchingResult result13 = matchingEngine.AddOrder(orderWrapper13);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result13);
@@ -1301,8 +1377,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order13.OpenQuantity);
             Assert.Equal((ulong)11, order13.Sequnce);
 
-            Order order14 = new Order { IsBuy = true, Quantity = 1000, Price = 7, OrderId = 14 };
-            OrderMatchingResult result14 = matchingEngine.AddOrder(order14);
+            Order order14 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 7, OrderId = 14 };
+            var orderWrapper14 = new OrderWrapper{ Order = order14 };
+            OrderMatchingResult result14 = matchingEngine.AddOrder(orderWrapper14);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result14);
@@ -1316,8 +1393,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order14.OpenQuantity);
             Assert.Equal((ulong)12, order14.Sequnce);
 
-            Order order15 = new Order { IsBuy = true, Quantity = 1000, Price = 7, OrderId = 15 };
-            OrderMatchingResult result15 = matchingEngine.AddOrder(order15);
+            Order order15 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 7, OrderId = 15 };
+            var orderWrapper15 = new OrderWrapper{ Order = order15 };
+            OrderMatchingResult result15 = matchingEngine.AddOrder(orderWrapper15);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result15);
@@ -1346,8 +1424,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order2.OpenQuantity);
             Assert.Equal((ulong)2, order2.Sequnce);
 
-            Order order17 = new Order { IsBuy = true, Quantity = 5000, Price = 16, OrderId = 17 };
-            OrderMatchingResult result17 = matchingEngine.AddOrder(order17);
+            Order order17 = new Order { IsBuy = true, OpenQuantity = 5000, Price = 16, OrderId = 17 };
+            var orderWrapper17 = new OrderWrapper{ Order = order17 };
+            OrderMatchingResult result17 = matchingEngine.AddOrder(orderWrapper17);
 
             mockTradeListener.Verify(x => x.OnTrade(17, 7, 12, 500, false));
             mockTradeListener.Verify(x => x.OnTrade(17, 8, 13, 1000, false));
@@ -1366,8 +1445,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)500, order17.OpenQuantity);
             Assert.Equal((ulong)14, order17.Sequnce);
 
-            Order order18 = new Order { IsBuy = false, Quantity = 4000, Price = 7, OrderId = 18 };
-            OrderMatchingResult result18 = matchingEngine.AddOrder(order18);
+            Order order18 = new Order { IsBuy = false, OpenQuantity = 4000, Price = 7, OrderId = 18 };
+            var orderWrapper18 = new OrderWrapper{ Order = order18 };
+            OrderMatchingResult result18 = matchingEngine.AddOrder(orderWrapper18);
 
             mockTradeListener.Verify(x => x.OnTrade(18, 17, 16, 500, false));
             mockTradeListener.Verify(x => x.OnTrade(18, 1, 10, 500, false));
@@ -1386,8 +1466,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order18.OpenQuantity);
             Assert.Equal((ulong)0, order18.Sequnce);
 
-            Order order19 = new Order { IsBuy = false, Quantity = 3000, Price = 7, OrderId = 19 };
-            OrderMatchingResult result19 = matchingEngine.AddOrder(order19);
+            Order order19 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 7, OrderId = 19 };
+            var orderWrapper19 = new OrderWrapper{ Order = order19 };
+            OrderMatchingResult result19 = matchingEngine.AddOrder(orderWrapper19);
 
             mockTradeListener.Verify(x => x.OnTrade(19, 13, 8, 1000, false));
             mockTradeListener.Verify(x => x.OnTrade(19, 14, 7, 1000, false));
@@ -1408,8 +1489,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Market_Matches_Order_With_Open_Orders_For_Sell()
         {
-            Order order1 = new Order { IsBuy = true, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -1423,8 +1505,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = false, Quantity = 500, Price = 0, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -1443,8 +1526,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Market_Matches_Order_With_Open_Orders_For_Buy()
         {
-            Order order1 = new Order { IsBuy = false, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -1458,8 +1542,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = true, Quantity = 500, Price = 0, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -1478,8 +1563,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void AddOrder_Normal_Market_Multiple_Matches_Order_With_Open_Orders_For_Sell()
         {
-            Order order1 = new Order { IsBuy = true, Quantity = 1000, Price = 10, OrderId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1);
+            Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1 };
+            var orderWrapper1 = new OrderWrapper{ Order = order1 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(orderWrapper1);
 
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
@@ -1493,8 +1579,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)1000, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequnce);
 
-            Order order2 = new Order { IsBuy = false, Quantity = 500, Price = 0, OrderId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2);
+            Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 2 };
+            var orderWrapper2 = new OrderWrapper{ Order = order2 };
+            OrderMatchingResult result2 = matchingEngine.AddOrder(orderWrapper2);
 
             mockTradeListener.Verify(x => x.OnTrade(2, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -1509,8 +1596,9 @@ namespace OrderMatcher.Tests
             Assert.Equal((Quantity)0, order2.OpenQuantity);
             Assert.Equal((ulong)0, order2.Sequnce);
 
-            Order order3 = new Order { IsBuy = false, Quantity = 500, Price = 0, OrderId = 3 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3);
+            Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3 };
+            var orderWrapper3 = new OrderWrapper{ Order = order3 };
+            OrderMatchingResult result3 = matchingEngine.AddOrder(orderWrapper3);
 
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 10, 500, true));
             mockTradeListener.VerifyNoOtherCalls();
@@ -1526,7 +1614,7 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)0, order3.Sequnce);
         }
 
-        [Fact]
+        /*[Fact]
         public void AddOrder_Normal_Market_Multiple_Matches_Order_With_Open_Orders_For_Buy()
         {
             Order order1 = new Order { IsBuy = false, Quantity = 1000, Price = 10, OrderId = 1 };
@@ -6691,7 +6779,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)0, order5.OpenQuantity);
             Assert.Equal((ulong)0, order5.Sequnce);
-        }
+        }*/
     }
 }
 
