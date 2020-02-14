@@ -9,9 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.0.100
+        dotnet-version: '3.1.100' # SDK Version to use.
     - name: Build with dotnet
       run: dotnet build ./OrderMatcher/OrderMatcher.sln --configuration Release
