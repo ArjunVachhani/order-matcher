@@ -2,8 +2,8 @@
 {
     public interface ITradeListener
     {
-        void OnTrade(ulong incomingOrderId, ulong restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderCompleted);
-        void OnCancel(ulong orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason);
-        void OnOrderTriggered(ulong orderId);
+        void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderCompleted);
+        void OnCancel(OrderId orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason);
+        void OnOrderTriggered(OrderId orderId);
     }
 }

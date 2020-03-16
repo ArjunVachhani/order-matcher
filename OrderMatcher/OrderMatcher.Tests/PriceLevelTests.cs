@@ -9,12 +9,12 @@ namespace OrderMatcher.Tests
         public void AddOrder_AddsOrder()
         {
             PriceLevel priceLevel = new PriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1, Quantity = 1000, StopPrice = 0 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1 };
             priceLevel.AddOrder(order1);
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2, Quantity = 1000, StopPrice = 0 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2  };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);
@@ -26,22 +26,22 @@ namespace OrderMatcher.Tests
         public void RemoveOrder_RemovesOrder()
         {
             PriceLevel priceLevel = new PriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1, Quantity = 1000, StopPrice = 0 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1 };
             priceLevel.AddOrder(order1);
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2, Quantity = 1000, StopPrice = 0 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2 };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);
 
-            Order order3 = new Order() { IsBuy = true, OrderId = 3, Price = 100, Sequnce = 3, Quantity = 1000, StopPrice = 0 };
+            Order order3 = new Order() { IsBuy = true, OrderId = 3, Price = 100, Sequnce = 3 };
             priceLevel.AddOrder(order3);
 
             Assert.Equal(3, priceLevel.OrderCount);
 
-            Order order4 = new Order() { IsBuy = true, OrderId = 4, Price = 100, Sequnce = 4, Quantity = 1000, StopPrice = 0 };
+            Order order4 = new Order() { IsBuy = true, OrderId = 4, Price = 100, Sequnce = 4 };
             priceLevel.AddOrder(order4);
 
             Assert.Equal(4, priceLevel.OrderCount);
@@ -58,12 +58,12 @@ namespace OrderMatcher.Tests
         public void Fill_RemovesOrder_IfOpenQuantityIs0()
         {
             PriceLevel priceLevel = new PriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, OpenQuantity = 1000, Sequnce = 1, Quantity = 1000, StopPrice = 0 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, OpenQuantity = 1000, Sequnce = 1 };
             priceLevel.AddOrder(order1);
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, OpenQuantity = 1000, Sequnce = 2, Quantity = 1000, StopPrice = 0 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, OpenQuantity = 1000, Sequnce = 2 };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);
@@ -78,12 +78,12 @@ namespace OrderMatcher.Tests
         public void Fill_DoesNotRemoveOrder_IfOpenQuantityIsNot0()
         {
             PriceLevel priceLevel = new PriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 100, Sequnce = 1, Quantity = 1000, StopPrice = 0 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 100, Sequnce = 1 };
             priceLevel.AddOrder(order1);
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, OpenQuantity = 1000, Price = 100, Sequnce = 2, Quantity = 1000, StopPrice = 0 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, OpenQuantity = 1000, Price = 100, Sequnce = 2 };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);
@@ -100,12 +100,12 @@ namespace OrderMatcher.Tests
         public void Fill_ThrowsException_IfOpenQuantityIsLessThanFillQuantity()
         {
             PriceLevel priceLevel = new PriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1, Quantity = 1000, StopPrice = 0 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequnce = 1 };
             priceLevel.AddOrder(order1);
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2, Quantity = 1000, StopPrice = 0 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2 };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);

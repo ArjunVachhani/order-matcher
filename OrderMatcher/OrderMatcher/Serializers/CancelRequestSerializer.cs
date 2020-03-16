@@ -23,7 +23,7 @@ namespace OrderMatcher
             sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
-            sizeOfOrderId = sizeof(ulong);
+            sizeOfOrderId = OrderId.SizeOfOrderId;
 
             version = 1;
 
@@ -76,14 +76,9 @@ namespace OrderMatcher
 
             var cancelRequest = new CancelRequest();
 
-            cancelRequest.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
+            cancelRequest.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
 
             return cancelRequest;
-        }
-
-        public static object Deserialize(object cancelRequestBinary)
-        {
-            throw new NotImplementedException();
         }
     }
 }
