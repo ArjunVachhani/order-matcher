@@ -25,8 +25,8 @@ namespace OrderMatcher
             sizeOfMessageLenght = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
-            sizeOfOrderId = sizeof(ulong);
-            sizeOfTimestamp = sizeof(long);
+            sizeOfOrderId = OrderId.SizeOfOrderId;
+            sizeOfTimestamp = sizeof(int);
             sizeOfMessageLenght = sizeof(int);
             version = 1;
 
@@ -48,7 +48,7 @@ namespace OrderMatcher
             return Serialize(orderTrigger.OrderId, orderTrigger.Timestamp);
         }
 
-        public static byte[] Serialize(ulong orderId, long timestamp)
+        public static byte[] Serialize(OrderId orderId, int timestamp)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -85,8 +85,8 @@ namespace OrderMatcher
 
             var orderTrigger = new OrderTrigger();
 
-            orderTrigger.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
-            orderTrigger.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
+            orderTrigger.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
+            orderTrigger.Timestamp = BitConverter.ToInt32(bytes, timestampOffset);
 
             return orderTrigger;
         }
