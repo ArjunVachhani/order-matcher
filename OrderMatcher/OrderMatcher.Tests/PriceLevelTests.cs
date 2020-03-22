@@ -14,7 +14,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(1, priceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2  };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequnce = 2 };
             priceLevel.AddOrder(order2);
 
             Assert.Equal(2, priceLevel.OrderCount);

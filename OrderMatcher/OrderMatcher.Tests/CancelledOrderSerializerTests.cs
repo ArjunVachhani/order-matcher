@@ -8,13 +8,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MinValue, Timestamp = int.MinValue, RemainingQuantity = int.MinValue, CancelReason = CancelReason.UserRequested, RemainingOrderAmount = decimal.MinValue });
+            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MinValue, Timestamp = int.MinValue, RemainingQuantity = int.MinValue, CancelReason = CancelReason.UserRequested, Cost = Quantity.MinValue  });
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, RemainingQuantity = int.MaxValue, CancelReason = CancelReason.ValidityExpired, RemainingOrderAmount = decimal.MaxValue });
+            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, RemainingQuantity = int.MaxValue, CancelReason = CancelReason.ValidityExpired, Cost = Quantity.MaxValue });
         }
 
         [Fact]
@@ -67,44 +67,44 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MinValue, Timestamp = int.MinValue, RemainingQuantity = int.MinValue, CancelReason = CancelReason.UserRequested, RemainingOrderAmount = decimal.MinValue });
+            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MinValue, Timestamp = int.MinValue, RemainingQuantity = int.MinValue, CancelReason = CancelReason.UserRequested, Cost = Quantity.MinValue });
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(52, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, cancelledOrder.OrderId);
-            Assert.Equal((Quantity)int.MinValue, cancelledOrder.RemainingQuantity);
+            Assert.Equal(int.MinValue, cancelledOrder.RemainingQuantity);
             Assert.Equal(int.MinValue, cancelledOrder.Timestamp);
             Assert.Equal(CancelReason.UserRequested, cancelledOrder.CancelReason);
-            Assert.Equal((Quantity)decimal.MinValue, cancelledOrder.RemainingOrderAmount);
+            Assert.Equal(Quantity.MinValue, cancelledOrder.Cost);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, RemainingQuantity = int.MaxValue, CancelReason = CancelReason.ValidityExpired, RemainingOrderAmount = decimal.MaxValue });
+            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, RemainingQuantity = int.MaxValue, CancelReason = CancelReason.ValidityExpired, Cost = Quantity.MaxValue });
 
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(52, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, cancelledOrder.OrderId);
-            Assert.Equal((Quantity)int.MaxValue, cancelledOrder.RemainingQuantity);
+            Assert.Equal(int.MaxValue, cancelledOrder.RemainingQuantity);
             Assert.Equal(int.MaxValue, cancelledOrder.Timestamp);
             Assert.Equal(CancelReason.ValidityExpired, cancelledOrder.CancelReason);
-            Assert.Equal((Quantity)decimal.MaxValue, cancelledOrder.RemainingOrderAmount);
+            Assert.Equal(Quantity.MaxValue, cancelledOrder.Cost);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
-            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = 12345678, RemainingQuantity = 56789, Timestamp = 404, CancelReason = CancelReason.ValidityExpired, RemainingOrderAmount = 12.13m });
+            var bytes = CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = 12345678, RemainingQuantity = 56789, Timestamp = 404, CancelReason = CancelReason.ValidityExpired, Cost = 12.13m });
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(52, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, cancelledOrder.OrderId);
-            Assert.Equal((Quantity)56789, cancelledOrder.RemainingQuantity);
+            Assert.Equal(56789, cancelledOrder.RemainingQuantity);
             Assert.Equal(404, cancelledOrder.Timestamp);
             Assert.Equal(CancelReason.ValidityExpired, cancelledOrder.CancelReason);
-            Assert.Equal((Quantity)12.13m, cancelledOrder.RemainingOrderAmount);
+            Assert.Equal((Quantity)12.13m, cancelledOrder.Cost);
         }
     }
 }

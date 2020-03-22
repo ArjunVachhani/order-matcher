@@ -2,8 +2,9 @@
 {
     public interface ITradeListener
     {
-        void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderCompleted);
-        void OnCancel(OrderId orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason);
+        void OnAccept(OrderId orderId);
+        void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Quantity? bidCost);
+        void OnCancel(OrderId orderId, Quantity remainingQuantity, Quantity cost, CancelReason cancelReason);
         void OnOrderTriggered(OrderId orderId);
     }
 }

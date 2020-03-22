@@ -5,6 +5,8 @@ namespace OrderMatcher
     public readonly struct Price : System.IEquatable<Price>
     {
         public const int SizeOfPrice = sizeof(decimal);
+        public static readonly Price MaxValue = decimal.MaxValue;
+        public static readonly Price MinValue = decimal.MinValue;
         private readonly decimal _price;
         public Price(decimal price)
         {

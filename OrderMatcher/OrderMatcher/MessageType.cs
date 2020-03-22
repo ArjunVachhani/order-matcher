@@ -12,6 +12,7 @@
         Fill = 102,
         Cancel = 103,
         Book = 104,
-        OrderTrigger = 105
+        OrderTrigger = 105,
+        OrderAccept = 106
     }
 }

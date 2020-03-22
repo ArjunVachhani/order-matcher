@@ -26,7 +26,7 @@ namespace OrderMatcher
         private static readonly int sizeOfSide;
         private static readonly int sizeOfCancelOn;
         private static readonly int sizeOfOrderAmount;
-        
+
         public static int MessageSize => sizeOfMessage;
 
         static OrderSerializer()
@@ -70,16 +70,16 @@ namespace OrderMatcher
             msg[orderConditionOffset] = (byte)order.OrderCondition;
             Write(msg, orderIdOffset, order.Order.OrderId);
             Write(msg, priceOffset, order.Order.Price);
-            
-            if(order.TipQuantity > 0 && order.TotalQuantity > 0)
+
+            if (order.TipQuantity > 0 && order.TotalQuantity > 0)
                 Write(msg, quantityOffset, order.TipQuantity);
             else
                 Write(msg, quantityOffset, order.Order.OpenQuantity);
-            
+
             Write(msg, stopPriceOffset, order.StopPrice);
             Write(msg, totalQuantityOffset, order.TotalQuantity);
             Write(msg, cancelOnOffset, order.Order.CancelOn);
-            Write(msg, orderAmountOffset, order.Order.OrderAmount);
+            Write(msg, orderAmountOffset, order.OrderAmount);
             return msg;
         }
 
@@ -109,7 +109,7 @@ namespace OrderMatcher
 
             var order = new OrderWrapper();
             order.Order = new Order();
-            
+
             order.Order.IsBuy = BitConverter.ToBoolean(bytes, sideOffset);
             order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
             order.Order.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
@@ -118,13 +118,13 @@ namespace OrderMatcher
             order.StopPrice = ReadPrice(bytes, stopPriceOffset);
             if (order.StopPrice > 0)
                 order.Order.IsStop = true;
-            
+
             order.TotalQuantity = ReadQuantity(bytes, totalQuantityOffset);
             if (order.TotalQuantity > 0)
                 order.TipQuantity = order.Order.OpenQuantity;
-            
+
             order.Order.CancelOn = BitConverter.ToInt32(bytes, cancelOnOffset);
-            order.Order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
+            order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
             return order;
         }
     }

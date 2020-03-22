@@ -2,17 +2,17 @@ using System.Runtime.CompilerServices;
 
 namespace OrderMatcher
 {
-    public readonly struct  OrderId : System.IEquatable<OrderId>
+    public readonly struct OrderId : System.IEquatable<OrderId>
     {
         public const int SizeOfOrderId = sizeof(int);
-        public static readonly OrderId MaxValue = (OrderId)int.MaxValue;
-        public static readonly OrderId MinValue = (OrderId)int.MinValue;
+        public static readonly OrderId MaxValue = int.MaxValue;
+        public static readonly OrderId MinValue = int.MinValue;
         private readonly int _orderId;
         public OrderId(int orderId)
         {
             _orderId = orderId;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator OrderId(int orderId)
         {
@@ -24,7 +24,7 @@ namespace OrderMatcher
         {
             return c._orderId;
         }
-        
+
         public static bool operator >(OrderId a, OrderId b)
         {
             return (a._orderId > b._orderId);
