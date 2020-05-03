@@ -124,7 +124,7 @@ namespace OrderMatcher
             }
             _acceptedOrders.Add(incomingOrder.OrderId);
             _tradeListener?.OnAccept(incomingOrder.OrderId);
-            if (orderWrapper.OrderAmount != null && orderWrapper.StopPrice != 0)
+            if (orderWrapper.OrderAmount != 0 && orderWrapper.StopPrice != 0)
             {
                 _orderAmount.Add(orderWrapper.Order.OrderId, orderWrapper.OrderAmount);
             }
@@ -387,7 +387,7 @@ namespace OrderMatcher
                         isIncomingOrderFilled = !_currentIcebergOrders.ContainsKey(incomingOrder.OrderId);
                     }
 
-                    bool isRestingFilled = restingOrder.IsFilled && !isRestingTipAdded;
+                    bool isRestingOrderFilled = restingOrder.IsFilled && !isRestingTipAdded;
 
                     Quantity? askRemainingQuanity = null;
                     Quantity? bidCost = null;
@@ -397,14 +397,14 @@ namespace OrderMatcher
                         {
                             bidCost = incomingOrder.Cost;
                         }
-                        if (isRestingFilled)
+                        if (isRestingOrderFilled)
                         {
                             askRemainingQuanity = restingOrder.OpenQuantity;
                         }
                     }
                     else
                     {
-                        if (isRestingFilled)
+                        if (isRestingOrderFilled)
                         {
                             bidCost = restingOrder.Cost;
                         }
