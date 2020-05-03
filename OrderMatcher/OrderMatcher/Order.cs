@@ -10,26 +10,12 @@
         public bool IsTip { get; set; }
         public bool IsStop { get; set; }
         public int CancelOn { get; set; }
-        public Quantity OrderAmount { get; set; }
+        public Quantity Cost { get; set; }
         public bool IsFilled
         {
             get
             {
-                if (IsBuy == true && Price == 0)
-                {
-                    if (OrderAmount == 0 && OpenQuantity == 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return OpenQuantity == 0;
-                }
+                return OpenQuantity == 0;
             }
         }
     }
@@ -38,6 +24,7 @@
     {
         public Quantity TipQuantity { get; set; }
         public Quantity TotalQuantity { get; set; }
+        public Quantity OrderAmount { get; set; }
         public Price StopPrice { get; set; }
         public OrderCondition OrderCondition { get; set; }
         public Order Order { get; set; }
@@ -47,5 +34,6 @@
     {
         public Quantity TipQuantity { get; set; }
         public Quantity TotalQuantity { get; set; }
+        public Quantity Cost { get; set; }
     }
 }

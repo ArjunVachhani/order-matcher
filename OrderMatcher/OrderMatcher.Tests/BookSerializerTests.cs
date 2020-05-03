@@ -103,9 +103,9 @@ namespace OrderMatcher.Tests
         public void Deserialize_CheckCorrectBidCountAskCountWithPriceLevel()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9,  OpenQuantity = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8,  OpenQuantity = 9 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10,  OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 9 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(131, messageLength);
@@ -113,12 +113,12 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
             Assert.Single(bookDepth.Ask);
-            Assert.Equal((Price)9, bookDepth.Bid[0].Key);
-            Assert.Equal((Quantity)10, bookDepth.Bid[0].Value);
-            Assert.Equal((Price)8, bookDepth.Bid[1].Key);
-            Assert.Equal((Quantity)9, bookDepth.Bid[1].Value);
-            Assert.Equal((Price)10, bookDepth.Ask[0].Key);
-            Assert.Equal((Quantity)10, bookDepth.Ask[0].Value);
+            Assert.Equal(9, bookDepth.Bid[0].Key);
+            Assert.Equal(10, bookDepth.Bid[0].Value);
+            Assert.Equal(8, bookDepth.Bid[1].Key);
+            Assert.Equal(9, bookDepth.Bid[1].Value);
+            Assert.Equal(10, bookDepth.Ask[0].Key);
+            Assert.Equal(10, bookDepth.Ask[0].Value);
         }
 
         [Fact]
@@ -134,17 +134,17 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
             Assert.Empty(bookDepth.Ask);
-            Assert.Equal((Price)9, bookDepth.Bid[0].Key);
-            Assert.Equal((Quantity)10, bookDepth.Bid[0].Value);
-            Assert.Equal((Price)8, bookDepth.Bid[1].Key);
-            Assert.Equal((Quantity)9, bookDepth.Bid[1].Value);
+            Assert.Equal(9, bookDepth.Bid[0].Key);
+            Assert.Equal(10, bookDepth.Bid[0].Value);
+            Assert.Equal(8, bookDepth.Bid[1].Key);
+            Assert.Equal(9, bookDepth.Bid[1].Value);
         }
 
         [Fact]
         public void Deserialize_CheckCorrectOnlyAsk()
         {
             var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10,  OpenQuantity = 10 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, OpenQuantity = 10 });
             var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
             Assert.Equal(67, messageLength);
@@ -152,8 +152,8 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Empty(bookDepth.Bid);
             Assert.Single(bookDepth.Ask);
-            Assert.Equal((Price)10, bookDepth.Ask[0].Key);
-            Assert.Equal((Quantity)10, bookDepth.Ask[0].Value);
+            Assert.Equal(10, bookDepth.Ask[0].Key);
+            Assert.Equal(10, bookDepth.Ask[0].Value);
         }
 
         [Fact]
@@ -161,8 +161,8 @@ namespace OrderMatcher.Tests
         {
             var book = new Book();
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10, OpenQuantity = 1 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9,  OpenQuantity = 2 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8,  OpenQuantity = 3 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 2 });
+            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 3 });
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 7, OpenQuantity = 4 });
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 6, OpenQuantity = 5 });
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 5, OpenQuantity = 6 });
@@ -171,16 +171,16 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 2, OpenQuantity = 9 });
             book.AddOrderOpenBook(new Order { IsBuy = true, Price = 1, OpenQuantity = 10 });
 
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 11,  OpenQuantity = 11 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 12,  OpenQuantity = 12 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 13,  OpenQuantity = 13 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 14,  OpenQuantity = 14 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 15,  OpenQuantity = 15 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 16,  OpenQuantity = 16 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 11, OpenQuantity = 11 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 12, OpenQuantity = 12 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 13, OpenQuantity = 13 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 14, OpenQuantity = 14 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 15, OpenQuantity = 15 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 16, OpenQuantity = 16 });
             book.AddOrderOpenBook(new Order { IsBuy = false, Price = 17, OpenQuantity = 17 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 18,  OpenQuantity = 18 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 19,  OpenQuantity = 19 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 20,  OpenQuantity = 20 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 18, OpenQuantity = 18 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 19, OpenQuantity = 19 });
+            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 20, OpenQuantity = 20 });
 
             var bytes = BookSerializer.Serialize(book, 5, 10, DateTime.UtcNow.Ticks);
             var messageLength = BitConverter.ToInt32(bytes, 0);
@@ -189,28 +189,28 @@ namespace OrderMatcher.Tests
             Assert.Equal(10, bookDepth.LTP);
             Assert.Equal(5, bookDepth.Bid.Count);
 
-            Assert.Equal((Price)10, bookDepth.Bid[0].Key);
-            Assert.Equal((Quantity)1, bookDepth.Bid[0].Value);
-            Assert.Equal((Price)9, bookDepth.Bid[1].Key);
-            Assert.Equal((Quantity)2, bookDepth.Bid[1].Value);
-            Assert.Equal((Price)8, bookDepth.Bid[2].Key);
-            Assert.Equal((Quantity)3, bookDepth.Bid[2].Value);
-            Assert.Equal((Price)7, bookDepth.Bid[3].Key);
-            Assert.Equal((Quantity)4, bookDepth.Bid[3].Value);
-            Assert.Equal((Price)6, bookDepth.Bid[4].Key);
-            Assert.Equal((Quantity)5, bookDepth.Bid[4].Value);
+            Assert.Equal(10, bookDepth.Bid[0].Key);
+            Assert.Equal(1, bookDepth.Bid[0].Value);
+            Assert.Equal(9, bookDepth.Bid[1].Key);
+            Assert.Equal(2, bookDepth.Bid[1].Value);
+            Assert.Equal(8, bookDepth.Bid[2].Key);
+            Assert.Equal(3, bookDepth.Bid[2].Value);
+            Assert.Equal(7, bookDepth.Bid[3].Key);
+            Assert.Equal(4, bookDepth.Bid[3].Value);
+            Assert.Equal(6, bookDepth.Bid[4].Key);
+            Assert.Equal(5, bookDepth.Bid[4].Value);
 
 
-            Assert.Equal((Price)11, bookDepth.Ask[0].Key);
-            Assert.Equal((Quantity)11, bookDepth.Ask[0].Value);
-            Assert.Equal((Price)12, bookDepth.Ask[1].Key);
-            Assert.Equal((Quantity)12, bookDepth.Ask[1].Value);
-            Assert.Equal((Price)13, bookDepth.Ask[2].Key);
-            Assert.Equal((Quantity)13, bookDepth.Ask[2].Value);
-            Assert.Equal((Price)14, bookDepth.Ask[3].Key);
-            Assert.Equal((Quantity)14, bookDepth.Ask[3].Value);
-            Assert.Equal((Price)15, bookDepth.Ask[4].Key);
-            Assert.Equal((Quantity)15, bookDepth.Ask[4].Value);
+            Assert.Equal(11, bookDepth.Ask[0].Key);
+            Assert.Equal(11, bookDepth.Ask[0].Value);
+            Assert.Equal(12, bookDepth.Ask[1].Key);
+            Assert.Equal(12, bookDepth.Ask[1].Value);
+            Assert.Equal(13, bookDepth.Ask[2].Key);
+            Assert.Equal(13, bookDepth.Ask[2].Value);
+            Assert.Equal(14, bookDepth.Ask[3].Key);
+            Assert.Equal(14, bookDepth.Ask[3].Value);
+            Assert.Equal(15, bookDepth.Ask[4].Key);
+            Assert.Equal(15, bookDepth.Ask[4].Value);
         }
     }
 }

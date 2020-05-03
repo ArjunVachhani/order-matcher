@@ -32,24 +32,24 @@ namespace OrderMatcher.Performance
         public SerializeBenchmark()
         {
             book = new Book();
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000,  OrderId = 3434, Price = 234 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000,  OrderId = 3434, Price = 235 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000,  OrderId = 3435, Price = 236 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000,  OrderId = 3436, Price = 237 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000,  OrderId = 3437, Price = 238 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000,  OrderId = 3438, Price = 239 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000,  OrderId = 3439, Price = 240 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000,  OrderId = 3440, Price = 241 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000,  OrderId = 3441, Price = 242 });
-            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000,  OrderId = 3442, Price = 243 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000, OrderId = 3434, Price = 234 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000, OrderId = 3434, Price = 235 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000, OrderId = 3435, Price = 236 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000, OrderId = 3436, Price = 237 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = true, IsTip = false, OpenQuantity = 1000, OrderId = 3437, Price = 238 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000, OrderId = 3438, Price = 239 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000, OrderId = 3439, Price = 240 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000, OrderId = 3440, Price = 241 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000, OrderId = 3441, Price = 242 });
+            book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, IsTip = false, OpenQuantity = 1000, OrderId = 3442, Price = 243 });
             bid = book.BidSide.Select(x => new KeyValuePair<Price, Quantity>(x.Key, x.Value.Quantity)).ToList();
             ask = book.AskSide.Select(x => new KeyValuePair<Price, Quantity>(x.Key, x.Value.Quantity)).ToList();
 
-            var order = new Order {CancelOn = 12345678, IsBuy = true,OrderId = 56789, Price = 404, OpenQuantity = 1000};
+            var order = new Order { CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, OpenQuantity = 1000 };
             var orderWrapper = new OrderWrapper() { Order = order, OrderCondition = OrderCondition.ImmediateOrCancel, StopPrice = 9534, TotalQuantity = 7878234 };
             orderJsonString = JsonConvert.SerializeObject(orderWrapper);
             orderBinarySerialized = OrderSerializer.Serialize(orderWrapper);
-            orderMsgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100,  OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
+            orderMsgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
 
             fillJsonString = JsonConvert.SerializeObject(new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 });
             fillBinary = FillSerializer.Serialize(new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 });
@@ -171,22 +171,22 @@ namespace OrderMatcher.Performance
         [Benchmark]
         public void orderJsonSerialize()
         {
-            var order = new Order {IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400,Sequnce = 0};
-            var orderWrapper = new OrderWrapper() {TotalQuantity = 100 , OrderCondition = OrderCondition.None,  StopPrice = 0  };
+            var order = new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400, Sequnce = 0 };
+            var orderWrapper = new OrderWrapper() { TotalQuantity = 100, OrderCondition = OrderCondition.None, StopPrice = 0 };
             var orderJsonString = JsonConvert.SerializeObject(orderWrapper);
         }
 
         [Benchmark]
         public void orderMsgPckSerialize()
         {
-            var msgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100,  OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
+            var msgPck = MessagePackSerializer.Serialize(new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 });
         }
 
         [Benchmark]
         public void orderBinarySerialize()
         {
-            var order = new Order {IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400,Sequnce = 0};
-            var orderWrapper = new OrderWrapper() {TotalQuantity = 100 , OrderCondition = OrderCondition.None,  StopPrice = 0  };
+            var order = new Order { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400, Sequnce = 0 };
+            var orderWrapper = new OrderWrapper() { TotalQuantity = 100, OrderCondition = OrderCondition.None, StopPrice = 0 };
             var bytes = OrderSerializer.Serialize(orderWrapper);
         }
 
