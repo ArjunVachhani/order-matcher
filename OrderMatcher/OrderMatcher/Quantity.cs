@@ -3,6 +3,8 @@
     public readonly struct Quantity : System.IEquatable<Quantity>
     {
         public const int SizeOfQuantity = sizeof(decimal);
+        public static readonly Quantity MaxValue = decimal.MaxValue;
+        public static readonly Quantity MinValue = decimal.MinValue;
         private readonly decimal _quantity;
         public Quantity(decimal quantity)
         {

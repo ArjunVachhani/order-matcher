@@ -7,15 +7,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Filled_ReturnsTrue_MarketOrderFilled()
         {
-            Order order = new Order() { Price = 0, OpenQuantity = 0, OrderAmount = 0, IsBuy = true };
+            Order order = new Order() { Price = 0, OpenQuantity = 0, IsBuy = true };
             Assert.True(order.IsFilled);
-        }
-
-        [Fact]
-        public void Filled_ReturnsFalse_MarketOrderFilled_1()
-        {
-            Order order = new Order() { Price = 0, OpenQuantity = 0, OrderAmount = 2, IsBuy = true };
-            Assert.False(order.IsFilled);
         }
 
         [Fact]
@@ -28,7 +21,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Filled_ReturnsTrue_MarketOrderFilled_3()
         {
-            Order order = new Order() { Price = 0, OpenQuantity = 0, OrderAmount = 2, IsBuy = false };
+            Order order = new Order() { Price = 0, OpenQuantity = 0, IsBuy = false };
             Assert.True(order.IsFilled);
         }
 

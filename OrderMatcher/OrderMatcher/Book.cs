@@ -19,7 +19,7 @@ namespace OrderMatcher
         private PriceLevel _bestStopAskPriceLevel;
         private QuantityTrackingPriceLevel _bestBidPriceLevel;
         private QuantityTrackingPriceLevel _bestAskPriceLevel;
-        
+
         public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> BidSide => _bidSide;
         public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> AskSide => _askSide;
         internal int AskPriceLevelCount => _askSide.Count;
@@ -59,7 +59,7 @@ namespace OrderMatcher
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _bidSide, true);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId,out var stopPrice) && _stopBid.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
+                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopBid.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
                 {
                     _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
@@ -74,7 +74,7 @@ namespace OrderMatcher
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _askSide, false);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId,out var stopPrice) && _stopAsk.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
+                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopAsk.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
                 {
                     _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
@@ -83,7 +83,7 @@ namespace OrderMatcher
             }
         }
 
-        public void AddStopOrder(Order order,Price stopPrice)
+        public void AddStopOrder(Order order, Price stopPrice)
         {
             order.Sequnce = ++_sequence;
             _stopDictionary.Add(order.OrderId, stopPrice);
