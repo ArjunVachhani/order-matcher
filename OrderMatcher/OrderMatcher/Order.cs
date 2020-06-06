@@ -11,6 +11,8 @@
         public bool IsStop { get; set; }
         public int CancelOn { get; set; }
         public Quantity Cost { get; set; }
+        public Quantity Fee { get; set; }//TODO serialize fee
+        public short FeeId { get; set; }
         public bool IsFilled
         {
             get
@@ -34,6 +36,5 @@
     {
         public Quantity TipQuantity { get; set; }
         public Quantity TotalQuantity { get; set; }
-        public Quantity Cost { get; set; }
     }
 }
