@@ -12,5 +12,9 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.100' # SDK Version to use.
+    - name: Restore Nuget packages
+      run: dotnet restore ./OrderMatcher/OrderMatcher.sln
     - name: Build with dotnet
-      run: dotnet build ./OrderMatcher/OrderMatcher.sln --configuration Release
+      run: dotnet build ./OrderMatcher/OrderMatcher.sln --configuration Release --no-restore
+    - name: Unit test with dotnet
+      run: dotnet test ./OrderMatcher/OrderMatcher.sln --configuration Release --no-build
