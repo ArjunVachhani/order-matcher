@@ -11,6 +11,7 @@ namespace OrderMatcher
         private static readonly int orderIdOffset;
         private static readonly int remainingQuantityOffset;
         private static readonly int costOffset;
+        private static readonly int feeOffset;
         private static readonly int cancelReasonOffset;
         private static readonly int timestampOffset;
 
@@ -21,6 +22,7 @@ namespace OrderMatcher
         private static readonly int sizeOfOrderId;
         private static readonly int sizeOfRemainingQuantity;
         private static readonly int sizeOfCost;
+        private static readonly int sizeOfFee;
         private static readonly int sizeOfCancelReason;
         private static readonly int sizeOfTimestamp;
 
@@ -34,6 +36,7 @@ namespace OrderMatcher
             sizeOfOrderId = sizeof(ulong);
             sizeOfRemainingQuantity = Quantity.SizeOfQuantity;
             sizeOfCost = Quantity.SizeOfQuantity;
+            sizeOfFee = Quantity.SizeOfQuantity;
             sizeOfCancelReason = sizeof(CancelReason);
             sizeOfTimestamp = sizeof(int);
             version = 1;
@@ -44,7 +47,8 @@ namespace OrderMatcher
             orderIdOffset = versionOffset + sizeOfVersion;
             remainingQuantityOffset = orderIdOffset + sizeOfOrderId;
             costOffset = remainingQuantityOffset + sizeOfRemainingQuantity;
-            cancelReasonOffset = costOffset + sizeOfCost;
+            feeOffset = costOffset + sizeOfCost;
+            cancelReasonOffset = feeOffset + sizeOfFee;
             timestampOffset = cancelReasonOffset + sizeOfCancelReason;
             sizeOfMessage = timestampOffset + sizeOfTimestamp;
         }
@@ -55,10 +59,10 @@ namespace OrderMatcher
             {
                 throw new ArgumentNullException(nameof(cancelledOrder));
             }
-            return Serialize(cancelledOrder.OrderId, cancelledOrder.RemainingQuantity, cancelledOrder.Cost, cancelledOrder.CancelReason, cancelledOrder.Timestamp);
+            return Serialize(cancelledOrder.OrderId, cancelledOrder.RemainingQuantity, cancelledOrder.Cost, cancelledOrder.Fee, cancelledOrder.CancelReason, cancelledOrder.Timestamp);
         }
 
-        public static byte[] Serialize(OrderId orderId, Quantity remainingQuantity, Quantity cost, CancelReason cancelReason, int timeStamp)
+        public static byte[] Serialize(OrderId orderId, Quantity remainingQuantity, Quantity cost, Quantity fee, CancelReason cancelReason, int timeStamp)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -69,6 +73,7 @@ namespace OrderMatcher
             msg[cancelReasonOffset] = (byte)cancelReason;
             Write(msg, timestampOffset, timeStamp);
             Write(msg, costOffset, cost);
+            Write(msg, feeOffset, fee);
             return msg;
         }
 
@@ -103,7 +108,7 @@ namespace OrderMatcher
             cancelledOrder.CancelReason = (CancelReason)bytes[cancelReasonOffset];
             cancelledOrder.Timestamp = BitConverter.ToInt32(bytes, timestampOffset);
             cancelledOrder.Cost = ReadQuantity(bytes, costOffset);
-
+            cancelledOrder.Fee = ReadQuantity(bytes, feeOffset);
             return cancelledOrder;
         }
     }

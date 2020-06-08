@@ -6,6 +6,7 @@
         NewOrderRequest = 1,
         CancelRequest = 2,
         BookRequest = 3,
+        CancelOpenGTD = 4,
 
         //Output from order matcher
         OrderMatchingResult = 101,

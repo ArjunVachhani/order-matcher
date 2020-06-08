@@ -128,6 +128,8 @@ namespace OrderMatcher
                 return MessageType.Fill;
             else if ((MessageType)data[4] == MessageType.Cancel && messageSize == CancelledOrderSerializer.MessageSize)
                 return MessageType.Cancel;
+            else if ((MessageType)data[4] == MessageType.OrderAccept && messageSize == OrderAcceptSerializer.MessageSize)
+                return MessageType.OrderAccept;
             else if ((MessageType)data[4] == MessageType.OrderTrigger && messageSize == OrderTriggerSerializer.MessageSize)
                 return MessageType.OrderTrigger;
             else if ((MessageType)data[4] == MessageType.Book)

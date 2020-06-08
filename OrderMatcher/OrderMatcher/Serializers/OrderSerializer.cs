@@ -17,6 +17,7 @@ namespace OrderMatcher
         private static readonly int totalQuantityOffset;
         private static readonly int cancelOnOffset;
         private static readonly int orderAmountOffset;
+        private static readonly int feeIdOffset;
 
         private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
@@ -26,6 +27,7 @@ namespace OrderMatcher
         private static readonly int sizeOfSide;
         private static readonly int sizeOfCancelOn;
         private static readonly int sizeOfOrderAmount;
+        private static readonly int sizeOfFeeId;
 
         public static int MessageSize => sizeOfMessage;
 
@@ -38,6 +40,7 @@ namespace OrderMatcher
             sizeOfCancelOn = sizeof(int);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderAmount = Quantity.SizeOfQuantity;
+            sizeOfFeeId = sizeof(short);
             version = 1;
 
             messageLengthOffset = 0;
@@ -52,7 +55,8 @@ namespace OrderMatcher
             totalQuantityOffset = stopPriceOffset + Price.SizeOfPrice;
             cancelOnOffset = totalQuantityOffset + Quantity.SizeOfQuantity;
             orderAmountOffset = cancelOnOffset + sizeOfCancelOn;
-            sizeOfMessage = orderAmountOffset + sizeOfOrderAmount;
+            feeIdOffset = orderAmountOffset + sizeOfOrderAmount;
+            sizeOfMessage = feeIdOffset + sizeOfFeeId;
         }
 
         public static byte[] Serialize(OrderWrapper order)
@@ -80,6 +84,7 @@ namespace OrderMatcher
             Write(msg, totalQuantityOffset, order.TotalQuantity);
             Write(msg, cancelOnOffset, order.Order.CancelOn);
             Write(msg, orderAmountOffset, order.OrderAmount);
+            Write(msg, feeIdOffset, order.Order.FeeId);
             return msg;
         }
 
@@ -125,6 +130,7 @@ namespace OrderMatcher
 
             order.Order.CancelOn = BitConverter.ToInt32(bytes, cancelOnOffset);
             order.OrderAmount = ReadQuantity(bytes, orderAmountOffset);
+            order.Order.FeeId = BitConverter.ToInt16(bytes, feeIdOffset);
             return order;
         }
     }
