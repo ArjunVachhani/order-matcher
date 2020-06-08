@@ -17,6 +17,10 @@ namespace OrderMatcher
         private static readonly int askRemainingQuantityOffset;
         private static readonly int isBidCostNullOffset;
         private static readonly int bidCostOffset;
+        private static readonly int isBidFeeNullOffset;
+        private static readonly int bidFeeOffset;
+        private static readonly int isAskFeeNullOffset;
+        private static readonly int askFeeOffset;
 
         private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
@@ -28,9 +32,13 @@ namespace OrderMatcher
         private static readonly int sizeOfMatchQuantity;
         private static readonly int sizeOfTimestamp;
         private static readonly int sizeOfAskRemainingQuantity;
+        private static readonly int sizeOfAskFee;
         private static readonly int sizeOfBidCost;
+        private static readonly int sizeOfBidFee;
         private static readonly int sizeOfIsAskRemainingNull;
+        private static readonly int sizeOfIsAskFeeNull;
         private static readonly int sizeOfIsBidCostNull;
+        private static readonly int sizeOfIsBidFeeNull;
 
         public static int MessageSize => sizeOfMessage;
 
@@ -47,6 +55,10 @@ namespace OrderMatcher
             sizeOfBidCost = Quantity.SizeOfQuantity;
             sizeOfTimestamp = sizeof(int);
             sizeOfIsAskRemainingNull = sizeof(bool);
+            sizeOfIsAskFeeNull = sizeof(bool);
+            sizeOfAskFee = Quantity.SizeOfQuantity;
+            sizeOfIsBidFeeNull = sizeof(bool);
+            sizeOfBidFee = Quantity.SizeOfQuantity;
             sizeOfIsBidCostNull = sizeof(bool);
             version = 1;
 
@@ -59,9 +71,13 @@ namespace OrderMatcher
             matchQuantityOffset = matchRateOffset + sizeOfMatchRate;
             isAskRemainingNullOffset = matchQuantityOffset + sizeOfMatchQuantity;
             askRemainingQuantityOffset = isAskRemainingNullOffset + sizeOfIsAskRemainingNull;
-            isBidCostNullOffset = askRemainingQuantityOffset + sizeOfAskRemainingQuantity;
+            isAskFeeNullOffset = askRemainingQuantityOffset + sizeOfAskRemainingQuantity;
+            askFeeOffset = isAskFeeNullOffset + sizeOfIsAskFeeNull;
+            isBidCostNullOffset = askFeeOffset + sizeOfAskFee;
             bidCostOffset = isBidCostNullOffset + sizeOfIsBidCostNull;
-            timestampOffset = bidCostOffset + sizeOfBidCost;
+            isBidFeeNullOffset = bidCostOffset + sizeOfBidCost;
+            bidFeeOffset = isBidFeeNullOffset + sizeOfIsBidFeeNull;
+            timestampOffset = bidFeeOffset + sizeOfBidFee;
             sizeOfMessage = timestampOffset + sizeOfTimestamp;
         }
 
@@ -71,10 +87,10 @@ namespace OrderMatcher
             {
                 throw new ArgumentNullException(nameof(fill));
             }
-            return Serialize(fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.BidCost, fill.Timestamp);
+            return Serialize(fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp);
         }
 
-        public static byte[] Serialize(OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? bidCost, int timeStamp)
+        public static byte[] Serialize(OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? askFee, Quantity? bidCost, Quantity? bidFee, int timeStamp)
         {
             byte[] msg = new byte[sizeOfMessage];
             Write(msg, messageLengthOffset, sizeOfMessage);
@@ -89,10 +105,20 @@ namespace OrderMatcher
             if (remainingAskQuantiy.HasValue)
                 Write(msg, askRemainingQuantityOffset, remainingAskQuantiy.Value);
 
+            msg[isAskFeeNullOffset] = Convert.ToByte(askFee.HasValue ? true : false);
+
+            if (askFee.HasValue)
+                Write(msg, askFeeOffset, askFee.Value);
+
             msg[isBidCostNullOffset] = Convert.ToByte(bidCost.HasValue ? true : false);
 
             if (bidCost.HasValue)
                 Write(msg, bidCostOffset, bidCost.Value);
+
+            msg[isBidFeeNullOffset] = Convert.ToByte(bidFee.HasValue ? true : false);
+
+            if (bidFee.HasValue)
+                Write(msg, bidFeeOffset, bidFee.Value);
 
             Write(msg, timestampOffset, timeStamp);
             return msg;
@@ -131,10 +157,16 @@ namespace OrderMatcher
 
             if (Convert.ToBoolean(bytes[isAskRemainingNullOffset]))
                 fill.AskRemainingQuantity = ReadQuantity(bytes, askRemainingQuantityOffset);
-            
+
+            if (Convert.ToBoolean(bytes[isAskFeeNullOffset]))
+                fill.AskFee = ReadQuantity(bytes, askFeeOffset);
+
             if (Convert.ToBoolean(bytes[isBidCostNullOffset]))
                 fill.BidCost = ReadQuantity(bytes, bidCostOffset);
-            
+
+            if (Convert.ToBoolean(bytes[isBidFeeNullOffset]))
+                fill.BidFee = ReadQuantity(bytes, bidFeeOffset);
+
             return fill;
         }
     }
