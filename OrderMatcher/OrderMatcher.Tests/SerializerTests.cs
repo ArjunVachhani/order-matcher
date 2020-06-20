@@ -1,3 +1,4 @@
+using OrderMatcher.Types.Serializers;
 using System;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace OrderMatcher.Tests
         public void WriteShortTest()
         {
             var arr1 = new byte[2];
-            Serializer.Write(arr1, 0, (short)5);
+            Serializer.Write(arr1, (short)5);
             var arr2 = BitConverter.GetBytes((short)5);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -19,7 +20,7 @@ namespace OrderMatcher.Tests
         public void WriteShortMinTest()
         {
             var arr1 = new byte[2];
-            Serializer.Write(arr1, 0, short.MinValue);
+            Serializer.Write(arr1, short.MinValue);
             var arr2 = BitConverter.GetBytes(short.MinValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -28,7 +29,7 @@ namespace OrderMatcher.Tests
         public void WriteShortMaxTest()
         {
             var arr1 = new byte[2];
-            Serializer.Write(arr1, 0, short.MaxValue);
+            Serializer.Write(arr1, short.MaxValue);
             var arr2 = BitConverter.GetBytes(short.MaxValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -37,7 +38,7 @@ namespace OrderMatcher.Tests
         public void WriteIntTest()
         {
             var arr1 = new byte[4];
-            Serializer.Write(arr1, 0, 5);
+            Serializer.Write(arr1, 5);
             var arr2 = BitConverter.GetBytes(5);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -46,7 +47,7 @@ namespace OrderMatcher.Tests
         public void WriteIntMinTest()
         {
             var arr1 = new byte[4];
-            Serializer.Write(arr1, 0, int.MinValue);
+            Serializer.Write(arr1, int.MinValue);
             var arr2 = BitConverter.GetBytes(int.MinValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -55,7 +56,7 @@ namespace OrderMatcher.Tests
         public void WriteIntMaxTest()
         {
             var arr1 = new byte[4];
-            Serializer.Write(arr1, 0, int.MaxValue);
+            Serializer.Write(arr1, int.MaxValue);
             var arr2 = BitConverter.GetBytes(int.MaxValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -65,7 +66,7 @@ namespace OrderMatcher.Tests
         public void WriteLongTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, 5);
+            Serializer.Write(arr1, 5);
             var arr2 = BitConverter.GetBytes((long)5);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -74,7 +75,7 @@ namespace OrderMatcher.Tests
         public void WriteLongMinTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, long.MinValue);
+            Serializer.Write(arr1, long.MinValue);
             var arr2 = BitConverter.GetBytes(long.MinValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -83,7 +84,7 @@ namespace OrderMatcher.Tests
         public void WriteLongMaxTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, long.MaxValue);
+            Serializer.Write(arr1, long.MaxValue);
             var arr2 = BitConverter.GetBytes(long.MaxValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -92,7 +93,7 @@ namespace OrderMatcher.Tests
         public void WriteULongTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, 5);
+            Serializer.Write(arr1, 5);
             var arr2 = BitConverter.GetBytes((ulong)5);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -101,7 +102,7 @@ namespace OrderMatcher.Tests
         public void WriteULongMinTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, ulong.MinValue);
+            Serializer.Write(arr1, ulong.MinValue);
             var arr2 = BitConverter.GetBytes(ulong.MinValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -110,7 +111,7 @@ namespace OrderMatcher.Tests
         public void WriteULongMaxTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 0, ulong.MaxValue);
+            Serializer.Write(arr1, ulong.MaxValue);
             var arr2 = BitConverter.GetBytes(ulong.MaxValue);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -119,7 +120,7 @@ namespace OrderMatcher.Tests
         public void WriteDecimalTest()
         {
             var arr1 = new byte[16];
-            Serializer.Write(arr1, 0, 5);
+            Serializer.Write(arr1, 5);
             var bits = decimal.GetBits(5);
             var arr2 = new byte[16];
             Array.Copy(BitConverter.GetBytes(bits[0]), 0, arr2, 0, 4);
@@ -133,7 +134,7 @@ namespace OrderMatcher.Tests
         public void WriteDecimalMinTest()
         {
             var arr1 = new byte[16];
-            Serializer.Write(arr1, 0, decimal.MinValue);
+            Serializer.Write(arr1, decimal.MinValue);
             var bits = decimal.GetBits(decimal.MinValue);
             var arr2 = new byte[16];
             Array.Copy(BitConverter.GetBytes(bits[0]), 0, arr2, 0, 4);
@@ -147,7 +148,7 @@ namespace OrderMatcher.Tests
         public void WriteDecimalMaxTest()
         {
             var arr1 = new byte[16];
-            Serializer.Write(arr1, 0, decimal.MaxValue);
+            Serializer.Write(arr1, decimal.MaxValue);
             var bits = decimal.GetBits(decimal.MaxValue);
             var arr2 = new byte[16];
             Array.Copy(BitConverter.GetBytes(bits[0]), 0, arr2, 0, 4);
@@ -161,7 +162,7 @@ namespace OrderMatcher.Tests
         public void WriteboolMinTest()
         {
             var arr1 = new byte[1];
-            Serializer.Write(arr1, 0, true);
+            Serializer.Write(arr1, true);
             var arr2 = BitConverter.GetBytes(true);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -170,7 +171,7 @@ namespace OrderMatcher.Tests
         public void WriteboolMaxTest()
         {
             var arr1 = new byte[1];
-            Serializer.Write(arr1, 0, false);
+            Serializer.Write(arr1, false);
             var arr2 = BitConverter.GetBytes(false);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
@@ -191,7 +192,7 @@ namespace OrderMatcher.Tests
         public void GetMessageType_ReturnsIfSizeDoesNotMatchLength()
         {
             var bytes = new byte[10];
-            Serializer.Write(bytes, 0, bytes.Length);
+            Serializer.Write(bytes, bytes.Length);
             Assert.Null(Serializer.GetMessageType(bytes));
         }
     }

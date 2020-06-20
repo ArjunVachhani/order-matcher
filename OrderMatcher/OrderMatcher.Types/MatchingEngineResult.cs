@@ -1,4 +1,4 @@
-﻿namespace OrderMatcher.Serializers
+﻿namespace OrderMatcher.Types
 {
     public class MatchingEngineResult
     {

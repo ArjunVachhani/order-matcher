@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OrderMatcher.Types;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace OrderMatcher

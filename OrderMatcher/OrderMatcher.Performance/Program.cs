@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using MessagePack;
+using OrderMatcher.Types;
 
 namespace OrderMatcher.Performance
 {

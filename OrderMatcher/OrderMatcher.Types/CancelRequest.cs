@@ -1,4 +1,4 @@
-﻿namespace OrderMatcher
+﻿namespace OrderMatcher.Types
 {
     public class CancelRequest
     {

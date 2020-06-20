@@ -1,5 +1,7 @@
-﻿using System;
+﻿using OrderMatcher.Types;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 namespace OrderMatcher
 {
@@ -11,14 +13,13 @@ namespace OrderMatcher
         private readonly SortedDictionary<Price, PriceLevel> _stopAsk;
         private readonly PriceComparerAscending _priceComparerAscending;
         private readonly PriceComparerDescending _priceComparerDescending;
-        private readonly PriceComparerDescendingZeroFirst _priceComparerDescendingZeroFirst;
         private readonly Dictionary<OrderId, Price> _stopDictionary;
 
         private ulong _sequence;
-        private PriceLevel _bestStopBidPriceLevel;
-        private PriceLevel _bestStopAskPriceLevel;
-        private QuantityTrackingPriceLevel _bestBidPriceLevel;
-        private QuantityTrackingPriceLevel _bestAskPriceLevel;
+        private PriceLevel? _bestStopBidPriceLevel;
+        private PriceLevel? _bestStopAskPriceLevel;
+        private QuantityTrackingPriceLevel? _bestBidPriceLevel;
+        private QuantityTrackingPriceLevel? _bestAskPriceLevel;
 
         public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> BidSide => _bidSide;
         public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> AskSide => _askSide;
@@ -36,9 +37,8 @@ namespace OrderMatcher
         public Book()
         {
             _priceComparerAscending = new PriceComparerAscending();
-            _priceComparerDescendingZeroFirst = new PriceComparerDescendingZeroFirst();
             _priceComparerDescending = new PriceComparerDescending();
-            _bidSide = new SortedDictionary<Price, QuantityTrackingPriceLevel>(_priceComparerDescendingZeroFirst);
+            _bidSide = new SortedDictionary<Price, QuantityTrackingPriceLevel>(_priceComparerDescending);
             _askSide = new SortedDictionary<Price, QuantityTrackingPriceLevel>(_priceComparerAscending);
             _stopBid = new SortedDictionary<Price, PriceLevel>(_priceComparerAscending);
             _stopAsk = new SortedDictionary<Price, PriceLevel>(_priceComparerDescending);
@@ -46,20 +46,17 @@ namespace OrderMatcher
             _sequence = 0;
         }
 
-        public void RemoveOrder(Order order)
+        internal void RemoveOrder(Order order)
         {
-            if (order == null)
-                throw new ArgumentNullException(nameof(order));
-
             if (order.IsBuy)
             {
                 bool removed = false;
-                if (_bidSide.TryGetValue(order.Price, out QuantityTrackingPriceLevel priceLevel))
+                if (_bidSide.TryGetValue(order.Price, out QuantityTrackingPriceLevel? priceLevel))
                 {
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _bidSide, true);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopBid.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
+                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopBid.TryGetValue(stopPrice, out PriceLevel? stopPriceLevel))
                 {
                     _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
@@ -69,12 +66,12 @@ namespace OrderMatcher
             else
             {
                 bool removed = false;
-                if (_askSide.TryGetValue(order.Price, out QuantityTrackingPriceLevel priceLevel))
+                if (_askSide.TryGetValue(order.Price, out QuantityTrackingPriceLevel? priceLevel))
                 {
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _askSide, false);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopAsk.TryGetValue(stopPrice, out PriceLevel stopPriceLevel))
+                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopAsk.TryGetValue(stopPrice, out PriceLevel? stopPriceLevel))
                 {
                     _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
@@ -83,7 +80,7 @@ namespace OrderMatcher
             }
         }
 
-        public void AddStopOrder(Order order, Price stopPrice)
+        internal void AddStopOrder(Order order, Price stopPrice)
         {
             order.Sequnce = ++_sequence;
             _stopDictionary.Add(order.OrderId, stopPrice);
@@ -107,7 +104,7 @@ namespace OrderMatcher
             }
         }
 
-        public void AddOrderOpenBook(Order order)
+        internal void AddOrderOpenBook(Order order)
         {
             order.Sequnce = ++_sequence;
             if (order.IsBuy)
@@ -130,7 +127,7 @@ namespace OrderMatcher
             }
         }
 
-        public List<PriceLevel> RemoveStopAsks(Price price)
+        internal List<PriceLevel> RemoveStopAsks(Price price)
         {
             List<PriceLevel> priceLevels = new List<PriceLevel>();
             if (_bestStopAskPriceLevel != null && price <= _bestStopAskPriceLevel.Price)
@@ -160,7 +157,7 @@ namespace OrderMatcher
             return priceLevels;
         }
 
-        public List<PriceLevel> RemoveStopBids(Price price)
+        internal List<PriceLevel> RemoveStopBids(Price price)
         {
             List<PriceLevel> priceLevels = new List<PriceLevel>();
             if (_bestStopBidPriceLevel != null && price >= _bestStopBidPriceLevel.Price)
@@ -190,7 +187,7 @@ namespace OrderMatcher
             return priceLevels;
         }
 
-        public bool FillOrder(Order order, Quantity quantity)
+        internal bool FillOrder(Order order, Quantity quantity)
         {
             SortedDictionary<Price, QuantityTrackingPriceLevel> side = order.IsBuy ? _bidSide : _askSide;
             QuantityTrackingPriceLevel priceLevel = side[order.Price];
@@ -199,9 +196,9 @@ namespace OrderMatcher
             return orderFilled;
         }
 
-        public Order GetBestBuyOrderToMatch(bool isBuy)
+        internal Order? GetBestBuyOrderToMatch(bool isBuy)
         {
-            QuantityTrackingPriceLevel bestPriceLevel = isBuy ? _bestBidPriceLevel : _bestAskPriceLevel;
+            QuantityTrackingPriceLevel? bestPriceLevel = isBuy ? _bestBidPriceLevel : _bestAskPriceLevel;
 
             if (bestPriceLevel != null)
             {
@@ -210,12 +207,12 @@ namespace OrderMatcher
             return null;
         }
 
-        public bool CheckCanFillOrder(bool isBuy, Quantity requestedQuantity, Price limitPrice)
+        internal bool CheckCanFillOrder(bool isBuy, Quantity requestedQuantity, Price limitPrice)
         {
             return isBuy ? CheckBuyOrderCanBeFilled(requestedQuantity, limitPrice) : CheckSellOrderCanBeFilled(requestedQuantity, limitPrice);
         }
 
-        public bool CheckCanFillMarketOrderAmount(bool isBuy, Quantity orderAmount)
+        internal bool CheckCanFillMarketOrderAmount(bool isBuy, Quantity orderAmount)
         {
             return isBuy ? CheckMarketOrderAmountCanBeFilled(orderAmount, _askSide) : CheckMarketOrderAmountCanBeFilled(orderAmount, _bidSide);
         }
@@ -262,7 +259,7 @@ namespace OrderMatcher
             return false;
         }
 
-        private bool CheckMarketOrderAmountCanBeFilled(Quantity orderAmount, SortedDictionary<Price, QuantityTrackingPriceLevel> side)
+        private static bool CheckMarketOrderAmountCanBeFilled(Quantity orderAmount, SortedDictionary<Price, QuantityTrackingPriceLevel> side)
         {
             Quantity cummulativeOrderAmount = 0;
             foreach (var priceLevel in side)
@@ -298,7 +295,7 @@ namespace OrderMatcher
             if (priceLevel.OrderCount == 0)
             {
                 side.Remove(priceLevel.Price);
-                if (isBuy && _bestBidPriceLevel.Price == priceLevel.Price)
+                if (isBuy && _bestBidPriceLevel!.Price == priceLevel.Price)
                 {
                     _bestBidPriceLevel = null;
                     if (side.Count > 0)
@@ -307,7 +304,7 @@ namespace OrderMatcher
                         _bestBidPriceLevel = keyval.Value;
                     }
                 }
-                else if (!isBuy && _bestAskPriceLevel.Price == priceLevel.Price)
+                else if (!isBuy && _bestAskPriceLevel!.Price == priceLevel.Price)
                 {
                     _bestAskPriceLevel = null;
                     if (side.Count > 0)
@@ -321,7 +318,7 @@ namespace OrderMatcher
 
         private static PriceLevel GetPriceLevel(Price price, SortedDictionary<Price, PriceLevel> side)
         {
-            if (!side.TryGetValue(price, out PriceLevel priceLevel))
+            if (!side.TryGetValue(price, out PriceLevel? priceLevel))
             {
                 priceLevel = new PriceLevel(price);
                 side.Add(price, priceLevel);
@@ -331,7 +328,7 @@ namespace OrderMatcher
 
         private static QuantityTrackingPriceLevel GetPriceLevel(Price price, SortedDictionary<Price, QuantityTrackingPriceLevel> side)
         {
-            if (!side.TryGetValue(price, out QuantityTrackingPriceLevel priceLevel))
+            if (!side.TryGetValue(price, out QuantityTrackingPriceLevel? priceLevel))
             {
                 priceLevel = new QuantityTrackingPriceLevel(price);
                 side.Add(price, priceLevel);

@@ -1,6 +1,9 @@
-﻿namespace OrderMatcher
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace OrderMatcher.Types
 {
-    public readonly struct Quantity : System.IEquatable<Quantity>
+    public readonly struct Quantity : IEquatable<Quantity>, IComparable<Quantity>
     {
         public const int SizeOfQuantity = sizeof(decimal);
         public static readonly Quantity MaxValue = decimal.MaxValue;
@@ -11,21 +14,25 @@
             _quantity = quantity;
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static Quantity operator -(Quantity a, Quantity b)
         {
             return (a._quantity - b._quantity);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static Quantity operator +(Quantity a, Quantity b)
         {
             return (a._quantity + b._quantity);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator Quantity(decimal quantity)
         {
             return new Quantity(quantity);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator decimal(Quantity c)
         {
             return c._quantity;
@@ -62,7 +69,7 @@
             return (a._quantity != b._quantity);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is Quantity))
             {
@@ -78,6 +85,7 @@
             return -5579697 + _quantity.GetHashCode();
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305")]
         public override string ToString()
         {
             return _quantity.ToString();
@@ -86,6 +94,11 @@
         public bool Equals(Quantity other)
         {
             return _quantity == other._quantity;
+        }
+
+        public int CompareTo(Quantity other)
+        {
+            return _quantity.CompareTo(other._quantity);
         }
     }
 }

@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderMatcher", "OrderMatcher\OrderMatcher.csproj", "{31E2432A-9C64-4F08-9927-D488CDC8D3BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderMatcher.Tests", "OrderMatcher.Tests\OrderMatcher.Tests.csproj", "{979421BC-02A5-470E-B31A-F07D20C31BDD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderMatcher.Performance", "OrderMatcher.Performance\OrderMatcher.Performance.csproj", "{EDAECD97-472B-4FE1-968E-9811555250B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderMatcher.Types", "OrderMatcher.Types\OrderMatcher.Types.csproj", "{1B0FF339-B31A-45B2-8AAE-B5C0DB463EF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{EDAECD97-472B-4FE1-968E-9811555250B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDAECD97-472B-4FE1-968E-9811555250B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDAECD97-472B-4FE1-968E-9811555250B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B0FF339-B31A-45B2-8AAE-B5C0DB463EF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0FF339-B31A-45B2-8AAE-B5C0DB463EF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0FF339-B31A-45B2-8AAE-B5C0DB463EF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B0FF339-B31A-45B2-8AAE-B5C0DB463EF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

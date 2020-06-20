@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
-namespace OrderMatcher
+namespace OrderMatcher.Types.Serializers
 {
     public class OrderTriggerSerializer : Serializer
     {
@@ -20,6 +21,7 @@ namespace OrderMatcher
 
         public static int MessageSize => sizeOfMessage;
 
+        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static OrderTriggerSerializer()
         {
             sizeOfMessageLenght = sizeof(int);
@@ -38,55 +40,54 @@ namespace OrderMatcher
             sizeOfMessage = timestampOffset + sizeOfTimestamp;
         }
 
-        public static byte[] Serialize(OrderTrigger orderTrigger)
+        public static void Serialize(OrderTrigger orderTrigger, Span<byte> bytes)
         {
             if (orderTrigger == null)
             {
                 throw new ArgumentNullException(nameof(orderTrigger));
             }
 
-            return Serialize(orderTrigger.OrderId, orderTrigger.Timestamp);
+            Serialize(orderTrigger.OrderId, orderTrigger.Timestamp, bytes);
         }
 
-        public static byte[] Serialize(OrderId orderId, int timestamp)
-        {
-            byte[] msg = new byte[sizeOfMessage];
-            Write(msg, messageLengthOffset, sizeOfMessage);
-            msg[messageTypeOffset] = (byte)MessageType.OrderTrigger;
-            Write(msg, versionOffset, (long)version);
-            Write(msg, orderIdOffset, orderId);
-            Write(msg, timestampOffset, timestamp);
-            return msg;
-        }
-
-        public static OrderTrigger Deserialize(byte[] bytes)
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public static void Serialize(OrderId orderId, int timestamp, Span<byte> bytes)
         {
             if (bytes == null)
-            {
                 throw new ArgumentNullException(nameof(bytes));
-            }
 
-            if (bytes.Length != sizeOfMessage)
-            {
+            if (bytes.Length < MessageSize)
+                throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
+
+            Write(bytes.Slice(messageLengthOffset, 4), sizeOfMessage);
+            bytes[messageTypeOffset] = (byte)MessageType.OrderTrigger;
+            Write(bytes.Slice(versionOffset), version);
+            Write(bytes.Slice(orderIdOffset), orderId);
+            Write(bytes.Slice(timestampOffset), timestamp);
+        }
+
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public static OrderTrigger Deserialize(ReadOnlySpan<byte> bytes)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            if (bytes.Length != MessageSize)
                 throw new Exception("Order Trigger Message must be of Size : " + sizeOfMessage);
-            }
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
-            if (messageType != MessageType.OrderTrigger)
-            {
-                throw new Exception("Invalid Message");
-            }
 
-            var version = BitConverter.ToInt16(bytes, versionOffset);
+            if (messageType != MessageType.OrderTrigger)
+                throw new Exception(Constant.INVALID_MESSAGE);
+
+            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
             if (version != OrderTriggerSerializer.version)
-            {
-                throw new Exception("version mismatch");
-            }
+                throw new Exception(Constant.INVALID_VERSION);
 
             var orderTrigger = new OrderTrigger();
 
-            orderTrigger.OrderId = BitConverter.ToInt32(bytes, orderIdOffset);
-            orderTrigger.Timestamp = BitConverter.ToInt32(bytes, timestampOffset);
+            orderTrigger.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
+            orderTrigger.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
 
             return orderTrigger;
         }

@@ -1,4 +1,5 @@
-﻿using OrderMatcher.Serializers;
+﻿using OrderMatcher.Types;
+using OrderMatcher.Types.Serializers;
 using System;
 using Xunit;
 
@@ -9,19 +10,21 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MinValue, Result = OrderMatchingResult.OrderAccepted, Timestamp = long.MinValue });
+            Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MinValue, Result = OrderMatchingResult.OrderAccepted, Timestamp = long.MinValue }, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MaxValue, Result = OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, Timestamp = long.MaxValue });
+            Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MaxValue, Result = OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, Timestamp = long.MaxValue }, bytes);
         }
 
         [Fact]
         public void Serialize_ThrowsExecption_IfNullPassed()
         {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => MatchingEngineResultSerializer.Serialize(null));
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => MatchingEngineResultSerializer.Serialize(null, null));
             Assert.Equal("matchingEngineResult", ex.ParamName);
         }
 
@@ -53,7 +56,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[24];
             Exception ex = Assert.Throws<Exception>(() => MatchingEngineResultSerializer.Deserialize(bytes));
-            Assert.Equal("Invalid Message", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
         [Fact]
@@ -62,14 +65,15 @@ namespace OrderMatcher.Tests
             var bytes = new byte[24];
             bytes[4] = (byte)MessageType.OrderMatchingResult;
             Exception ex = Assert.Throws<Exception>(() => MatchingEngineResultSerializer.Deserialize(bytes));
-            Assert.Equal("version mismatch", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MinValue, Result = OrderMatchingResult.OrderAccepted, Timestamp = long.MinValue });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MinValue, Result = OrderMatchingResult.OrderAccepted, Timestamp = long.MinValue }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(24, messageLength);
             var result = MatchingEngineResultSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MinValue, result.OrderId);
@@ -80,8 +84,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MaxValue, Result = OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, Timestamp = long.MaxValue });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = UInt64.MaxValue, Result = OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize, Timestamp = long.MaxValue }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(24, messageLength);
             var result = MatchingEngineResultSerializer.Deserialize(bytes);
             Assert.Equal(ulong.MaxValue, result.OrderId);
@@ -92,8 +97,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
-            var bytes = MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = 16879, Result = OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, Timestamp = 132465 });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = 16879, Result = OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, Timestamp = 132465 }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(24, messageLength);
             var result = MatchingEngineResultSerializer.Deserialize(bytes);
             Assert.Equal((ulong)16879, result.OrderId);

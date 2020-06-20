@@ -1,4 +1,5 @@
 ﻿using Moq;
+using OrderMatcher.Types;
 using System.Linq;
 using Xunit;
 

@@ -1,4 +1,6 @@
-﻿namespace OrderMatcher
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OrderMatcher.Types
 {
     public class Order
     {

@@ -1,8 +1,10 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace OrderMatcher
+namespace OrderMatcher.Types
 {
-    public readonly struct OrderId : System.IEquatable<OrderId>
+    public readonly struct OrderId : IEquatable<OrderId>, IComparable<OrderId>
     {
         public const int SizeOfOrderId = sizeof(int);
         public static readonly OrderId MaxValue = int.MaxValue;
@@ -14,12 +16,14 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator OrderId(int orderId)
         {
             return new OrderId(orderId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator int(OrderId c)
         {
             return c._orderId;
@@ -56,7 +60,7 @@ namespace OrderMatcher
             return (a._orderId != b._orderId);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is OrderId))
             {
@@ -72,6 +76,7 @@ namespace OrderMatcher
             return -5579697 + _orderId.GetHashCode();
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305")]
         public override string ToString()
         {
             return _orderId.ToString();
@@ -80,6 +85,11 @@ namespace OrderMatcher
         public bool Equals(OrderId other)
         {
             return _orderId == other._orderId;
+        }
+
+        public int CompareTo(OrderId other)
+        {
+            return _orderId.CompareTo(other._orderId);
         }
     }
 }

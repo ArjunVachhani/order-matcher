@@ -1,3 +1,4 @@
+using OrderMatcher.Types;
 using Xunit;
 
 namespace OrderMatcher.Tests
