@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
-namespace OrderMatcher.Serializers
+namespace OrderMatcher.Types.Serializers
 {
     public class MatchingEngineResultSerializer : Serializer
     {
@@ -21,6 +22,8 @@ namespace OrderMatcher.Serializers
         private static readonly int sizeOfTimestamp;
 
         public static int MessageSize => sizeOfMessage;
+
+        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static MatchingEngineResultSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -40,55 +43,57 @@ namespace OrderMatcher.Serializers
             sizeOfMessage = timestampOffset + sizeOfTimestamp;
         }
 
-        public static byte[] Serialize(MatchingEngineResult matchingEngineResult)
+        public static void Serialize(MatchingEngineResult matchingEngineResult, Span<byte> bytes)
         {
             if (matchingEngineResult == null)
-            {
                 throw new ArgumentNullException(nameof(matchingEngineResult));
-            }
-            return Serialize(matchingEngineResult.OrderId, matchingEngineResult.Result, matchingEngineResult.Timestamp);
+
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            Serialize(matchingEngineResult.OrderId, matchingEngineResult.Result, matchingEngineResult.Timestamp, bytes);
         }
 
-        public static byte[] Serialize(ulong orderId, OrderMatchingResult result, long timeStamp)
-        {
-            byte[] msg = new byte[sizeOfMessage];
-            Write(msg, messageLengthOffset, sizeOfMessage);
-            msg[messageTypeOffset] = (byte)MessageType.OrderMatchingResult;
-            Write(msg, versionOffset, version);
-            Write(msg, orderIdOffset, orderId);
-            Write(msg, resultOffset, (byte)result);
-            Write(msg, timestampOffset, timeStamp);
-            return msg;
-        }
-
-        public static MatchingEngineResult Deserialize(byte[] bytes)
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public static void Serialize(ulong orderId, OrderMatchingResult result, long timeStamp, Span<byte> bytes)
         {
             if (bytes == null)
-            {
                 throw new ArgumentNullException(nameof(bytes));
-            }
+
+            if (bytes.Length < sizeOfMessage)
+                throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
+
+            Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
+            bytes[messageTypeOffset] = (byte)MessageType.OrderMatchingResult;
+            Write(bytes.Slice(versionOffset), version);
+            Write(bytes.Slice(orderIdOffset), orderId);
+            Write(bytes.Slice(resultOffset), (byte)result);
+            Write(bytes.Slice(timestampOffset), timeStamp);
+        }
+
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public static MatchingEngineResult Deserialize(ReadOnlySpan<byte> bytes)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
 
             if (bytes.Length != sizeOfMessage)
-            {
                 throw new Exception("OrderMatchingResult Message must be of Size : " + sizeOfMessage);
-            }
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
-            if (messageType != MessageType.OrderMatchingResult)
-            {
-                throw new Exception("Invalid Message");
-            }
 
-            var version = BitConverter.ToInt16(bytes, versionOffset);
+            if (messageType != MessageType.OrderMatchingResult)
+                throw new Exception(Constant.INVALID_MESSAGE);
+
+            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
+
             if (version != MatchingEngineResultSerializer.version)
-            {
-                throw new Exception("version mismatch");
-            }
+                throw new Exception(Constant.INVALID_VERSION);
 
             var result = new MatchingEngineResult();
-            result.OrderId = BitConverter.ToUInt64(bytes, orderIdOffset);
+            result.OrderId = BitConverter.ToUInt64(bytes.Slice(orderIdOffset));
             result.Result = (OrderMatchingResult)bytes[resultOffset];
-            result.Timestamp = BitConverter.ToInt64(bytes, timestampOffset);
+            result.Timestamp = BitConverter.ToInt64(bytes.Slice(timestampOffset));
             return result;
         }
     }

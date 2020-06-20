@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using OrderMatcher.Types;
 
 namespace OrderMatcher.Performance
 {

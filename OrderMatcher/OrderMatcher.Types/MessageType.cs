@@ -1,5 +1,8 @@
-﻿namespace OrderMatcher
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OrderMatcher.Types
 {
+    [SuppressMessage("Microsoft.Design", "CA1028")]
     public enum MessageType : byte
     {
         //Input to order matcher

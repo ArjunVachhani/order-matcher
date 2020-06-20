@@ -1,6 +1,8 @@
-﻿using System;
+﻿using OrderMatcher.Types;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher
 {
@@ -12,29 +14,26 @@ namespace OrderMatcher
         public int OrderCount => _orders.Count;
         public Price Price => _price;
 
-        private static readonly OrderSequenceComparer _orderSequenceComparer;
-        static PriceLevel()
-        {
-            _orderSequenceComparer = new OrderSequenceComparer();
-        }
-
+        private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
+        
         public PriceLevel(Price price)
         {
             _price = price;
             _orders = new SortedSet<Order>(_orderSequenceComparer);
         }
 
-        public void AddOrder(Order order)
+        internal void AddOrder(Order order)
         {
             _orders.Add(order);
         }
 
-        public bool RemoveOrder(Order order)
+        internal bool RemoveOrder(Order order)
         {
             return _orders.Remove(order);
         }
 
-        public bool Fill(Order order, Quantity quantity)
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        internal bool Fill(Order order, Quantity quantity)
         {
             if (order.OpenQuantity >= quantity)
             {
@@ -47,7 +46,7 @@ namespace OrderMatcher
             }
             else
             {
-                throw new Exception("Order quantity is less then requested fill quanity");
+                throw new Exception(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
             }
         }
 

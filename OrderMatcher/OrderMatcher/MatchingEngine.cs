@@ -1,6 +1,11 @@
-﻿using System;
+﻿using OrderMatcher.Types;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("OrderMatcher.Tests")]
 
 namespace OrderMatcher
 {
@@ -28,6 +33,7 @@ namespace OrderMatcher
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public MatchingEngine(ITradeListener tradeListener, ITimeProvider timeProvider, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
         {
             if (quoteCurrencyDecimalPlaces < 0)
@@ -50,11 +56,15 @@ namespace OrderMatcher
             _stepSize = stepSize;
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public OrderMatchingResult AddOrder(OrderWrapper orderWrapper, bool isOrderTriggered = false)
         {
+            if (orderWrapper == null)
+                throw new ArgumentNullException(nameof(orderWrapper));
+
             var incomingOrder = orderWrapper.Order;
             if (incomingOrder == null)
-                throw new ArgumentNullException(nameof(incomingOrder));
+                throw new NullReferenceException(nameof(orderWrapper.Order));
 
             incomingOrder.IsTip = false;
 
@@ -223,14 +233,14 @@ namespace OrderMatcher
 
         private OrderMatchingResult CancelOrder(OrderId orderId, CancelReason cancelReason)
         {
-            if (_currentOrders.TryGetValue(orderId, out Order order))
+            if (_currentOrders.TryGetValue(orderId, out Order? order))
             {
                 var quantityCancel = order.OpenQuantity;
                 _book.RemoveOrder(order);
                 _currentOrders.Remove(orderId);
                 if (order.IsTip)
                 {
-                    if (_currentIcebergOrders.TryGetValue(orderId, out Iceberg iceBergOrder))
+                    if (_currentIcebergOrders.TryGetValue(orderId, out Iceberg? iceBergOrder))
                     {
                         quantityCancel += iceBergOrder.TotalQuantity;
                         _currentIcebergOrders.Remove(orderId);
@@ -343,12 +353,13 @@ namespace OrderMatcher
             }
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         private bool MatchWithOpenOrders(Order incomingOrder)
         {
             bool anyMatchHappend = false;
             while (true)
             {
-                Order restingOrder = _book.GetBestBuyOrderToMatch(!incomingOrder.IsBuy);
+                Order? restingOrder = _book.GetBestBuyOrderToMatch(!incomingOrder.IsBuy);
                 if (restingOrder == null)
                 {
                     break;
@@ -365,7 +376,7 @@ namespace OrderMatcher
                     }
                     else
                     {
-                        throw new Exception("not expected");
+                        throw new Exception(Constant.NOT_EXPECTED);
                     }
 
                     var cost = Math.Round(maxQuantity * matchPrice, _quoteCurrencyDecimalPlaces);
@@ -449,7 +460,7 @@ namespace OrderMatcher
 
         private bool AddTip(Order order, Quantity cost, Quantity fee)
         {
-            if (_currentIcebergOrders.TryGetValue(order.OrderId, out Iceberg iceberg))
+            if (_currentIcebergOrders.TryGetValue(order.OrderId, out Iceberg? iceberg))
             {
                 var tip = GetTip(order, iceberg, cost, fee);
                 _currentOrders.Add(tip.OrderId, tip);
@@ -503,7 +514,7 @@ namespace OrderMatcher
 
         private void AddGoodTillDateOrder(int time, OrderId orderId)
         {
-            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId> orderIds))
+            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId>? orderIds))
             {
                 orderIds = new HashSet<OrderId>();
                 _goodTillDateOrders.Add(time, orderIds);
@@ -525,7 +536,7 @@ namespace OrderMatcher
                 {
                     _goodTillDateOrders.Remove(time);
 
-                    if (time == _firstGoodTillDate.Value.Key)
+                    if (time == _firstGoodTillDate!.Value.Key)
                     {
                         _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
                     }

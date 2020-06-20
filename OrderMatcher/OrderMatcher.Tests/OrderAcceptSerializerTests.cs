@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OrderMatcher.Types;
+using OrderMatcher.Types.Serializers;
+using System;
 using Xunit;
 
 namespace OrderMatcher.Tests
@@ -8,19 +10,21 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
-            var bytes = OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MinValue, Timestamp = int.MinValue });
+            Span<byte> bytes = stackalloc byte[OrderAcceptSerializer.MessageSize];
+            OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MinValue, Timestamp = int.MinValue }, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
-            var bytes = OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue });
+            Span<byte> bytes = stackalloc byte[OrderAcceptSerializer.MessageSize];
+            OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue }, bytes);
         }
 
         [Fact]
         public void Serialize_ThrowsExecption_IfNullPassed()
         {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => OrderAcceptSerializer.Serialize(null));
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => OrderAcceptSerializer.Serialize(null, null));
             Assert.Equal("orderAccept", ex.ParamName);
         }
 
@@ -52,7 +56,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[15];
             Exception ex = Assert.Throws<Exception>(() => OrderAcceptSerializer.Deserialize(bytes));
-            Assert.Equal("Invalid Message", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
         [Fact]
@@ -61,14 +65,15 @@ namespace OrderMatcher.Tests
             var bytes = new byte[15];
             bytes[4] = (byte)MessageType.OrderAccept;
             Exception ex = Assert.Throws<Exception>(() => OrderAcceptSerializer.Deserialize(bytes));
-            Assert.Equal("version mismatch", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_VERSION , ex.Message);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Min()
         {
-            var bytes = OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MinValue, Timestamp = int.MinValue });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[OrderAcceptSerializer.MessageSize];
+            OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MinValue, Timestamp = int.MinValue }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(15, messageLength);
             var OrderAccept = OrderAcceptSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, OrderAccept.OrderId);
@@ -78,8 +83,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
-            var bytes = OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[OrderAcceptSerializer.MessageSize];
+            OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(15, messageLength);
             var OrderAccept = OrderAcceptSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, OrderAccept.OrderId);
@@ -89,8 +95,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
-            var bytes = OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = 12345678, Timestamp = 404 });
-            var messageLength = BitConverter.ToInt32(bytes, 0);
+            Span<byte> bytes = stackalloc byte[OrderAcceptSerializer.MessageSize];
+            OrderAcceptSerializer.Serialize(new OrderAccept { OrderId = 12345678, Timestamp = 404 }, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(15, messageLength);
             var OrderAccept = OrderAcceptSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, OrderAccept.OrderId);

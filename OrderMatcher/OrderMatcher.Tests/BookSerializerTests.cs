@@ -1,4 +1,7 @@
-﻿using System;
+﻿using OrderMatcher.Types;
+using OrderMatcher.Types.Serializers;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace OrderMatcher.Tests
@@ -9,16 +12,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_ThrowsExecption_IfNullPassed()
         {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => BookSerializer.Serialize(null, 10, null, 10));
+            var bytes = new byte[31];
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => BookSerializer.Serialize(null, bytes));
             Assert.Equal("book", ex.ParamName);
-        }
-
-        [Fact]
-        public void Serialize_ThrowsExecption_IfLevelNegativePassed()
-        {
-            var book = new Book();
-            ArgumentException ex = Assert.Throws<ArgumentException>(() => BookSerializer.Serialize(book, -1, null, 10));
-            Assert.Equal("levels should be non negative", ex.Message);
         }
 
         [Fact]
@@ -41,7 +37,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[31];
             Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
-            Assert.Equal("Invalid Message", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
         [Fact]
@@ -50,51 +46,62 @@ namespace OrderMatcher.Tests
             var bytes = new byte[31];
             bytes[4] = (byte)MessageType.Book;
             Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
-            Assert.Equal("version mismatch", ex.Message);
+            Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_EmptyBook()
         {
-            var book = new Book();
-            var bytes = BookSerializer.Serialize(book, 10, 10, DateTime.UtcNow.Ticks);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var book = new BookDepth(3, 10, bid, ask);
+            Span<byte> bytes = stackalloc byte[31];
+            BookSerializer.Serialize(book, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_OnlyBidOrder()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10 });
-            var bytes = BookSerializer.Serialize(book, 10, 10, DateTime.UtcNow.Ticks);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var book = new BookDepth(10, 10, bid, ask);
+            Span<byte> bytes = stackalloc byte[63];
+            BookSerializer.Serialize(book, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_OnlyAskOrder()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10 });
-            var bytes = BookSerializer.Serialize(book, 10, 10, DateTime.UtcNow.Ticks);
+            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
+            var bid = new List<KeyValuePair<Price, Quantity>>() { };
+            var book = new BookDepth(10, 10, bid, ask);
+            Span<byte> bytes = stackalloc byte[63];
+            BookSerializer.Serialize(book, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10 });
-            var bytes = BookSerializer.Serialize(book, 10, 10, DateTime.UtcNow.Ticks);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
+            var book = new BookDepth(10, 10, bid, ask);
+            Span<byte> bytes = stackalloc byte[95];
+            BookSerializer.Serialize(book, bytes);
         }
 
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskCountForEmpty()
         {
-            var book = new Book();
-            var bytes = BookSerializer.Serialize(book, 10, 1010, DateTime.UtcNow.Ticks);
-            var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(35, messageLength);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var book = new BookDepth(3, 1010, bid, ask); ;
+            Span<byte> bytes = stackalloc byte[31];
+            BookSerializer.Serialize(book, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
+            Assert.Equal(31, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(1010, bookDepth.LTP);
-            Assert.NotEqual(0, bookDepth.TimeStamp);
+            Assert.Equal(3, bookDepth.TimeStamp);
             Assert.Empty(bookDepth.Bid);
             Assert.Empty(bookDepth.Ask);
         }
@@ -102,13 +109,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskCountWithPriceLevel()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 9 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, OpenQuantity = 10 });
-            var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
-            var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(131, messageLength);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(9, 10), new KeyValuePair<Price, Quantity>(8, 9) };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 10) };
+            var book = new BookDepth(3, 11000, bid, ask);
+            Span<byte> bytes = stackalloc byte[127];
+            BookSerializer.Serialize(book, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
+            Assert.Equal(127, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
@@ -124,12 +131,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectOnlyBuy()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 10 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 9 });
-            var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
-            var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(99, messageLength);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(9, 10), new KeyValuePair<Price, Quantity>(8, 9) };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var book = new BookDepth(3, 11000, bid, ask);
+            Span<byte> bytes = stackalloc byte[95];
+            BookSerializer.Serialize(book, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
+            Assert.Equal(95, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
@@ -143,11 +151,13 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectOnlyAsk()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 10, OpenQuantity = 10 });
-            var bytes = BookSerializer.Serialize(book, 9, 11000, DateTime.UtcNow.Ticks);
-            var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(67, messageLength);
+            var bid = new List<KeyValuePair<Price, Quantity>>() { };
+            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 10) };
+            var book = new BookDepth(3, 11000, bid, ask);
+            Span<byte> bytes = stackalloc byte[63];
+            BookSerializer.Serialize(book, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
+            Assert.Equal(63, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Empty(bookDepth.Bid);
@@ -159,32 +169,26 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskFullBook()
         {
-            var book = new Book();
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 10, OpenQuantity = 1 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 9, OpenQuantity = 2 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 8, OpenQuantity = 3 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 7, OpenQuantity = 4 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 6, OpenQuantity = 5 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 5, OpenQuantity = 6 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 4, OpenQuantity = 7 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 3, OpenQuantity = 8 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 2, OpenQuantity = 9 });
-            book.AddOrderOpenBook(new Order { IsBuy = true, Price = 1, OpenQuantity = 10 });
+            var bid = new List<KeyValuePair<Price, Quantity>>() {
+                new KeyValuePair<Price, Quantity>(10,1),
+                new KeyValuePair<Price, Quantity>(9,2),
+                new KeyValuePair<Price, Quantity>(8,3),
+                new KeyValuePair<Price, Quantity>(7,4),
+                new KeyValuePair<Price, Quantity>(6,5)
+            };
+            var ask = new List<KeyValuePair<Price, Quantity>>() {
+                new KeyValuePair<Price, Quantity>(11, 11),
+                new KeyValuePair<Price, Quantity>(12,12),
+                new KeyValuePair<Price, Quantity>(13,13),
+                new KeyValuePair<Price, Quantity>(14,14),
+                new KeyValuePair<Price, Quantity>(15,15)
+            };
+            var book = new BookDepth(3, 10, bid, ask);
+            Span<byte> bytes = stackalloc byte[351];
+            BookSerializer.Serialize(book, bytes);
+            var messageLength = BitConverter.ToInt32(bytes.Slice(0));
 
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 11, OpenQuantity = 11 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 12, OpenQuantity = 12 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 13, OpenQuantity = 13 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 14, OpenQuantity = 14 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 15, OpenQuantity = 15 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 16, OpenQuantity = 16 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 17, OpenQuantity = 17 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 18, OpenQuantity = 18 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 19, OpenQuantity = 19 });
-            book.AddOrderOpenBook(new Order { IsBuy = false, Price = 20, OpenQuantity = 20 });
-
-            var bytes = BookSerializer.Serialize(book, 5, 10, DateTime.UtcNow.Ticks);
-            var messageLength = BitConverter.ToInt32(bytes, 0);
-            Assert.Equal(355, messageLength);
+            Assert.Equal(351, messageLength);
             var bookDepth = BookSerializer.Deserialize(bytes);
             Assert.Equal(10, bookDepth.LTP);
             Assert.Equal(5, bookDepth.Bid.Count);

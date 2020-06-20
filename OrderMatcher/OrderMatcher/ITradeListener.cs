@@ -1,4 +1,6 @@
-﻿namespace OrderMatcher
+﻿using OrderMatcher.Types;
+
+namespace OrderMatcher
 {
     public interface ITradeListener
     {

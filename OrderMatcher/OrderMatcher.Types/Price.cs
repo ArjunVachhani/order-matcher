@@ -1,8 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
-namespace OrderMatcher
+namespace OrderMatcher.Types
 {
-    public readonly struct Price : System.IEquatable<Price>
+    public readonly struct Price : IEquatable<Price>, IComparable<Price>
     {
         public const int SizeOfPrice = sizeof(decimal);
         public static readonly Price MaxValue = decimal.MaxValue;
@@ -14,12 +16,14 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator Price(decimal price)
         {
             return new Price(price);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator decimal(Price c)
         {
             return c._price;
@@ -60,7 +64,7 @@ namespace OrderMatcher
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is Price))
             {
@@ -75,6 +79,8 @@ namespace OrderMatcher
         {
             return 326187671 + _price.GetHashCode();
         }
+
+        [SuppressMessage("Microsoft.Globalization", "CA1305")]
         public override string ToString()
         {
             return _price.ToString();
@@ -83,6 +89,11 @@ namespace OrderMatcher
         public bool Equals(Price other)
         {
             return _price == other._price;
+        }
+
+        public int CompareTo(Price other)
+        {
+            return _price.CompareTo(other._price);
         }
     }
 }

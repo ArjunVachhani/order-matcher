@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OrderMatcher.Types;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_ReturnsNegative_IfSecondArguementIsLarger()
         {
-            PriceComparerDescendingZeroFirst comparer = new PriceComparerDescendingZeroFirst();
+            PriceComparerDescending comparer = new PriceComparerDescending();
             Price p1 = new Price(2);
             Price p2 = new Price(1);
             int result = comparer.Compare(p1, p2);
@@ -19,7 +20,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_ReturnsPositive_IfSecondArguementIsSmaller()
         {
-            PriceComparerDescendingZeroFirst comparer = new PriceComparerDescendingZeroFirst();
+            PriceComparerDescending comparer = new PriceComparerDescending();
             Price p1 = new Price(1);
             Price p2 = new Price(2);
             int result = comparer.Compare(p1, p2);
@@ -29,7 +30,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_Returns0_IfBothArguementAreEqual()
         {
-            PriceComparerDescendingZeroFirst comparer = new PriceComparerDescendingZeroFirst();
+            PriceComparerDescending comparer = new PriceComparerDescending();
             Price p1 = new Price(1);
             Price p2 = new Price(1);
             int result = comparer.Compare(p1, p2);
@@ -39,7 +40,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void SortedDictionarySortsDescendingPriceLevel()
         {
-            PriceComparerDescendingZeroFirst comparer = new PriceComparerDescendingZeroFirst();
+            PriceComparerDescending comparer = new PriceComparerDescending();
             SortedDictionary<Price, PriceLevel> sortedDictionary = new SortedDictionary<Price, PriceLevel>(comparer);
             Price price1 = new Price(1);
             PriceLevel level1 = new PriceLevel(price1);
@@ -71,7 +72,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void SortedDictionarySortsDescendingQuantityTrackingPriceLevel()
         {
-            PriceComparerDescendingZeroFirst comparer = new PriceComparerDescendingZeroFirst();
+            PriceComparerDescending comparer = new PriceComparerDescending();
             SortedDictionary<Price, QuantityTrackingPriceLevel> sortedDictionary = new SortedDictionary<Price, QuantityTrackingPriceLevel>(comparer);
             Price price1 = new Price(1);
             QuantityTrackingPriceLevel level1 = new QuantityTrackingPriceLevel(price1);
