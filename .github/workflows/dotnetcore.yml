@@ -8,7 +8,7 @@ env:
 jobs:
   build:
 
-    runs-on: [ubuntu-20.04, ubuntu-16.04, ubuntu-latest, windows-latest ]
+    runs-on: [ubuntu-latest, windows-latest ]
 
     steps:
     - uses: actions/checkout@master
