@@ -1,6 +1,6 @@
 name: .NET Core
 
-on: [push, pull_request]
+on: push
 
 env:
   dotnet_sdk_version: '5.0.100-preview.5.20279.10'
