@@ -19,7 +19,6 @@ namespace OrderMatcher
         private readonly ITradeListener _tradeListener;
         private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
-        private readonly ITimeProvider _timeProvider;
         private readonly IFeeProvider _feeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
         private readonly decimal _power;
@@ -34,7 +33,7 @@ namespace OrderMatcher
         public Book Book => _book;
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
-        public MatchingEngine(ITradeListener tradeListener, ITimeProvider timeProvider, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
+        public MatchingEngine(ITradeListener tradeListener, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
         {
             if (quoteCurrencyDecimalPlaces < 0)
                 throw new NotSupportedException($"Invalid value of {nameof(quoteCurrencyDecimalPlaces)}");
@@ -49,7 +48,6 @@ namespace OrderMatcher
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
-            _timeProvider = timeProvider;
             _feeProvider = feeProvider;
             _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
             _power = (decimal)Math.Pow(10, _quoteCurrencyDecimalPlaces);
@@ -57,7 +55,7 @@ namespace OrderMatcher
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
-        public OrderMatchingResult AddOrder(OrderWrapper orderWrapper, bool isOrderTriggered = false)
+        public OrderMatchingResult AddOrder(OrderWrapper orderWrapper,int timestamp, bool isOrderTriggered = false)
         {
             if (orderWrapper == null)
                 throw new ArgumentNullException(nameof(orderWrapper));
@@ -153,8 +151,7 @@ namespace OrderMatcher
                 }
             }
 
-            var timeNow = _timeProvider.GetSecondsFromEpoch();
-            CancelExpiredOrders(timeNow);
+            CancelExpiredOrders(timestamp);
             if (orderWrapper.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
                 if (orderWrapper.TotalQuantity == 0)
@@ -170,7 +167,7 @@ namespace OrderMatcher
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, 0, 0, 0, CancelReason.FillOrKill);
             }
-            else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timeNow)
+            else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timestamp)
             {
                 if (orderWrapper.TotalQuantity == 0)
                     _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
@@ -225,10 +222,9 @@ namespace OrderMatcher
             return CancelOrder(orderId, CancelReason.UserRequested);
         }
 
-        public void CancelExpiredOrder()
+        public void CancelExpiredOrder(int timestamp)
         {
-            var timeNow = _timeProvider.GetSecondsFromEpoch();
-            CancelExpiredOrders(timeNow);
+            CancelExpiredOrders(timestamp);
         }
 
         private OrderMatchingResult CancelOrder(OrderId orderId, CancelReason cancelReason)
