@@ -1,6 +1,6 @@
 name: .NET Core
 
-on: push
+on: [push, pull_request]
 
 env:
   dotnet_sdk_version: '5.0.100-preview.5.20279.10'
@@ -23,12 +23,8 @@ jobs:
     - name: Restore Nuget packages
       run: dotnet restore ./OrderMatcher/OrderMatcher.sln
     
-    - name: Build with dotnet
+    - name: Build
       run: dotnet build ./OrderMatcher/OrderMatcher.sln --configuration Release --no-restore
-      
-    - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.100' # SDK Version to use.    
      
-    - name: Unit test with dotnet
+    - name: Unit test
       run: dotnet test ./OrderMatcher/OrderMatcher.sln --configuration Release --no-build

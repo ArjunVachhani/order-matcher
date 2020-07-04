@@ -9,12 +9,15 @@ namespace OrderMatcher.Types
         public ulong Sequnce { get; set; }
         public Quantity OpenQuantity { get; set; }
         public Price Price { get; set; }
-        public bool IsTip { get; set; }
-        public bool IsStop { get; set; }
         public int CancelOn { get; set; }
         public Quantity Cost { get; set; }
-        public Quantity Fee { get; set; }//TODO serialize fee
+        public Quantity Fee { get; set; }
         public short FeeId { get; set; }
+        public Quantity TipQuantity { get; set; }
+        public Quantity TotalQuantity { get; set; }
+        public Quantity OrderAmount { get; set; }
+        public Price StopPrice { get; set; }
+        public OrderCondition OrderCondition { get; set; }
         public bool IsFilled
         {
             get
@@ -22,21 +25,19 @@ namespace OrderMatcher.Types
                 return OpenQuantity == 0;
             }
         }
-    }
-
-    public class OrderWrapper
-    {
-        public Quantity TipQuantity { get; set; }
-        public Quantity TotalQuantity { get; set; }
-        public Quantity OrderAmount { get; set; }
-        public Price StopPrice { get; set; }
-        public OrderCondition OrderCondition { get; set; }
-        public Order Order { get; set; }
-    }
-
-    public class Iceberg
-    {
-        public Quantity TipQuantity { get; set; }
-        public Quantity TotalQuantity { get; set; }
+        public bool IsStop
+        {
+            get
+            {
+                return StopPrice > 0;
+            }
+        }
+        public bool IsTip
+        {
+            get
+            {
+                return TipQuantity > 0 && TotalQuantity > 0;
+            }
+        }
     }
 }
