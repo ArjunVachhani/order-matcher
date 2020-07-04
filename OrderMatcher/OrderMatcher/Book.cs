@@ -13,7 +13,6 @@ namespace OrderMatcher
         private readonly SortedDictionary<Price, PriceLevel> _stopAsk;
         private readonly PriceComparerAscending _priceComparerAscending;
         private readonly PriceComparerDescending _priceComparerDescending;
-        private readonly Dictionary<OrderId, Price> _stopDictionary;
 
         private ulong _sequence;
         private PriceLevel? _bestStopBidPriceLevel;
@@ -42,7 +41,6 @@ namespace OrderMatcher
             _askSide = new SortedDictionary<Price, QuantityTrackingPriceLevel>(_priceComparerAscending);
             _stopBid = new SortedDictionary<Price, PriceLevel>(_priceComparerAscending);
             _stopAsk = new SortedDictionary<Price, PriceLevel>(_priceComparerDescending);
-            _stopDictionary = new Dictionary<OrderId, Price>();
             _sequence = 0;
         }
 
@@ -56,9 +54,8 @@ namespace OrderMatcher
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _bidSide, true);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopBid.TryGetValue(stopPrice, out PriceLevel? stopPriceLevel))
+                if (!removed && order.IsStop && _stopBid.TryGetValue(order.StopPrice, out PriceLevel? stopPriceLevel))
                 {
-                    _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(stopPriceLevel, _stopBid);
                 }
@@ -71,33 +68,31 @@ namespace OrderMatcher
                     removed = priceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(priceLevel, _askSide, false);
                 }
-                if (!removed && order.IsStop && _stopDictionary.TryGetValue(order.OrderId, out var stopPrice) && _stopAsk.TryGetValue(stopPrice, out PriceLevel? stopPriceLevel))
+                if (!removed && order.IsStop && _stopAsk.TryGetValue(order.StopPrice, out PriceLevel? stopPriceLevel))
                 {
-                    _stopDictionary.Remove(order.OrderId);
                     stopPriceLevel.RemoveOrder(order);
                     RemoveEmptyPriceLevel(stopPriceLevel, _stopAsk);
                 }
             }
         }
 
-        internal void AddStopOrder(Order order, Price stopPrice)
+        internal void AddStopOrder(Order order)
         {
             order.Sequnce = ++_sequence;
-            _stopDictionary.Add(order.OrderId, stopPrice);
             if (order.IsBuy)
             {
-                PriceLevel priceLevel = GetPriceLevel(stopPrice, _stopBid);
+                PriceLevel priceLevel = GetPriceLevel(order.StopPrice, _stopBid);
                 priceLevel.AddOrder(order);
-                if (_bestStopBidPriceLevel == null || stopPrice < _bestStopBidPriceLevel.Price)
+                if (_bestStopBidPriceLevel == null || order.StopPrice < _bestStopBidPriceLevel.Price)
                 {
                     _bestStopBidPriceLevel = priceLevel;
                 }
             }
             else
             {
-                PriceLevel priceLevel = GetPriceLevel(stopPrice, _stopAsk);
+                PriceLevel priceLevel = GetPriceLevel(order.StopPrice, _stopAsk);
                 priceLevel.AddOrder(order);
-                if (_bestStopAskPriceLevel == null || stopPrice > _bestStopAskPriceLevel.Price)
+                if (_bestStopAskPriceLevel == null || order.StopPrice > _bestStopAskPriceLevel.Price)
                 {
                     _bestStopAskPriceLevel = priceLevel;
                 }
@@ -148,10 +143,6 @@ namespace OrderMatcher
                 for (var i = 0; i < priceLevels.Count; i++)
                 {
                     _stopAsk.Remove(priceLevels[i].Price);
-                    foreach (var order in priceLevels[i])
-                    {
-                        _stopDictionary.Remove(order.OrderId);
-                    }
                 }
             }
             return priceLevels;
@@ -178,10 +169,6 @@ namespace OrderMatcher
                 for (var i = 0; i < priceLevels.Count; i++)
                 {
                     _stopBid.Remove(priceLevels[i].Price);
-                    foreach (var order in priceLevels[i])
-                    {
-                        _stopDictionary.Remove(order.OrderId);
-                    }
                 }
             }
             return priceLevels;

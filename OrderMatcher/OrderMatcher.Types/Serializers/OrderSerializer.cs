@@ -19,6 +19,8 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int cancelOnOffset;
         private static readonly int orderAmountOffset;
         private static readonly int feeIdOffset;
+        private static readonly int costOffset;
+        private static readonly int feeOffset;
 
         private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
@@ -29,6 +31,8 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sizeOfCancelOn;
         private static readonly int sizeOfOrderAmount;
         private static readonly int sizeOfFeeId;
+        private static readonly int sizeOfCost;
+        private static readonly int sizeOfFee;
 
         public static int MessageSize => sizeOfMessage;
 
@@ -43,6 +47,8 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderAmount = Quantity.SizeOfQuantity;
             sizeOfFeeId = sizeof(short);
+            sizeOfCost = Quantity.SizeOfQuantity;
+            sizeOfFee = Quantity.SizeOfQuantity;
             version = 1;
 
             messageLengthOffset = 0;
@@ -58,11 +64,13 @@ namespace OrderMatcher.Types.Serializers
             cancelOnOffset = totalQuantityOffset + Quantity.SizeOfQuantity;
             orderAmountOffset = cancelOnOffset + sizeOfCancelOn;
             feeIdOffset = orderAmountOffset + sizeOfOrderAmount;
-            sizeOfMessage = feeIdOffset + sizeOfFeeId;
+            costOffset = feeIdOffset + sizeOfFeeId;
+            feeOffset = costOffset + sizeOfCost;
+            sizeOfMessage = feeOffset + sizeOfFee;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
-        public static void Serialize(OrderWrapper order, Span<byte> bytes)
+        public static void Serialize(Order order, Span<byte> bytes)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
@@ -76,25 +84,27 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
             bytes[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
             Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(sideOffset), order.Order.IsBuy);
+            Write(bytes.Slice(sideOffset), order.IsBuy);
             bytes[orderConditionOffset] = (byte)order.OrderCondition;
-            Write(bytes.Slice(orderIdOffset), order.Order.OrderId);
-            Write(bytes.Slice(priceOffset), order.Order.Price);
+            Write(bytes.Slice(orderIdOffset), order.OrderId);
+            Write(bytes.Slice(priceOffset), order.Price);
 
             if (order.TipQuantity > 0 && order.TotalQuantity > 0)
                 Write(bytes.Slice(quantityOffset), order.TipQuantity);
             else
-                Write(bytes.Slice(quantityOffset), order.Order.OpenQuantity);
+                Write(bytes.Slice(quantityOffset), order.OpenQuantity);
 
             Write(bytes.Slice(stopPriceOffset), order.StopPrice);
             Write(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
-            Write(bytes.Slice(cancelOnOffset), order.Order.CancelOn);
+            Write(bytes.Slice(cancelOnOffset), order.CancelOn);
             Write(bytes.Slice(orderAmountOffset), order.OrderAmount);
-            Write(bytes.Slice(feeIdOffset), order.Order.FeeId);
+            Write(bytes.Slice(feeIdOffset), order.FeeId);
+            Write(bytes.Slice(costOffset), order.Cost);
+            Write(bytes.Slice(feeOffset), order.Fee);
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
-        public static OrderWrapper Deserialize(ReadOnlySpan<byte> bytes)
+        public static Order Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
@@ -112,25 +122,24 @@ namespace OrderMatcher.Types.Serializers
             if (version != OrderSerializer.version)
                 throw new Exception(Constant.INVALID_VERSION);
 
-            var order = new OrderWrapper();
-            order.Order = new Order();
+            var order = new Order();
 
-            order.Order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
+            order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
             order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
-            order.Order.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
-            order.Order.Price = ReadPrice(bytes.Slice(priceOffset));
-            order.Order.OpenQuantity = ReadQuantity(bytes.Slice(quantityOffset));
+            order.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
+            order.Price = ReadPrice(bytes.Slice(priceOffset));
+            order.OpenQuantity = ReadQuantity(bytes.Slice(quantityOffset));
             order.StopPrice = ReadPrice(bytes.Slice(stopPriceOffset));
-            if (order.StopPrice > 0)
-                order.Order.IsStop = true;
 
             order.TotalQuantity = ReadQuantity(bytes.Slice(totalQuantityOffset));
             if (order.TotalQuantity > 0)
-                order.TipQuantity = order.Order.OpenQuantity;
+                order.TipQuantity = order.OpenQuantity;
 
-            order.Order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
+            order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
             order.OrderAmount = ReadQuantity(bytes.Slice(orderAmountOffset));
-            order.Order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
+            order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
+            order.Cost = ReadQuantity(bytes.Slice(costOffset));
+            order.Fee = ReadQuantity(bytes.Slice(feeOffset));
             return order;
         }
     }
