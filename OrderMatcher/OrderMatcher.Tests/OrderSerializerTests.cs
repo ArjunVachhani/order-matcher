@@ -11,8 +11,22 @@ namespace OrderMatcher.Tests
         public void Serialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var order1 = new Order { CancelOn = int.MinValue, IsBuy = false, OrderId = OrderId.MinValue, Price = int.MinValue, FeeId = short.MinValue };
-            var orderWrapper = new OrderWrapper() { StopPrice = int.MinValue, TotalQuantity = int.MinValue, TipQuantity = int.MinValue, OrderCondition = OrderCondition.None, OrderAmount = Quantity.MinValue, Order = order1 };
+            var orderWrapper = new Order()
+            {
+                StopPrice = Price.MinValue,
+                TotalQuantity = Quantity.MinValue,
+                TipQuantity = Quantity.MinValue,
+                OrderCondition = OrderCondition.None,
+                OrderAmount = Quantity.MinValue,
+                CancelOn = int.MinValue,
+                IsBuy = false,
+                OrderId = OrderId.MinValue,
+                Price = Price.MinValue,
+                FeeId = short.MinValue,
+                Cost = Quantity.MinValue,
+                Fee = Quantity.MinValue,
+                OpenQuantity = Quantity.MinValue
+            };
             OrderSerializer.Serialize(orderWrapper, bytes);
         }
 
@@ -20,8 +34,22 @@ namespace OrderMatcher.Tests
         public void Serialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var order1 = new Order { CancelOn = int.MaxValue, IsBuy = true, OrderId = OrderId.MaxValue, Price = int.MaxValue, FeeId = short.MaxValue };
-            var orderWrapper = new OrderWrapper() { StopPrice = int.MaxValue, TotalQuantity = int.MaxValue, TipQuantity = int.MaxValue, OrderCondition = OrderCondition.FillOrKill, OrderAmount = Quantity.MaxValue, Order = order1 };
+            var orderWrapper = new Order()
+            {
+                StopPrice = Price.MaxValue,
+                TotalQuantity = Quantity.MaxValue,
+                TipQuantity = Quantity.MaxValue,
+                OrderCondition = OrderCondition.FillOrKill,
+                OrderAmount = Quantity.MaxValue,
+                CancelOn = int.MaxValue,
+                IsBuy = true,
+                OrderId = OrderId.MaxValue,
+                Price = Price.MaxValue,
+                FeeId = short.MaxValue,
+                Cost = Quantity.MaxValue,
+                Fee = Quantity.MaxValue,
+                OpenQuantity = Quantity.MaxValue
+            };
             OrderSerializer.Serialize(orderWrapper, bytes);
         }
 
@@ -42,23 +70,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan37Bytes()
         {
-            var bytes = new byte[98];
+            var bytes = new byte[130];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
-            Assert.Equal("Order Message must be of Size : 99", ex.Message);
+            Assert.Equal("Order Message must be of Size : 131", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan37Bytes()
         {
-            var bytes = new byte[100];
+            var bytes = new byte[132];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
-            Assert.Equal("Order Message must be of Size : 99", ex.Message);
+            Assert.Equal("Order Message must be of Size : 131", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[99];
+            var bytes = new byte[131];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -66,7 +94,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[99];
+            var bytes = new byte[131];
             bytes[4] = (byte)MessageType.NewOrderRequest;
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -76,69 +104,103 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var order1 = new Order { CancelOn = int.MinValue, IsBuy = false, OrderId = OrderId.MinValue, Price = int.MinValue, FeeId = short.MinValue };
-            var orderWrapper = new OrderWrapper() { StopPrice = int.MinValue, TotalQuantity = int.MinValue, TipQuantity = int.MinValue, OrderCondition = OrderCondition.None, OrderAmount = Quantity.MinValue, Order = order1 };
-            OrderSerializer.Serialize(orderWrapper, bytes);
+            var inputOrder = new Order()
+            {
+                StopPrice = Price.MinValue,
+                TotalQuantity = Quantity.MinValue,
+                TipQuantity = Quantity.MinValue,
+                OrderCondition = OrderCondition.None,
+                OrderAmount = Quantity.MinValue,
+                CancelOn = int.MinValue,
+                IsBuy = false,
+                OrderId = OrderId.MinValue,
+                Price = Price.MinValue,
+                FeeId = short.MinValue,
+                Cost = Quantity.MinValue,
+                Fee = Quantity.MinValue,
+                OpenQuantity = Quantity.MinValue
+            };
+            OrderSerializer.Serialize(inputOrder, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(99, messageLength);
+            Assert.Equal(131, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
-            Assert.Equal(int.MinValue, order.Order.CancelOn);
-            Assert.False(order.Order.IsBuy);
+            Assert.Equal(int.MinValue, order.CancelOn);
+            Assert.False(order.IsBuy);
             Assert.Equal(OrderCondition.None, order.OrderCondition);
-            Assert.Equal(OrderId.MinValue, order.Order.OrderId);
-            Assert.Equal(int.MinValue, order.Order.Price);
+            Assert.Equal(OrderId.MinValue, order.OrderId);
+            Assert.Equal(Price.MinValue, order.Price);
             Assert.Equal(0, order.TipQuantity);
-            Assert.False(order.Order.IsStop);
-            Assert.Equal(int.MinValue, order.StopPrice);
-            Assert.Equal(int.MinValue, order.TotalQuantity);
+            Assert.False(order.IsStop);
+            Assert.Equal(Price.MinValue, order.StopPrice);
+            Assert.Equal(Quantity.MinValue, order.TotalQuantity);
             Assert.Equal(Quantity.MinValue, order.OrderAmount);
-            Assert.Equal(short.MinValue, order.Order.FeeId);
+            Assert.Equal(short.MinValue, order.FeeId);
+            Assert.Equal(Quantity.MinValue, order.Cost);
+            Assert.Equal(Quantity.MinValue, order.Fee);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var order1 = new Order { CancelOn = int.MaxValue, IsBuy = true, OrderId = OrderId.MaxValue, Price = int.MaxValue, FeeId = short.MaxValue };
-            var orderWrapper = new OrderWrapper() { StopPrice = int.MaxValue, TotalQuantity = int.MaxValue, TipQuantity = int.MaxValue, OrderCondition = OrderCondition.FillOrKill, OrderAmount = Quantity.MaxValue, Order = order1 };
+            var orderWrapper = new Order()
+            {
+                StopPrice = Price.MaxValue,
+                TotalQuantity = Quantity.MaxValue,
+                TipQuantity = Quantity.MaxValue,
+                OrderCondition = OrderCondition.FillOrKill,
+                OrderAmount = Quantity.MaxValue,
+                CancelOn = int.MaxValue,
+                IsBuy = true,
+                OrderId = OrderId.MaxValue,
+                Price = Price.MaxValue,
+                FeeId = short.MaxValue,
+                Cost = Quantity.MaxValue,
+                Fee = Quantity.MaxValue,
+                OpenQuantity = Quantity.MaxValue
+            };
             OrderSerializer.Serialize(orderWrapper, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(99, messageLength);
+            Assert.Equal(131, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
-            Assert.Equal(int.MaxValue, order.Order.CancelOn);
-            Assert.True(order.Order.IsBuy);
+            Assert.Equal(int.MaxValue, order.CancelOn);
+            Assert.True(order.IsBuy);
             Assert.Equal(OrderCondition.FillOrKill, order.OrderCondition);
-            Assert.Equal(OrderId.MaxValue, order.Order.OrderId);
-            Assert.Equal(int.MaxValue, order.Order.Price);
-            Assert.Equal(int.MaxValue, order.TipQuantity);
-            Assert.True(order.Order.IsStop);
-            Assert.Equal(int.MaxValue, order.StopPrice);
-            Assert.Equal(int.MaxValue, order.TotalQuantity);
+            Assert.Equal(OrderId.MaxValue, order.OrderId);
+            Assert.Equal(Price.MaxValue, order.Price);
+            Assert.Equal(Quantity.MaxValue, order.TipQuantity);
+            Assert.True(order.IsStop);
+            Assert.Equal(Price.MaxValue, order.StopPrice);
+            Assert.Equal(Quantity.MaxValue, order.TotalQuantity);
             Assert.Equal(Quantity.MaxValue, order.OrderAmount);
-            Assert.Equal(short.MaxValue, order.Order.FeeId);
+            Assert.Equal(short.MaxValue, order.FeeId);
+            Assert.Equal(Quantity.MaxValue, order.Cost);
+            Assert.Equal(Quantity.MaxValue, order.Fee);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var order1 = new Order { CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69 };
-            var orderWrapper = new OrderWrapper() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, Order = order1 };
+            var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546 };
             OrderSerializer.Serialize(orderWrapper, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(99, messageLength);
+            Assert.Equal(131, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
-            Assert.Equal(12345678, order.Order.CancelOn);
-            Assert.True(order.Order.IsBuy);
+            Assert.Equal(12345678, order.CancelOn);
+            Assert.True(order.IsBuy);
             Assert.Equal(OrderCondition.ImmediateOrCancel, order.OrderCondition);
-            Assert.Equal((OrderId)56789, order.Order.OrderId);
-            Assert.Equal(404, order.Order.Price);
+            Assert.Equal((OrderId)56789, order.OrderId);
+            Assert.Equal(404, order.Price);
             Assert.Equal(2356, order.TipQuantity);
-            Assert.True(order.Order.IsStop);
+            Assert.True(order.IsStop);
             Assert.Equal(9534, order.StopPrice);
             Assert.Equal(7878234, order.TotalQuantity);
             Assert.Equal((Quantity)12345.6789m, order.OrderAmount);
-            Assert.Equal(69, order.Order.FeeId);
+            Assert.Equal(69, order.FeeId);
+            Assert.Equal((Quantity)253.15m, order.Cost);
+            Assert.Equal((Quantity)8649.123m, order.Fee);
+            Assert.Equal((Quantity)2356, order.OpenQuantity);
         }
     }
 }
