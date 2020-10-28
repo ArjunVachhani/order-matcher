@@ -8,5 +8,6 @@
         public Quantity Fee { get; set; }
         public CancelReason CancelReason { get; set; }
         public int Timestamp { get; set; }
+        public long MessageSequence { get; set; }
     }
 }
