@@ -3,7 +3,7 @@ name: .NET Core
 on: [push, pull_request]
 
 env:
-  dotnet_sdk_version: '5.0.100-preview.5.20279.10'
+  dotnet_sdk_version: '5.0.100-rc.1.20452.10'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
       
-    - uses: actions/setup-dotnet@1.4.0
+    - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.dotnet_sdk_version }} # SDK Version to use.
     
