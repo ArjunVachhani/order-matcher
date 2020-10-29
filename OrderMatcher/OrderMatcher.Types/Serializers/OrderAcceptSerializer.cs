@@ -11,33 +11,37 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int versionOffset;
         private static readonly int orderIdOffset;
         private static readonly int timestampOffset;
+        private static readonly int messageSequenceOffset;
 
-        private static readonly int sizeOfMessageLenght;
+        private static readonly int sizeOfMessageLength;
         private static readonly int sizeOfMessage;
         private static readonly int sizeOfVersion;
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfOrderId;
         private static readonly int sizeOfTimestamp;
+        private static readonly int sizeOfMessageSequence;
 
         public static int MessageSize => sizeOfMessage;
 
         [SuppressMessage("Microsoft.Performance", "CA1810")]
         static OrderAcceptSerializer()
         {
-            sizeOfMessageLenght = sizeof(int);
+            sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
             sizeOfOrderId = OrderId.SizeOfOrderId;
             sizeOfTimestamp = sizeof(int);
-            sizeOfMessageLenght = sizeof(int);
+            sizeOfMessageLength = sizeof(int);
+            sizeOfMessageSequence = sizeof(long);
             version = 1;
 
             messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLenght;
+            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             orderIdOffset = versionOffset + sizeOfVersion;
             timestampOffset = orderIdOffset + sizeOfOrderId;
-            sizeOfMessage = timestampOffset + sizeOfTimestamp;
+            messageSequenceOffset = timestampOffset + sizeOfTimestamp;
+            sizeOfMessage = messageSequenceOffset + sizeOfMessageSequence;
         }
 
         public static void Serialize(OrderAccept orderAccept, Span<byte> bytes)
@@ -48,11 +52,11 @@ namespace OrderMatcher.Types.Serializers
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
-            Serialize(orderAccept.OrderId, orderAccept.Timestamp, bytes);
+            Serialize(orderAccept.MessageSequence, orderAccept.OrderId, orderAccept.Timestamp, bytes);
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
-        public static void Serialize(OrderId orderId, int timestamp, Span<byte> bytes)
+        public static void Serialize(long messageSequence, OrderId orderId, int timestamp, Span<byte> bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
@@ -65,6 +69,7 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(versionOffset), (long)version);
             Write(bytes.Slice(orderIdOffset), orderId);
             Write(bytes.Slice(timestampOffset), timestamp);
+            Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303")]
@@ -90,6 +95,7 @@ namespace OrderMatcher.Types.Serializers
 
             orderAccept.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
             orderAccept.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
+            orderAccept.MessageSequence = BitConverter.ToInt64(bytes.Slice(messageSequenceOffset));
 
             return orderAccept;
         }
