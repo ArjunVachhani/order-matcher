@@ -11,14 +11,14 @@ namespace OrderMatcher.Tests
         public void Serialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
-            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue }, bytes);
+            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue, MessageSequence = long.MinValue }, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
-            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue }, bytes);
+            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, MessageSequence = long.MaxValue }, bytes);
         }
 
         [Fact]
@@ -38,23 +38,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[14];
+            var bytes = new byte[22];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 15", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[16];
+            var bytes = new byte[24];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 15", ex.Message);
+            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[15];
+            var bytes = new byte[23];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -62,7 +62,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[15];
+            var bytes = new byte[23];
             bytes[4] = (byte)MessageType.OrderTrigger;
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -72,36 +72,39 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
-            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue }, bytes);
+            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue, MessageSequence = long.MinValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(15, messageLength);
+            Assert.Equal(23, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, orderTrigger.OrderId);
             Assert.Equal(int.MinValue, orderTrigger.Timestamp);
+            Assert.Equal(long.MinValue, orderTrigger.MessageSequence);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
-            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue }, bytes);
+            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, MessageSequence = long.MaxValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(15, messageLength);
+            Assert.Equal(23, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, orderTrigger.OrderId);
             Assert.Equal(int.MaxValue, orderTrigger.Timestamp);
+            Assert.Equal(long.MaxValue, orderTrigger.MessageSequence);
         }
 
         [Fact]
         public void Deserialize_Doesnotthrowexception()
         {
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
-            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 12345678, Timestamp = 404 }, bytes);
+            OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 12345678, Timestamp = 404, MessageSequence = 972 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(15, messageLength);
+            Assert.Equal(23, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, orderTrigger.OrderId);
             Assert.Equal(404, orderTrigger.Timestamp);
+            Assert.Equal(972, orderTrigger.MessageSequence);
         }
     }
 }

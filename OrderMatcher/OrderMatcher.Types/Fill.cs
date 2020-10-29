@@ -11,5 +11,6 @@
         public Quantity? BidCost { get; set; }
         public Quantity? BidFee { get; set; }
         public int Timestamp { get; set; }
+        public long MessageSequence { get; set; }
     }
 }
