@@ -542,6 +542,7 @@ namespace OrderMatcher
                         if (q > 0)
                         {
                             quantity += q;
+                            orderAmount -= (q * order.Price);
                         }
                         else
                         {
