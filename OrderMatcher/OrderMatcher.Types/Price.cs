@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace OrderMatcher.Types
@@ -16,14 +15,12 @@ namespace OrderMatcher.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator Price(decimal price)
         {
             return new Price(price);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator decimal(Price c)
         {
             return c._price;
@@ -80,7 +77,6 @@ namespace OrderMatcher.Types
             return 326187671 + _price.GetHashCode();
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1305")]
         public override string ToString()
         {
             return _price.ToString();

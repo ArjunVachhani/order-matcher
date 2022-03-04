@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace OrderMatcher.Types
@@ -16,14 +15,12 @@ namespace OrderMatcher.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator OrderId(int orderId)
         {
             return new OrderId(orderId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [SuppressMessage("Microsoft.Usage", "CA2225")]
         public static implicit operator int(OrderId c)
         {
             return c._orderId;
@@ -76,7 +73,6 @@ namespace OrderMatcher.Types
             return -5579697 + _orderId.GetHashCode();
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1305")]
         public override string ToString()
         {
             return _orderId.ToString();

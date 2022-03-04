@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher.Types.Serializers
 {
@@ -45,7 +44,6 @@ namespace OrderMatcher.Types.Serializers
 
         public static int MessageSize => sizeOfMessage;
 
-        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static FillSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -98,7 +96,6 @@ namespace OrderMatcher.Types.Serializers
             Serialize(fill.MessageSequence, fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp, bytes);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? askFee, Quantity? bidCost, Quantity? bidFee, int timeStamp, Span<byte> bytes)
         {
             if (bytes == null)
@@ -138,7 +135,6 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static Fill Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)

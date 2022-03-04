@@ -4,16 +4,23 @@ namespace OrderMatcher.Types
 {
     public class BookDepth
     {
-        public BookDepth(int timeStamp, Price? ltp, List<KeyValuePair<Price, Quantity>> bid, List<KeyValuePair<Price, Quantity>> ask)
+        public BookDepth(int timeStamp, Price? ltp, Dictionary<Price,Quantity> bid, Dictionary<Price, Quantity> ask)
         {
             TimeStamp = timeStamp;
             LTP = ltp;
             Bid = bid;
             Ask = ask;
         }
-        public int TimeStamp { get; private set; }
-        public Price? LTP { get; private set; }
-        public List<KeyValuePair<Price, Quantity>> Bid { get; private set; }
-        public List<KeyValuePair<Price, Quantity>> Ask { get; private set; }
+
+        public int TimeStamp { get; set; }
+        public Price? LTP { get; set; }
+        public Dictionary<Price, Quantity> Bid { get; }
+        public Dictionary<Price, Quantity> Ask { get; }
+    }
+    
+    public struct BookLevel
+    {
+        public Price Price { get; set; }
+        public Quantity Quantity { get; set; }
     }
 }

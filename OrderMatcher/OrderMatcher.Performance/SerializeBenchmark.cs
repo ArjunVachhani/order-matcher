@@ -14,8 +14,8 @@ namespace OrderMatcher.Performance
     public class SerializeBenchmark
     {
         readonly Book book;
-        readonly List<KeyValuePair<Price, Quantity>> bid;
-        readonly List<KeyValuePair<Price, Quantity>> ask;
+        readonly Dictionary<Price, Quantity> bid;
+        readonly Dictionary<Price, Quantity> ask;
         readonly string orderJsonString;
         readonly byte[] orderBinarySerialized;
         readonly string fillJsonString;
@@ -54,8 +54,8 @@ namespace OrderMatcher.Performance
             book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, OpenQuantity = 1000, OrderId = 3440, Price = 241 });
             book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, OpenQuantity = 1000, OrderId = 3441, Price = 242 });
             book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, OpenQuantity = 1000, OrderId = 3442, Price = 243 });
-            bid = book.BidSide.Select(x => new KeyValuePair<Price, Quantity>(x.Key, x.Value.Quantity)).ToList();
-            ask = book.AskSide.Select(x => new KeyValuePair<Price, Quantity>(x.Key, x.Value.Quantity)).ToList();
+            bid = book.BidSide.ToDictionary(x => x.Key, x => x.Value.Quantity);
+            ask = book.AskSide.ToDictionary(x => x.Key, x => x.Value.Quantity);
 
             var order = new Order() { CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, OpenQuantity = 1000, OrderCondition = OrderCondition.ImmediateOrCancel, StopPrice = 9534, TotalQuantity = 7878234 };
             orderJsonString = JsonConvert.SerializeObject(order);

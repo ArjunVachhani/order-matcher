@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace OrderMatcher.Types.Serializers
 {
-    [SuppressMessage("Microsoft.Globalization", "CA1303")]
     public abstract class Serializer
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
