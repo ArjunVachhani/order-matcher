@@ -1,9 +1,7 @@
 ﻿using OrderMatcher.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace OrderMatcher
 {
@@ -17,7 +15,6 @@ namespace OrderMatcher
         private readonly Quantity _stepSize;
         private readonly IFeeProvider _feeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
-        private readonly decimal _power;
         private Price _marketPrice;
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
 
@@ -27,7 +24,6 @@ namespace OrderMatcher
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public MatchingEngine(ITradeListener tradeListener, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
         {
             if (quoteCurrencyDecimalPlaces < 0)
@@ -43,11 +39,14 @@ namespace OrderMatcher
             _tradeListener = tradeListener;
             _feeProvider = feeProvider;
             _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
-            _power = (decimal)Math.Pow(10, _quoteCurrencyDecimalPlaces);
             _stepSize = stepSize;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public void InitializeMarketPrice(Price marketPrice)
+        {
+            _marketPrice = marketPrice;
+        }
+
         public OrderMatchingResult AddOrder(Order incomingOrder, int timestamp, bool isOrderTriggered = false)
         {
             if (incomingOrder == null)
@@ -319,7 +318,6 @@ namespace OrderMatcher
             }
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         private bool MatchWithOpenOrders(Order incomingOrder)
         {
             bool anyMatchHappend = false;
@@ -334,7 +332,7 @@ namespace OrderMatcher
                 if ((incomingOrder.IsBuy && (restingOrder.Price <= incomingOrder.Price || incomingOrder.Price == 0)) || (!incomingOrder.IsBuy && (restingOrder.Price >= incomingOrder.Price)))
                 {
                     Price matchPrice = restingOrder.Price;
-                    Quantity maxQuantity = 0;
+                    Quantity maxQuantity;
                     if (incomingOrder.OpenQuantity > 0)
                     {
                         maxQuantity = incomingOrder.OpenQuantity >= restingOrder.OpenQuantity ? restingOrder.OpenQuantity : incomingOrder.OpenQuantity;

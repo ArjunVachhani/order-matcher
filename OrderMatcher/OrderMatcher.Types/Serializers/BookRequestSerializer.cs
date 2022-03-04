@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher.Types.Serializers
 {
@@ -19,8 +18,7 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sizeOfLevelCount;
 
         public static int MessageSize => sizeOfMessage;
-        
-        [SuppressMessage("Microsoft.Performance", "CA1810")]
+
         static BookRequestSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -37,8 +35,6 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMessage = levelCountOffset + sizeOfLevelCount;
         }
 
-
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static void Serialize(BookRequest bookRequest, Span<byte> bytes)
         {
             if (bookRequest == null)
@@ -56,7 +52,6 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(levelCountOffset, 4), bookRequest.LevelCount);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static BookRequest Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)

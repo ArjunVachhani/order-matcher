@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
 
 namespace OrderMatcher.Types.Serializers
 {
@@ -28,7 +26,6 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sizeOfLevel;
         private static readonly int minMessageSize;
 
-        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static BookSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -64,7 +61,6 @@ namespace OrderMatcher.Types.Serializers
             return sizeOfMessage;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static void Serialize(BookDepth book, Span<byte> bytes)
         {
             if (book == null)
@@ -111,7 +107,6 @@ namespace OrderMatcher.Types.Serializers
             }
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static BookDepth Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)
@@ -143,20 +138,20 @@ namespace OrderMatcher.Types.Serializers
             var bidCount = BitConverter.ToInt16(bytes.Slice(bidCountOffset));
             var askCount = BitConverter.ToInt16(bytes.Slice(askCountOffset));
 
-            List<KeyValuePair<Price, Quantity>> bid = new List<KeyValuePair<Price, Quantity>>(bidCount);
-            List<KeyValuePair<Price, Quantity>> ask = new List<KeyValuePair<Price, Quantity>>(askCount);
+            Dictionary<Price, Quantity> bid = new Dictionary<Price, Quantity>(bidCount);
+            Dictionary<Price, Quantity> ask = new Dictionary<Price, Quantity>(askCount);
             for (int i = 0; i < bidCount; i++)
             {
                 var price = ReadPrice(bytes.Slice(bidStartOffset + (i * sizeOfLevel)));
                 var quantity = ReadQuantity(bytes.Slice(bidStartOffset + (i * sizeOfLevel) + sizeOfPrice));
-                bid.Add(new KeyValuePair<Price, Quantity>(price, quantity));
+                bid.Add(price, quantity);
             }
             var askStartOffset = bidStartOffset + (bidCount * sizeOfLevel);
             for (int i = 0; i < askCount; i++)
             {
                 var price = ReadPrice(bytes.Slice(askStartOffset + (i * sizeOfLevel)));
                 var quantity = ReadQuantity(bytes.Slice(askStartOffset + (i * sizeOfLevel) + sizeOfPrice));
-                ask.Add(new KeyValuePair<Price, Quantity>(price, quantity));
+                ask.Add(price, quantity);
             }
 
             var book = new BookDepth(timeStamp, ltp, bid,ask);
