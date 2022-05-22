@@ -7080,6 +7080,66 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
         }
+
+        [Fact]
+        public void AcceptedOrderTrackingDisable_ShouldNotTrack_AcceptedOrders()
+        {
+            matchingEngine = new MatchingEngine(mockTradeListener.Object, mockFeeProcider.Object, 0.0000_0001m, 2);
+            Order order1 = new Order { IsBuy = false, OrderId = 1, OpenQuantity = 0.5m, Price = 675800M };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
+
+            mockTradeListener.Verify(x => x.OnAccept(order1.OrderId));
+            mockTradeListener.VerifyNoOtherCalls();
+            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
+            Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
+            Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Single(matchingEngine.Book.AskSide);
+            Assert.Empty(matchingEngine.Book.BidSide);
+            Assert.Empty(matchingEngine.Book.StopAskSide);
+            Assert.Empty(matchingEngine.Book.StopBidSide);
+            Assert.Equal((Quantity)0.5m, order1.OpenQuantity);
+            Assert.Equal((ulong)1, order1.Sequnce);
+
+            matchingEngine.AcceptedOrderTrackingEnabled = false;
+            Assert.False(matchingEngine.AcceptedOrderTrackingEnabled);
+            Assert.Empty(matchingEngine.AcceptedOrders);
+
+            Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 1.1m, Price = 680000M };
+            OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
+
+            mockTradeListener.Verify(x => x.OnAccept(order2.OrderId));
+            mockTradeListener.VerifyNoOtherCalls();
+            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
+            Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
+            Assert.Empty(matchingEngine.AcceptedOrders);
+            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Empty(matchingEngine.Book.BidSide);
+            Assert.Empty(matchingEngine.Book.StopAskSide);
+            Assert.Empty(matchingEngine.Book.StopBidSide);
+            Assert.Equal((Quantity)1.1m, order2.OpenQuantity);
+            Assert.Equal((ulong)2, order2.Sequnce);
+
+            matchingEngine.AcceptedOrderTrackingEnabled = true;
+            Assert.True(matchingEngine.AcceptedOrderTrackingEnabled);
+            Assert.Empty(matchingEngine.AcceptedOrders);
+
+            Order order3 = new Order { IsBuy = false, OrderId = 3, OpenQuantity = 0.6m, Price = 678800M };
+            OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
+
+            mockTradeListener.Verify(x => x.OnAccept(order3.OrderId));
+            mockTradeListener.VerifyNoOtherCalls();
+            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult3);
+            Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
+            Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
+            Assert.Single(matchingEngine.AcceptedOrders);
+            Assert.Contains(order3, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Empty(matchingEngine.Book.BidSide);
+            Assert.Empty(matchingEngine.Book.StopAskSide);
+            Assert.Empty(matchingEngine.Book.StopBidSide);
+            Assert.Equal((Quantity)0.6m, order3.OpenQuantity);
+            Assert.Equal((ulong)3, order3.Sequnce);
+        }
     }
 }
 
