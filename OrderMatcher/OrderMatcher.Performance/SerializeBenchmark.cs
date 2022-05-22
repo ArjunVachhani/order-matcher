@@ -88,7 +88,7 @@ namespace OrderMatcher.Performance
 
             bookDepth = new BookDepth(1234, 100, bid, ask);
             bookJsonString = JsonConvert.SerializeObject(bookDepth);
-            bookBinary = new byte[OrderSerializer.MessageSize];
+            bookBinary = new byte[BookSerializer.GetMessageSize(bookDepth)];
             BookSerializer.Serialize(bookDepth, bookBinary);
 
             fill = new Fill { MakerOrderId = 10001, MatchQuantity = 2000, MatchRate = 2400, TakerOrderId = 9999, Timestamp = 10303 };
@@ -305,7 +305,7 @@ namespace OrderMatcher.Performance
         [Benchmark]
         public void BookSerializeBinarySerialize()
         {
-            Span<byte> bytes = stackalloc byte[10];
+            Span<byte> bytes = stackalloc byte[BookSerializer.GetMessageSize(bookDepth)];
             BookSerializer.Serialize(bookDepth, bytes);
         }
 
