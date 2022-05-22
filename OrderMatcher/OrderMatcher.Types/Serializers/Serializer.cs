@@ -74,7 +74,7 @@ namespace OrderMatcher.Types.Serializers
             if (array.Length <= 15)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(array));
 
-#if NET5_0
+#if NET6_0
             Span<int> arr = stackalloc int[4];
             decimal.GetBits(value, arr);
 #elif NETSTANDARD2_1
@@ -117,7 +117,7 @@ namespace OrderMatcher.Types.Serializers
             int mid = (array[4]) | (array[5] << 8) | (array[6] << 16) | (array[7] << 24);
             int hi = (array[8]) | (array[9] << 8) | (array[10] << 16) | (array[11] << 24);
             int flags = (array[12]) | (array[13] << 8) | (array[14] << 16) | (array[15] << 24);
-#if NET5_0
+#if NET6_0
             Span<int> bits = stackalloc int[4];
             bits[0] = lo;
             bits[1] = mid;
@@ -139,7 +139,7 @@ namespace OrderMatcher.Types.Serializers
             int mid = (array[4]) | (array[5] << 8) | (array[6] << 16) | (array[7] << 24);
             int hi = (array[8]) | (array[9] << 8) | (array[10] << 16) | (array[11] << 24);
             int flags = (array[12]) | (array[13] << 8) | (array[14] << 16) | (array[15] << 24);
-#if NET5_0
+#if NET6_0
             Span<int> bits = stackalloc int[4];
             bits[0] = lo;
             bits[1] = mid;
