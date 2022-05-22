@@ -17,12 +17,28 @@ namespace OrderMatcher
         private readonly int _quoteCurrencyDecimalPlaces;
         private Price _marketPrice;
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
+        private bool _acceptedOrderTrackingEnabled = true;
 
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
+
+        public bool AcceptedOrderTrackingEnabled
+        {
+            get => _acceptedOrderTrackingEnabled;
+            set
+            {
+                if (!value)
+                {
+                    _acceptedOrders.Clear();
+                    _acceptedOrders.TrimExcess();
+                }
+
+                _acceptedOrderTrackingEnabled = value;
+            }
+        }
 
         public MatchingEngine(ITradeListener tradeListener, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
         {
@@ -114,11 +130,15 @@ namespace OrderMatcher
                 }
             }
 
-            if (_acceptedOrders.Contains(incomingOrder.OrderId))
+            if (_acceptedOrderTrackingEnabled)
             {
-                return OrderMatchingResult.DuplicateOrder;
+                if (_acceptedOrders.Contains(incomingOrder.OrderId))
+                {
+                    return OrderMatchingResult.DuplicateOrder;
+                }
+                _acceptedOrders.Add(incomingOrder.OrderId);
             }
-            _acceptedOrders.Add(incomingOrder.OrderId);
+
             _tradeListener?.OnAccept(incomingOrder.OrderId);
 
             Quantity? quantity = null;
