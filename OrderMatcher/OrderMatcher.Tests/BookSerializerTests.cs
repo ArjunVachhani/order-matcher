@@ -2,6 +2,7 @@
 using OrderMatcher.Types.Serializers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace OrderMatcher.Tests
@@ -52,8 +53,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_EmptyBook()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var bid = new Dictionary<Price, Quantity>() { };
+            var ask = new Dictionary<Price, Quantity>() { };
             var book = new BookDepth(3, 10, bid, ask);
             Span<byte> bytes = stackalloc byte[31];
             BookSerializer.Serialize(book, bytes);
@@ -62,8 +63,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_OnlyBidOrder()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var bid = new Dictionary<Price, Quantity>() { { 10, 20 } };
+            var ask = new Dictionary<Price, Quantity>() { };
             var book = new BookDepth(10, 10, bid, ask);
             Span<byte> bytes = stackalloc byte[63];
             BookSerializer.Serialize(book, bytes);
@@ -72,8 +73,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception_OnlyAskOrder()
         {
-            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
-            var bid = new List<KeyValuePair<Price, Quantity>>() { };
+            var ask = new Dictionary<Price, Quantity>() { { 10, 20 } };
+            var bid = new Dictionary<Price, Quantity>() { };
             var book = new BookDepth(10, 10, bid, ask);
             Span<byte> bytes = stackalloc byte[63];
             BookSerializer.Serialize(book, bytes);
@@ -82,8 +83,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Serialize_Doesnotthrowexception()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 20) };
+            var bid = new Dictionary<Price, Quantity>() { { 10, 20 } };
+            var ask = new Dictionary<Price, Quantity>() { { 10, 20 } };
             var book = new BookDepth(10, 10, bid, ask);
             Span<byte> bytes = stackalloc byte[95];
             BookSerializer.Serialize(book, bytes);
@@ -92,8 +93,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskCountForEmpty()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var bid = new Dictionary<Price, Quantity>() { };
+            var ask = new Dictionary<Price, Quantity>() { };
             var book = new BookDepth(3, 1010, bid, ask); ;
             Span<byte> bytes = stackalloc byte[31];
             BookSerializer.Serialize(book, bytes);
@@ -109,8 +110,8 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskCountWithPriceLevel()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(9, 10), new KeyValuePair<Price, Quantity>(8, 9) };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 10) };
+            var bid = new Dictionary<Price, Quantity>() { { 9, 10 }, { 8, 9 } };
+            var ask = new Dictionary<Price, Quantity>() { { 10, 10 } };
             var book = new BookDepth(3, 11000, bid, ask);
             Span<byte> bytes = stackalloc byte[127];
             BookSerializer.Serialize(book, bytes);
@@ -120,19 +121,19 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
             Assert.Single(bookDepth.Ask);
-            Assert.Equal(9, bookDepth.Bid[0].Key);
-            Assert.Equal(10, bookDepth.Bid[0].Value);
-            Assert.Equal(8, bookDepth.Bid[1].Key);
-            Assert.Equal(9, bookDepth.Bid[1].Value);
-            Assert.Equal(10, bookDepth.Ask[0].Key);
-            Assert.Equal(10, bookDepth.Ask[0].Value);
+            Assert.Equal(9, bookDepth.Bid.ElementAt(0).Key);
+            Assert.Equal(10, bookDepth.Bid.ElementAt(0).Value);
+            Assert.Equal(8, bookDepth.Bid.ElementAt(1).Key);
+            Assert.Equal(9, bookDepth.Bid.ElementAt(1).Value);
+            Assert.Equal(10, bookDepth.Ask.ElementAt(0).Key);
+            Assert.Equal(10, bookDepth.Ask.ElementAt(0).Value);
         }
 
         [Fact]
         public void Deserialize_CheckCorrectOnlyBuy()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(9, 10), new KeyValuePair<Price, Quantity>(8, 9) };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { };
+            var bid = new Dictionary<Price, Quantity>() { { 9, 10 }, { 8, 9 } };
+            var ask = new Dictionary<Price, Quantity>() { };
             var book = new BookDepth(3, 11000, bid, ask);
             Span<byte> bytes = stackalloc byte[95];
             BookSerializer.Serialize(book, bytes);
@@ -142,17 +143,17 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Equal(2, bookDepth.Bid.Count);
             Assert.Empty(bookDepth.Ask);
-            Assert.Equal(9, bookDepth.Bid[0].Key);
-            Assert.Equal(10, bookDepth.Bid[0].Value);
-            Assert.Equal(8, bookDepth.Bid[1].Key);
-            Assert.Equal(9, bookDepth.Bid[1].Value);
+            Assert.Equal(9, bookDepth.Bid.ElementAt(0).Key);
+            Assert.Equal(10, bookDepth.Bid.ElementAt(0).Value);
+            Assert.Equal(8, bookDepth.Bid.ElementAt(1).Key);
+            Assert.Equal(9, bookDepth.Bid.ElementAt(1).Value);
         }
 
         [Fact]
         public void Deserialize_CheckCorrectOnlyAsk()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() { };
-            var ask = new List<KeyValuePair<Price, Quantity>>() { new KeyValuePair<Price, Quantity>(10, 10) };
+            var bid = new Dictionary<Price, Quantity>() { };
+            var ask = new Dictionary<Price, Quantity>() { { 10, 10 } };
             var book = new BookDepth(3, 11000, bid, ask);
             Span<byte> bytes = stackalloc byte[63];
             BookSerializer.Serialize(book, bytes);
@@ -162,26 +163,26 @@ namespace OrderMatcher.Tests
             Assert.Equal(11000, bookDepth.LTP);
             Assert.Empty(bookDepth.Bid);
             Assert.Single(bookDepth.Ask);
-            Assert.Equal(10, bookDepth.Ask[0].Key);
-            Assert.Equal(10, bookDepth.Ask[0].Value);
+            Assert.Equal(10, bookDepth.Ask.ElementAt(0).Key);
+            Assert.Equal(10, bookDepth.Ask.ElementAt(0).Value);
         }
 
         [Fact]
         public void Deserialize_CheckCorrectBidCountAskFullBook()
         {
-            var bid = new List<KeyValuePair<Price, Quantity>>() {
-                new KeyValuePair<Price, Quantity>(10,1),
-                new KeyValuePair<Price, Quantity>(9,2),
-                new KeyValuePair<Price, Quantity>(8,3),
-                new KeyValuePair<Price, Quantity>(7,4),
-                new KeyValuePair<Price, Quantity>(6,5)
+            var bid = new Dictionary<Price, Quantity>() {
+                { 10, 1 },
+                { 9, 2 },
+                { 8, 3 },
+                { 7, 4 },
+                { 6, 5 }
             };
-            var ask = new List<KeyValuePair<Price, Quantity>>() {
-                new KeyValuePair<Price, Quantity>(11, 11),
-                new KeyValuePair<Price, Quantity>(12,12),
-                new KeyValuePair<Price, Quantity>(13,13),
-                new KeyValuePair<Price, Quantity>(14,14),
-                new KeyValuePair<Price, Quantity>(15,15)
+            var ask = new Dictionary<Price, Quantity>() {
+                { 11, 11 },
+                { 12, 12 },
+                { 13, 13 },
+                { 14, 14 },
+                { 15, 15 }
             };
             var book = new BookDepth(3, 10, bid, ask);
             Span<byte> bytes = stackalloc byte[351];
@@ -193,28 +194,28 @@ namespace OrderMatcher.Tests
             Assert.Equal(10, bookDepth.LTP);
             Assert.Equal(5, bookDepth.Bid.Count);
 
-            Assert.Equal(10, bookDepth.Bid[0].Key);
-            Assert.Equal(1, bookDepth.Bid[0].Value);
-            Assert.Equal(9, bookDepth.Bid[1].Key);
-            Assert.Equal(2, bookDepth.Bid[1].Value);
-            Assert.Equal(8, bookDepth.Bid[2].Key);
-            Assert.Equal(3, bookDepth.Bid[2].Value);
-            Assert.Equal(7, bookDepth.Bid[3].Key);
-            Assert.Equal(4, bookDepth.Bid[3].Value);
-            Assert.Equal(6, bookDepth.Bid[4].Key);
-            Assert.Equal(5, bookDepth.Bid[4].Value);
+            Assert.Equal(10, bookDepth.Bid.ElementAt(0).Key);
+            Assert.Equal(1, bookDepth.Bid.ElementAt(0).Value);
+            Assert.Equal(9, bookDepth.Bid.ElementAt(1).Key);
+            Assert.Equal(2, bookDepth.Bid.ElementAt(1).Value);
+            Assert.Equal(8, bookDepth.Bid.ElementAt(2).Key);
+            Assert.Equal(3, bookDepth.Bid.ElementAt(2).Value);
+            Assert.Equal(7, bookDepth.Bid.ElementAt(3).Key);
+            Assert.Equal(4, bookDepth.Bid.ElementAt(3).Value);
+            Assert.Equal(6, bookDepth.Bid.ElementAt(4).Key);
+            Assert.Equal(5, bookDepth.Bid.ElementAt(4).Value);
 
 
-            Assert.Equal(11, bookDepth.Ask[0].Key);
-            Assert.Equal(11, bookDepth.Ask[0].Value);
-            Assert.Equal(12, bookDepth.Ask[1].Key);
-            Assert.Equal(12, bookDepth.Ask[1].Value);
-            Assert.Equal(13, bookDepth.Ask[2].Key);
-            Assert.Equal(13, bookDepth.Ask[2].Value);
-            Assert.Equal(14, bookDepth.Ask[3].Key);
-            Assert.Equal(14, bookDepth.Ask[3].Value);
-            Assert.Equal(15, bookDepth.Ask[4].Key);
-            Assert.Equal(15, bookDepth.Ask[4].Value);
+            Assert.Equal(11, bookDepth.Ask.ElementAt(0).Key);
+            Assert.Equal(11, bookDepth.Ask.ElementAt(0).Value);
+            Assert.Equal(12, bookDepth.Ask.ElementAt(1).Key);
+            Assert.Equal(12, bookDepth.Ask.ElementAt(1).Value);
+            Assert.Equal(13, bookDepth.Ask.ElementAt(2).Key);
+            Assert.Equal(13, bookDepth.Ask.ElementAt(2).Value);
+            Assert.Equal(14, bookDepth.Ask.ElementAt(3).Key);
+            Assert.Equal(14, bookDepth.Ask.ElementAt(3).Value);
+            Assert.Equal(15, bookDepth.Ask.ElementAt(4).Key);
+            Assert.Equal(15, bookDepth.Ask.ElementAt(4).Value);
         }
     }
 }

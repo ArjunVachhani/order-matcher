@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher
 {
@@ -15,7 +14,7 @@ namespace OrderMatcher
         public Price Price => _price;
 
         private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
-        
+
         public PriceLevel(Price price)
         {
             _price = price;
@@ -32,7 +31,6 @@ namespace OrderMatcher
             return _orders.Remove(order);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         internal bool Fill(Order order, Quantity quantity)
         {
             if (order.OpenQuantity >= quantity)

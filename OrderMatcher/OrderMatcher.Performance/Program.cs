@@ -8,9 +8,24 @@ namespace OrderMatcher.Performance
     {
         static void Main(string[] args)
         {
-            //BenchmarkRunner.Run<PriceComparerBenchmark>();
-            //BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
-            BenchmarkRunner.Run<SerializeBenchmark>();
+            BenchmarkRunner.Run<BookRequestDeserializeBenchmark>();
+            BenchmarkRunner.Run<BookRequestSerializeBenchmark>();
+            BenchmarkRunner.Run<CancelRequestDeserializeBenchmark>();
+            BenchmarkRunner.Run<CancelRequestSerializeBenchmark>();
+            BenchmarkRunner.Run<FillDeserializeBenchmark>();
+            BenchmarkRunner.Run<FillSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderBookDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderBookSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderCancelledDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderCancelledSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
+            BenchmarkRunner.Run<OrderTriggerDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderTriggerSerializeBenchmark>();
+            BenchmarkRunner.Run<PriceLevelBenchmark>();
+            BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
+            BenchmarkRunner.Run<SpanBenchmark>();
 
 
             //TODO check for aggresive inline performance improvement

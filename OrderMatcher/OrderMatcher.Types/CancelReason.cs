@@ -1,8 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types
 {
-    [SuppressMessage("Microsoft.Design", "CA1028")]
     public enum CancelReason : byte
     {
         UserRequested = 1,
@@ -11,6 +8,7 @@ namespace OrderMatcher.Types
         FillOrKill = 4,
         BookOrCancel = 5,
         ValidityExpired = 6,
-        MarketOrderCannotMatchLessThanStepSize = 7
+        MarketOrderCannotMatchLessThanStepSize = 7,
+        InvalidOrder = 8
     }
 }

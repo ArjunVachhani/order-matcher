@@ -1,8 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types
 {
-    [SuppressMessage("Microsoft.Design", "CA1028")]
     public enum OrderMatchingResult : byte
     {
         //Success Result
