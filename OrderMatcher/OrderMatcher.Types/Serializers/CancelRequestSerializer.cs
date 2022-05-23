@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher.Types.Serializers
 {
@@ -20,7 +19,6 @@ namespace OrderMatcher.Types.Serializers
 
         public static int MessageSize => sizeOfMessage;
 
-        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static CancelRequestSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -37,8 +35,6 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMessage = orderIdOffset + sizeOfOrderId;
         }
 
-
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static void Serialize(CancelRequest cancelRequest, Span<byte> bytes)
         {
             if (cancelRequest == null)
@@ -56,7 +52,6 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(orderIdOffset), cancelRequest.OrderId);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static CancelRequest Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)

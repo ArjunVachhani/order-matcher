@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher.Types.Serializers
 {
@@ -23,7 +22,6 @@ namespace OrderMatcher.Types.Serializers
 
         public static int MessageSize => sizeOfMessage;
 
-        [SuppressMessage("Microsoft.Performance", "CA1810")]
         static OrderAcceptSerializer()
         {
             sizeOfMessageLength = sizeof(int);
@@ -55,7 +53,6 @@ namespace OrderMatcher.Types.Serializers
             Serialize(orderAccept.MessageSequence, orderAccept.OrderId, orderAccept.Timestamp, bytes);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static void Serialize(long messageSequence, OrderId orderId, int timestamp, Span<byte> bytes)
         {
             if (bytes == null)
@@ -72,7 +69,6 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         public static OrderAccept Deserialize(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null)

@@ -1,8 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types
 {
-    [SuppressMessage("Microsoft.Naming", "CA1707")]
     public static class Constant
     {
         public const string INVALID_VERSION = "Invalid Version";

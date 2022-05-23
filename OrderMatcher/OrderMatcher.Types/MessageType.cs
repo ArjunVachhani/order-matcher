@@ -17,6 +17,12 @@ namespace OrderMatcher.Types
         Cancel = 103,
         Book = 104,
         OrderTrigger = 105,
-        OrderAccept = 106
+        OrderAccept = 106,
+
+        GeneralPurpose1 = 201,
+        GeneralPurpose2 = 202,
+        GeneralPurpose3 = 203,
+        GeneralPurpose4 = 204,
+        GeneralPurpose5 = 205,
     }
 }

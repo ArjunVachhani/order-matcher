@@ -1,9 +1,7 @@
 ﻿using OrderMatcher.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace OrderMatcher
 {
@@ -17,9 +15,9 @@ namespace OrderMatcher
         private readonly Quantity _stepSize;
         private readonly IFeeProvider _feeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
-        private readonly decimal _power;
         private Price _marketPrice;
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
+        private bool _acceptedOrderTrackingEnabled = true;
 
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
@@ -27,7 +25,21 @@ namespace OrderMatcher
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public bool AcceptedOrderTrackingEnabled
+        {
+            get => _acceptedOrderTrackingEnabled;
+            set
+            {
+                if (!value)
+                {
+                    _acceptedOrders.Clear();
+                    _acceptedOrders.TrimExcess();
+                }
+
+                _acceptedOrderTrackingEnabled = value;
+            }
+        }
+
         public MatchingEngine(ITradeListener tradeListener, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
         {
             if (quoteCurrencyDecimalPlaces < 0)
@@ -43,11 +55,14 @@ namespace OrderMatcher
             _tradeListener = tradeListener;
             _feeProvider = feeProvider;
             _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
-            _power = (decimal)Math.Pow(10, _quoteCurrencyDecimalPlaces);
             _stepSize = stepSize;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        public void InitializeMarketPrice(Price marketPrice)
+        {
+            _marketPrice = marketPrice;
+        }
+
         public OrderMatchingResult AddOrder(Order incomingOrder, int timestamp, bool isOrderTriggered = false)
         {
             if (incomingOrder == null)
@@ -115,11 +130,15 @@ namespace OrderMatcher
                 }
             }
 
-            if (_acceptedOrders.Contains(incomingOrder.OrderId))
+            if (_acceptedOrderTrackingEnabled)
             {
-                return OrderMatchingResult.DuplicateOrder;
+                if (_acceptedOrders.Contains(incomingOrder.OrderId))
+                {
+                    return OrderMatchingResult.DuplicateOrder;
+                }
+                _acceptedOrders.Add(incomingOrder.OrderId);
             }
-            _acceptedOrders.Add(incomingOrder.OrderId);
+
             _tradeListener?.OnAccept(incomingOrder.OrderId);
 
             Quantity? quantity = null;
@@ -319,7 +338,6 @@ namespace OrderMatcher
             }
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         private bool MatchWithOpenOrders(Order incomingOrder)
         {
             bool anyMatchHappend = false;
@@ -334,7 +352,7 @@ namespace OrderMatcher
                 if ((incomingOrder.IsBuy && (restingOrder.Price <= incomingOrder.Price || incomingOrder.Price == 0)) || (!incomingOrder.IsBuy && (restingOrder.Price >= incomingOrder.Price)))
                 {
                     Price matchPrice = restingOrder.Price;
-                    Quantity maxQuantity = 0;
+                    Quantity maxQuantity;
                     if (incomingOrder.OpenQuantity > 0)
                     {
                         maxQuantity = incomingOrder.OpenQuantity >= restingOrder.OpenQuantity ? restingOrder.OpenQuantity : incomingOrder.OpenQuantity;
