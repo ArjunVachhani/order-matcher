@@ -16,7 +16,7 @@ namespace OrderMatcher.Performance
         public OrderSerializeBenchmark()
         {
             order2 = new Order2 { IsBuy = true, IsTip = false, OpenQuantity = 100, OrderId = 1001, Price = 400, Quantity = 100, Sequnce = 0, StopPrice = 0 };
-            order = new Order { IsBuy = true, OpenQuantity = 100, OrderId = 1001, Price = 400, Sequnce = 0, TotalQuantity = 100, OrderCondition = OrderCondition.None, StopPrice = 0 };
+            order = new Order { IsBuy = true, OpenQuantity = 100, OrderId = 1001, Price = 400, Sequence = 0, TotalQuantity = 100, OrderCondition = OrderCondition.None, StopPrice = 0 };
         }
 
         [Benchmark]
