@@ -17,11 +17,11 @@ namespace OrderMatcher
             if (y == null)
                 throw new ArgumentNullException(nameof(y));
 
-            if (x.Sequnce < y.Sequnce)
+            if (x.Sequence < y.Sequence)
             {
                 return -1;
             }
-            else if (x.Sequnce > y.Sequnce)
+            else if (x.Sequence > y.Sequence)
             {
                 return 1;
             }
