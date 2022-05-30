@@ -93,7 +93,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -112,7 +112,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             OrderMatchingResult result3 = matchingEngine.CancelOrder(2);
 
@@ -128,7 +128,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -148,7 +148,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -167,7 +167,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             OrderMatchingResult result3 = matchingEngine.CancelOrder(2);
 
@@ -183,7 +183,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -220,7 +220,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -236,7 +236,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(3, 500, 0, 0, CancelReason.UserRequested));
@@ -250,7 +250,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -287,7 +287,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -303,7 +303,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(3, 500, 0, 0, CancelReason.UserRequested));
@@ -317,7 +317,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -337,7 +337,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -354,7 +354,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -370,7 +370,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(3, 500, 0, 0, CancelReason.UserRequested));
@@ -384,7 +384,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -404,7 +404,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -421,7 +421,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -437,7 +437,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(3, 500, 0, 0, CancelReason.UserRequested));
@@ -451,7 +451,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -471,7 +471,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -488,7 +488,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -504,7 +504,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4, StopPrice = 11 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -520,7 +520,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 5, StopPrice = 13 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -536,7 +536,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Equal(2, matchingEngine.Book.StopBidSide.Count());
             Assert.Equal(500, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
 
             Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 12, OrderId = 6 };
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6, 6);
@@ -552,7 +552,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Equal(2, matchingEngine.Book.StopBidSide.Count());
             Assert.Equal(500, order6.OpenQuantity);
-            Assert.Equal((ulong)5, order6.Sequnce);
+            Assert.Equal((ulong)5, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 12, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -573,9 +573,9 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order7.OpenQuantity);
-            Assert.Equal((ulong)0, order7.Sequnce);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)0, order7.Sequence);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
 
             OrderMatchingResult result8 = matchingEngine.CancelOrder(order4.OrderId);
 
@@ -592,9 +592,9 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order7.OpenQuantity);
-            Assert.Equal((ulong)0, order7.Sequnce);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)0, order7.Sequence);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
         }
 
         [Fact]
@@ -615,7 +615,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -632,7 +632,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -648,7 +648,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4, StopPrice = 9 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -664,7 +664,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 5, StopPrice = 7 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -680,7 +680,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(2, matchingEngine.Book.StopAskSide.Count());
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
 
             Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 8, OrderId = 6 };
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6, 6);
@@ -696,7 +696,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(2, matchingEngine.Book.StopAskSide.Count());
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order6.OpenQuantity);
-            Assert.Equal((ulong)5, order6.Sequnce);
+            Assert.Equal((ulong)5, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 8, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -720,9 +720,9 @@ namespace OrderMatcher.Tests
             Assert.Equal(7, matchingEngine.Book.StopAskSide.First().Key);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order7.OpenQuantity);
-            Assert.Equal((ulong)0, order7.Sequnce);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)0, order7.Sequence);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
 
             OrderMatchingResult result8 = matchingEngine.CancelOrder(order4.OrderId);
 
@@ -739,8 +739,8 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Equal(7, matchingEngine.Book.StopAskSide.First().Key);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
         }
 
         [Fact]
@@ -760,7 +760,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -777,7 +777,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -795,7 +795,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
             mockTradeListener.Verify(x => x.OnCancel(3, 500, 1000, 5, CancelReason.UserRequested));
@@ -810,7 +810,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -830,7 +830,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 600, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -847,7 +847,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(100, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -865,7 +865,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
 
@@ -881,7 +881,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
         }
 
         [Fact]
@@ -1171,7 +1171,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1187,7 +1187,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1203,7 +1203,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -1236,7 +1236,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
 
             Order order6 = new Order { IsBuy = true, OpenQuantity = 500, Price = 12, OrderId = 6 };
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6, 6);
@@ -1254,7 +1254,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order6.OpenQuantity);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order6.Sequnce);
+            Assert.Equal((ulong)0, order6.Sequence);
 
             Order order7 = new Order { IsBuy = false, OpenQuantity = 500, Price = 12, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -1270,7 +1270,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order7.OpenQuantity);
-            Assert.Equal((ulong)5, order7.Sequnce);
+            Assert.Equal((ulong)5, order7.Sequence);
 
             Order order8 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 13, OrderId = 8 };
             OrderMatchingResult result8 = matchingEngine.AddOrder(order8, 8);
@@ -1286,7 +1286,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order8.OpenQuantity);
-            Assert.Equal((ulong)6, order8.Sequnce);
+            Assert.Equal((ulong)6, order8.Sequence);
 
             Order order9 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 14, OrderId = 9 };
             OrderMatchingResult result9 = matchingEngine.AddOrder(order9, 9);
@@ -1302,7 +1302,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order9.OpenQuantity);
-            Assert.Equal((ulong)7, order9.Sequnce);
+            Assert.Equal((ulong)7, order9.Sequence);
 
             Order order10 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 14, OrderId = 10 };
             OrderMatchingResult result10 = matchingEngine.AddOrder(order10, 10);
@@ -1318,7 +1318,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order10.OpenQuantity);
-            Assert.Equal((ulong)8, order10.Sequnce);
+            Assert.Equal((ulong)8, order10.Sequence);
 
             Order order11 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 15, OrderId = 11 };
             OrderMatchingResult result11 = matchingEngine.AddOrder(order11, 11);
@@ -1334,7 +1334,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order11.OpenQuantity);
-            Assert.Equal((ulong)9, order11.Sequnce);
+            Assert.Equal((ulong)9, order11.Sequence);
 
             Order order12 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 12 };
             OrderMatchingResult result12 = matchingEngine.AddOrder(order12, 12);
@@ -1350,7 +1350,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order12.OpenQuantity);
-            Assert.Equal((ulong)10, order12.Sequnce);
+            Assert.Equal((ulong)10, order12.Sequence);
 
             Order order13 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 8, OrderId = 13 };
             OrderMatchingResult result13 = matchingEngine.AddOrder(order13, 13);
@@ -1366,7 +1366,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order13.OpenQuantity);
-            Assert.Equal((ulong)11, order13.Sequnce);
+            Assert.Equal((ulong)11, order13.Sequence);
 
             Order order14 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 7, OrderId = 14 };
             OrderMatchingResult result14 = matchingEngine.AddOrder(order14, 14);
@@ -1382,7 +1382,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order14.OpenQuantity);
-            Assert.Equal((ulong)12, order14.Sequnce);
+            Assert.Equal((ulong)12, order14.Sequence);
 
             Order order15 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 7, OrderId = 15 };
             OrderMatchingResult result15 = matchingEngine.AddOrder(order15, 15);
@@ -1398,7 +1398,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order15.OpenQuantity);
-            Assert.Equal((ulong)13, order15.Sequnce);
+            Assert.Equal((ulong)13, order15.Sequence);
 
             OrderMatchingResult result16 = matchingEngine.CancelOrder(2);
 
@@ -1413,7 +1413,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order17 = new Order { IsBuy = true, OpenQuantity = 5000, Price = 16, OrderId = 17 };
             OrderMatchingResult result17 = matchingEngine.AddOrder(order17, 17);
@@ -1434,7 +1434,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order17.OpenQuantity);
-            Assert.Equal((ulong)14, order17.Sequnce);
+            Assert.Equal((ulong)14, order17.Sequence);
 
             Order order18 = new Order { IsBuy = false, OpenQuantity = 4000, Price = 7, OrderId = 18 };
             OrderMatchingResult result18 = matchingEngine.AddOrder(order18, 18);
@@ -1455,7 +1455,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order18.OpenQuantity);
-            Assert.Equal((ulong)0, order18.Sequnce);
+            Assert.Equal((ulong)0, order18.Sequence);
 
             Order order19 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 7, OrderId = 19 };
             OrderMatchingResult result19 = matchingEngine.AddOrder(order19, 19);
@@ -1474,7 +1474,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order19.OpenQuantity);
-            Assert.Equal((ulong)0, order19.Sequnce);
+            Assert.Equal((ulong)0, order19.Sequence);
         }
 
         [Fact]
@@ -1494,7 +1494,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1511,7 +1511,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -1531,7 +1531,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1548,7 +1548,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -1568,7 +1568,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1585,7 +1585,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1602,7 +1602,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -1622,7 +1622,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1639,7 +1639,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1656,7 +1656,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -1676,7 +1676,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 9, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -1692,7 +1692,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 0, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1710,7 +1710,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -1730,7 +1730,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -1746,7 +1746,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 0, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1764,7 +1764,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -1785,7 +1785,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -1806,7 +1806,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -1826,7 +1826,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1845,7 +1845,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -1865,7 +1865,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 0, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1884,7 +1884,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -1904,7 +1904,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -1920,7 +1920,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -1936,7 +1936,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -1987,7 +1987,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order6.OpenQuantity);
             Assert.Equal(9, order6.Price);
-            Assert.Equal((ulong)4, order6.Sequnce);
+            Assert.Equal((ulong)4, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 2000, Price = 12, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -2005,7 +2005,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order7.OpenQuantity);
-            Assert.Equal((ulong)5, order7.Sequnce);
+            Assert.Equal((ulong)5, order7.Sequence);
 
             Order order8 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 12, OrderId = 8 };
             OrderMatchingResult result8 = matchingEngine.AddOrder(order8, 8);
@@ -2021,7 +2021,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order8.OpenQuantity);
-            Assert.Equal((ulong)6, order8.Sequnce);
+            Assert.Equal((ulong)6, order8.Sequence);
 
             Order order9 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 13, OrderId = 9 };
             OrderMatchingResult result9 = matchingEngine.AddOrder(order9, 9);
@@ -2037,7 +2037,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order9.OpenQuantity);
-            Assert.Equal((ulong)7, order9.Sequnce);
+            Assert.Equal((ulong)7, order9.Sequence);
 
             Order order10 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 0, OrderId = 10 };
             OrderMatchingResult result10 = matchingEngine.AddOrder(order10, 10);
@@ -2056,7 +2056,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order10.OpenQuantity);
-            Assert.Equal((ulong)0, order10.Sequnce);
+            Assert.Equal((ulong)0, order10.Sequence);
 
             Order order11 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 0, OrderId = 11 };
             OrderMatchingResult result11 = matchingEngine.AddOrder(order11, 11);
@@ -2073,7 +2073,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(3000, order11.OpenQuantity);
-            Assert.Equal((ulong)0, order11.Sequnce);
+            Assert.Equal((ulong)0, order11.Sequence);
 
             Order order12 = new Order { IsBuy = true, OpenQuantity = 3000, Price = 0, OrderId = 12 };
             OrderMatchingResult result12 = matchingEngine.AddOrder(order12, 12);
@@ -2090,7 +2090,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(3000, order12.OpenQuantity);
-            Assert.Equal((ulong)0, order12.Sequnce);
+            Assert.Equal((ulong)0, order12.Sequence);
 
             Order order13 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 13 };
             OrderMatchingResult result13 = matchingEngine.AddOrder(order13, 13);
@@ -2106,7 +2106,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order13.OpenQuantity);
-            Assert.Equal((ulong)8, order13.Sequnce);
+            Assert.Equal((ulong)8, order13.Sequence);
 
             Order order14 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 14 };
             OrderMatchingResult result14 = matchingEngine.AddOrder(order14, 14);
@@ -2122,7 +2122,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order14.OpenQuantity);
-            Assert.Equal((ulong)9, order14.Sequnce);
+            Assert.Equal((ulong)9, order14.Sequence);
 
             Order order15 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 15 };
             OrderMatchingResult result15 = matchingEngine.AddOrder(order15, 15);
@@ -2138,7 +2138,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order15.OpenQuantity);
-            Assert.Equal((ulong)10, order15.Sequnce);
+            Assert.Equal((ulong)10, order15.Sequence);
 
             Order order16 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 16 };
             OrderMatchingResult result16 = matchingEngine.AddOrder(order16, 16);
@@ -2175,7 +2175,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -2195,7 +2195,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -2215,7 +2215,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -2235,7 +2235,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -2255,7 +2255,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2272,7 +2272,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2288,7 +2288,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2308,7 +2308,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2325,7 +2325,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2341,7 +2341,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2361,7 +2361,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2378,7 +2378,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2394,7 +2394,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2414,7 +2414,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2431,7 +2431,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2447,7 +2447,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2467,7 +2467,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2484,7 +2484,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2500,7 +2500,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4, StopPrice = 11 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -2516,7 +2516,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 5, StopPrice = 13 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -2532,7 +2532,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Equal(2, matchingEngine.Book.StopBidSide.Count());
             Assert.Equal(500, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
 
             Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 12, OrderId = 6 };
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6, 6);
@@ -2548,7 +2548,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Equal(2, matchingEngine.Book.StopBidSide.Count());
             Assert.Equal(500, order6.OpenQuantity);
-            Assert.Equal((ulong)5, order6.Sequnce);
+            Assert.Equal((ulong)5, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 12, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -2569,9 +2569,9 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order7.OpenQuantity);
-            Assert.Equal((ulong)0, order7.Sequnce);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)0, order7.Sequence);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
         }
 
         [Fact]
@@ -2591,7 +2591,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2608,7 +2608,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2624,7 +2624,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4, StopPrice = 9 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -2640,7 +2640,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 5, StopPrice = 7 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -2656,7 +2656,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(2, matchingEngine.Book.StopAskSide.Count());
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
 
             Order order6 = new Order { IsBuy = false, OpenQuantity = 500, Price = 8, OrderId = 6 };
             OrderMatchingResult result6 = matchingEngine.AddOrder(order6, 6);
@@ -2672,7 +2672,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(2, matchingEngine.Book.StopAskSide.Count());
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order6.OpenQuantity);
-            Assert.Equal((ulong)5, order6.Sequnce);
+            Assert.Equal((ulong)5, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 500, Price = 8, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -2696,9 +2696,9 @@ namespace OrderMatcher.Tests
             Assert.Equal(7, matchingEngine.Book.StopAskSide.First().Key);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order7.OpenQuantity);
-            Assert.Equal((ulong)0, order7.Sequnce);
-            Assert.Equal((ulong)6, order3.Sequnce);
-            Assert.Equal((ulong)7, order4.Sequnce);
+            Assert.Equal((ulong)0, order7.Sequence);
+            Assert.Equal((ulong)6, order3.Sequence);
+            Assert.Equal((ulong)7, order4.Sequence);
         }
 
         [Fact]
@@ -2718,7 +2718,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2735,7 +2735,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2751,7 +2751,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2771,7 +2771,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2788,7 +2788,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2804,7 +2804,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2824,7 +2824,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2841,7 +2841,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2859,7 +2859,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -2879,7 +2879,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 600, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2896,7 +2896,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(100, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 600, Price = 0, OrderId = 3, StopPrice = 10 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2914,7 +2914,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
             Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
         }
 
         [Fact]
@@ -2934,7 +2934,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -2951,7 +2951,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -2967,7 +2967,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -2983,7 +2983,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 5 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -3002,8 +3002,8 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -3023,7 +3023,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3040,7 +3040,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -3056,7 +3056,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -3072,7 +3072,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 5 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -3091,8 +3091,8 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -3112,7 +3112,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3129,7 +3129,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 7, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -3145,7 +3145,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 8, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -3161,7 +3161,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 8, OrderId = 5 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -3180,7 +3180,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
         }
 
         [Fact]
@@ -3200,7 +3200,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3217,7 +3217,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 0, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -3233,7 +3233,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 8, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -3249,7 +3249,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 8, OrderId = 5 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -3268,7 +3268,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)4, order5.Sequnce);
+            Assert.Equal((ulong)4, order5.Sequence);
         }
 
         [Fact]
@@ -3288,7 +3288,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3303,7 +3303,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3323,7 +3323,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 1000, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel, StopPrice = 1000 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3338,7 +3338,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3358,7 +3358,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3375,7 +3375,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3395,7 +3395,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 9, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3411,7 +3411,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -3431,7 +3431,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -3451,7 +3451,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3468,7 +3468,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3488,7 +3488,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 11, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3504,7 +3504,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -3524,7 +3524,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -3544,7 +3544,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 1000, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel, StopPrice = 1000 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3559,7 +3559,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3579,7 +3579,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3597,7 +3597,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3617,7 +3617,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3635,7 +3635,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3655,7 +3655,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 9, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3672,7 +3672,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3692,7 +3692,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 11, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3709,7 +3709,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3729,7 +3729,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 100, Price = 11, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3746,7 +3746,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3766,7 +3766,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 100, Price = 10, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3783,7 +3783,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3803,7 +3803,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 0, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3821,7 +3821,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3841,7 +3841,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 0, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3859,7 +3859,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3880,7 +3880,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -3901,7 +3901,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -3921,7 +3921,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 100, Price = 0, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3938,7 +3938,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -3958,7 +3958,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 100, Price = 0, OrderId = 2, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -3975,7 +3975,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -4005,7 +4005,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4022,7 +4022,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4038,7 +4038,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4054,7 +4054,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 600, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4071,7 +4071,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4091,7 +4091,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4108,7 +4108,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4124,7 +4124,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4140,7 +4140,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 600, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4157,7 +4157,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4177,7 +4177,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4194,7 +4194,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4210,7 +4210,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4226,7 +4226,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 400, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4243,7 +4243,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4263,7 +4263,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4280,7 +4280,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4296,7 +4296,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4312,7 +4312,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 400, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4329,7 +4329,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4349,7 +4349,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4366,7 +4366,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4382,7 +4382,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4398,7 +4398,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 600, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4415,7 +4415,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4435,7 +4435,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4452,7 +4452,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4468,7 +4468,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4484,7 +4484,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 600, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4501,7 +4501,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4521,7 +4521,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4538,7 +4538,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4554,7 +4554,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4570,7 +4570,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 400, Price = 10, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4587,7 +4587,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4607,7 +4607,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4624,7 +4624,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 11 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4640,7 +4640,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4656,7 +4656,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = false, OpenQuantity = 400, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -4673,7 +4673,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -4694,7 +4694,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             OrderMatchingResult acceptanceResult2 = matchingEngine.CancelOrder(order1.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(1, 5000, 0, 0, CancelReason.UserRequested));
@@ -4706,7 +4706,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -4727,7 +4727,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4748,7 +4748,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 200, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4769,7 +4769,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             OrderMatchingResult acceptanceResult4 = matchingEngine.CancelOrder(order1.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(1, 4300, 7000, 14, CancelReason.UserRequested));
@@ -4781,7 +4781,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -4802,7 +4802,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(700, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4823,7 +4823,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(200, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4843,7 +4843,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 100, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4863,7 +4863,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
 
             OrderMatchingResult acceptanceResult5 = matchingEngine.CancelOrder(order1.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(1, 100, 11000, 22, CancelReason.UserRequested));
@@ -4895,7 +4895,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -4916,7 +4916,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -4936,7 +4936,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -4955,7 +4955,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
 
             OrderMatchingResult acceptanceResult5 = matchingEngine.CancelOrder(order1.OrderId);
             mockTradeListener.VerifyNoOtherCalls();
@@ -4980,7 +4980,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5001,7 +5001,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5022,7 +5022,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5043,7 +5043,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(700, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5064,7 +5064,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(200, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5084,7 +5084,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 100, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -5104,7 +5104,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
         }
 
         [Fact]
@@ -5125,7 +5125,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5146,7 +5146,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5166,7 +5166,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 100, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -5186,7 +5186,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
         }
 
         [Fact]
@@ -5207,7 +5207,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5228,7 +5228,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5248,7 +5248,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -5267,7 +5267,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order4.OpenQuantity);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
         }
 
         [Fact]
@@ -5288,7 +5288,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 5000, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5314,7 +5314,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5335,7 +5335,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5352,7 +5352,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5369,7 +5369,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5386,7 +5386,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5403,7 +5403,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5420,7 +5420,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5437,7 +5437,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5456,7 +5456,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 2, OrderCondition = OrderCondition.BookOrCancel, TotalQuantity = 5000, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5471,7 +5471,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5490,7 +5490,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 2, TotalQuantity = 1500, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5508,7 +5508,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order2.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5527,7 +5527,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 400, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5542,7 +5542,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(400, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, TotalQuantity = 1500, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5561,7 +5561,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order3.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -5580,7 +5580,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 400, Price = 11, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5595,7 +5595,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(400, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 600, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5610,7 +5610,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(600, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4, TotalQuantity = 1500, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -5629,7 +5629,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
         }
 
         [Fact]
@@ -5648,7 +5648,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(5000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 2, TotalQuantity = 5000, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5673,7 +5673,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5692,7 +5692,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 400, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5707,7 +5707,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(400, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, TotalQuantity = 1500, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5726,7 +5726,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, matchingEngine.CurrentOrders.Single(x => x.Key == order3.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
 
             OrderMatchingResult acceptanceResult4 = matchingEngine.CancelOrder(order3.OrderId);
 
@@ -5755,7 +5755,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 2, TotalQuantity = 5000, OrderCondition = OrderCondition.BookOrCancel, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5770,7 +5770,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -5789,7 +5789,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5804,7 +5804,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, TotalQuantity = 5000, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5822,7 +5822,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(3500, matchingEngine.CurrentOrders.Single(x => x.Key == order3.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -5841,7 +5841,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -5856,7 +5856,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, TotalQuantity = 1000, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5873,7 +5873,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -5892,7 +5892,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
@@ -5908,7 +5908,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -5923,7 +5923,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4, TotalQuantity = 1500, TipQuantity = 500 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -5942,7 +5942,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order4.Sequnce);
+            Assert.Equal((ulong)0, order4.Sequence);
         }
 
         [Fact]
@@ -5961,7 +5961,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -5979,7 +5979,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -5998,7 +5998,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -6018,7 +6018,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 10);
@@ -6035,7 +6035,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -6055,7 +6055,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 10);
@@ -6072,7 +6072,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
         }
 
         [Fact]
@@ -6093,7 +6093,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4500, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -6114,7 +6114,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(4000, matchingEngine.CurrentOrders.Single(x => x.Key == order1.OrderId).Value.TotalQuantity);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 200, Price = 10, OrderId = 3 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 10);
@@ -6132,7 +6132,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(200, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
         }
 
         [Fact]
@@ -6170,7 +6170,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -6190,7 +6190,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, Price = 0, OrderId = 2, OrderAmount = 5000 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6207,7 +6207,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
         }
 
         [Fact]
@@ -6227,7 +6227,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, Price = 0, OrderId = 2, OrderAmount = 5000 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6244,7 +6244,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, Price = 0, OrderId = 3, OrderAmount = 5000 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6261,7 +6261,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -6282,7 +6282,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order1.OpenQuantity);
-            Assert.Equal((ulong)0, order1.Sequnce);
+            Assert.Equal((ulong)0, order1.Sequence);
         }
 
         [Fact]
@@ -6302,7 +6302,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -6318,7 +6318,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, Price = 0, OrderId = 3, OrderAmount = 10000 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6336,7 +6336,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)0, order3.Sequnce);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -6356,7 +6356,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6372,7 +6372,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 3 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6388,7 +6388,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -6439,7 +6439,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order6.OpenQuantity);
             Assert.Equal(9, order6.Price);
-            Assert.Equal((ulong)4, order6.Sequnce);
+            Assert.Equal((ulong)4, order6.Sequence);
 
             Order order7 = new Order { IsBuy = true, OpenQuantity = 2000, Price = 12, OrderId = 7 };
             OrderMatchingResult result7 = matchingEngine.AddOrder(order7, 7);
@@ -6457,7 +6457,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order7.OpenQuantity);
-            Assert.Equal((ulong)5, order7.Sequnce);
+            Assert.Equal((ulong)5, order7.Sequence);
 
             Order order8 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 12, OrderId = 8 };
             OrderMatchingResult result8 = matchingEngine.AddOrder(order8, 8);
@@ -6473,7 +6473,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1500, order8.OpenQuantity);
-            Assert.Equal((ulong)6, order8.Sequnce);
+            Assert.Equal((ulong)6, order8.Sequence);
 
             Order order9 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 13, OrderId = 9 };
             OrderMatchingResult result9 = matchingEngine.AddOrder(order9, 9);
@@ -6489,7 +6489,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order9.OpenQuantity);
-            Assert.Equal((ulong)7, order9.Sequnce);
+            Assert.Equal((ulong)7, order9.Sequence);
 
             Order order10 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 0, OrderId = 10 };
             OrderMatchingResult result10 = matchingEngine.AddOrder(order10, 10);
@@ -6508,7 +6508,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order10.OpenQuantity);
-            Assert.Equal((ulong)0, order10.Sequnce);
+            Assert.Equal((ulong)0, order10.Sequence);
 
             Order order11 = new Order { IsBuy = false, OpenQuantity = 3000, Price = 0, OrderId = 11 };
             OrderMatchingResult result11 = matchingEngine.AddOrder(order11, 11);
@@ -6525,7 +6525,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(3000, order11.OpenQuantity);
-            Assert.Equal((ulong)0, order11.Sequnce);
+            Assert.Equal((ulong)0, order11.Sequence);
 
             Order order12 = new Order { IsBuy = true, Price = 0, OrderId = 12, OrderAmount = 3000 };
             OrderMatchingResult result12 = matchingEngine.AddOrder(order12, 12);
@@ -6543,7 +6543,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order12.OpenQuantity);
             Assert.Equal(3000, order12.OrderAmount);
-            Assert.Equal((ulong)0, order12.Sequnce);
+            Assert.Equal((ulong)0, order12.Sequence);
 
             Order order13 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 13 };
             OrderMatchingResult result13 = matchingEngine.AddOrder(order13, 13);
@@ -6559,7 +6559,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order13.OpenQuantity);
-            Assert.Equal((ulong)8, order13.Sequnce);
+            Assert.Equal((ulong)8, order13.Sequence);
 
             Order order14 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 14 };
             OrderMatchingResult result14 = matchingEngine.AddOrder(order14, 14);
@@ -6575,7 +6575,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order14.OpenQuantity);
-            Assert.Equal((ulong)9, order14.Sequnce);
+            Assert.Equal((ulong)9, order14.Sequence);
 
             Order order15 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 9, OrderId = 15 };
             OrderMatchingResult result15 = matchingEngine.AddOrder(order15, 15);
@@ -6591,7 +6591,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order15.OpenQuantity);
-            Assert.Equal((ulong)10, order15.Sequnce);
+            Assert.Equal((ulong)10, order15.Sequence);
 
             Order order16 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 16 };
             OrderMatchingResult result16 = matchingEngine.AddOrder(order16, 16);
@@ -6628,7 +6628,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6645,7 +6645,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, Price = 0, OrderId = 3, OrderAmount = 500, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6661,7 +6661,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             OrderMatchingResult result4 = matchingEngine.CancelOrder(order3.OrderId);
             mockTradeListener.Verify(x => x.OnCancel(3, 0, 0, 0, CancelReason.UserRequested));
@@ -6675,7 +6675,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -6694,7 +6694,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
         }
 
         [Fact]
@@ -6714,7 +6714,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6731,7 +6731,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, Price = 0, OrderId = 3, OrderAmount = 5000, StopPrice = 11 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6747,7 +6747,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -6767,7 +6767,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
@@ -6784,7 +6784,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = true, Price = 0, OrderId = 3, StopPrice = 11, OrderAmount = 5500 };
             OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
@@ -6799,7 +6799,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 11, OrderId = 4 };
             OrderMatchingResult result4 = matchingEngine.AddOrder(order4, 4);
@@ -6815,7 +6815,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Single(matchingEngine.Book.StopBidSide);
             Assert.Equal(1000, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 5 };
             OrderMatchingResult result5 = matchingEngine.AddOrder(order5, 5);
@@ -6834,8 +6834,8 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
+            Assert.Equal((ulong)2, order3.Sequence);
         }
 
         [Fact]
@@ -6855,7 +6855,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -6872,7 +6872,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -6888,7 +6888,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -6904,7 +6904,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill, OrderAmount = 6000 };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -6920,7 +6920,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -6940,7 +6940,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 2 };
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
@@ -6957,7 +6957,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequnce);
+            Assert.Equal((ulong)0, order2.Sequence);
 
             Order order3 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 3, StopPrice = 9 };
             OrderMatchingResult acceptanceResult3 = matchingEngine.AddOrder(order3, 3);
@@ -6973,7 +6973,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal((ulong)2, order3.Sequnce);
+            Assert.Equal((ulong)2, order3.Sequence);
 
             Order order4 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 4 };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -6989,7 +6989,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order4.OpenQuantity);
-            Assert.Equal((ulong)3, order4.Sequnce);
+            Assert.Equal((ulong)3, order4.Sequence);
 
             Order order5 = new Order { IsBuy = true, Price = 0, OrderId = 5, OrderCondition = OrderCondition.FillOrKill, OrderAmount = 4000 };
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
@@ -7006,7 +7006,7 @@ namespace OrderMatcher.Tests
             Assert.Single(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(0, order5.OpenQuantity);
-            Assert.Equal((ulong)0, order5.Sequnce);
+            Assert.Equal((ulong)0, order5.Sequence);
         }
 
         [Fact]
@@ -7027,7 +7027,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)0.5m, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, OpenQuantity = 1.1m, Price = 680000M };
@@ -7043,7 +7043,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)1.1m, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, OpenQuantity = 0.6m, Price = 678800M };
@@ -7059,7 +7059,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)0.6m, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
 
             Order order4 = new Order { IsBuy = true, Price = 0, OrderId = 4, OrderAmount = 700000m, OrderCondition = OrderCondition.ImmediateOrCancel };
             OrderMatchingResult acceptanceResult4 = matchingEngine.AddOrder(order4, 4);
@@ -7099,7 +7099,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)0.5m, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequnce);
+            Assert.Equal((ulong)1, order1.Sequence);
 
             matchingEngine.AcceptedOrderTrackingEnabled = false;
             Assert.False(matchingEngine.AcceptedOrderTrackingEnabled);
@@ -7118,7 +7118,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)1.1m, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequnce);
+            Assert.Equal((ulong)2, order2.Sequence);
 
             matchingEngine.AcceptedOrderTrackingEnabled = true;
             Assert.True(matchingEngine.AcceptedOrderTrackingEnabled);
@@ -7138,7 +7138,7 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal((Quantity)0.6m, order3.OpenQuantity);
-            Assert.Equal((ulong)3, order3.Sequnce);
+            Assert.Equal((ulong)3, order3.Sequence);
         }
     }
 }

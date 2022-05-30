@@ -13,8 +13,8 @@ namespace OrderMatcher.Performance
         {
             _orderSequenceComparer = new OrderSequenceComparer();
 
-            _order1 = new Order() { Sequnce = 1 };
-            _order2 = new Order() { Sequnce = 2 };
+            _order1 = new Order() { Sequence = 1 };
+            _order2 = new Order() { Sequence = 2 };
         }
 
         [Benchmark]

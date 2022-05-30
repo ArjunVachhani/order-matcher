@@ -6,7 +6,7 @@ namespace OrderMatcher.Types
     {
         public bool IsBuy { get; set; }
         public OrderId OrderId { get; set; }
-        public ulong Sequnce { get; set; }
+        public ulong Sequence { get; set; }
         public Quantity OpenQuantity { get; set; }
         public Price Price { get; set; }
         public int CancelOn { get; set; }
