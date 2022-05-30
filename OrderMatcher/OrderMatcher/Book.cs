@@ -78,7 +78,7 @@ namespace OrderMatcher
 
         internal void AddStopOrder(Order order)
         {
-            order.Sequnce = ++_sequence;
+            order.Sequence = ++_sequence;
             if (order.IsBuy)
             {
                 PriceLevel priceLevel = GetPriceLevel(order.StopPrice, _stopBid);
@@ -101,7 +101,7 @@ namespace OrderMatcher
 
         internal void AddOrderOpenBook(Order order)
         {
-            order.Sequnce = ++_sequence;
+            order.Sequence = ++_sequence;
             if (order.IsBuy)
             {
                 QuantityTrackingPriceLevel priceLevel = GetPriceLevel(order.Price, _bidSide);
