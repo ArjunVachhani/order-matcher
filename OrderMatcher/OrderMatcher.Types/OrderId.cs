@@ -1,3 +1,4 @@
+using OrderMatcher.Types.Serializers;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -86,6 +87,21 @@ namespace OrderMatcher.Types
         public int CompareTo(OrderId other)
         {
             return _orderId.CompareTo(other._orderId);
+        }
+
+        public void WriteBytes(Span<byte> bytes)
+        {
+            WriteBytes(bytes, this);
+        }
+
+        public static void WriteBytes(Span<byte> bytes, OrderId orderId)
+        {
+            Serializer.Write(bytes, orderId._orderId);
+        }
+
+        public static OrderId ReadOrderId(ReadOnlySpan<byte> bytes)
+        {
+            return Serializer.ReadInt(bytes);
         }
     }
 }

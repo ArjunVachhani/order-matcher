@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderMatcher.Types.Serializers;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace OrderMatcher.Types
@@ -90,6 +91,21 @@ namespace OrderMatcher.Types
         public int CompareTo(Price other)
         {
             return _price.CompareTo(other._price);
+        }
+
+        public void WriteBytes(Span<byte> bytes)
+        {
+            WriteBytes(bytes, this);
+        }
+
+        public static void WriteBytes(Span<byte> bytes, Price price)
+        {
+            Serializer.Write(bytes, price._price);
+        }
+
+        public static Price ReadPrice(ReadOnlySpan<byte> bytes)
+        {
+            return Serializer.ReadDecimal(bytes);
         }
     }
 }

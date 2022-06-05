@@ -107,30 +107,32 @@ namespace OrderMatcher.Types.Serializers
             array[15] = (byte)(flags >> 24);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Price ReadPrice(ReadOnlySpan<byte> array)
+        public static bool ReadBool(ReadOnlySpan<byte> array)
         {
-            if (array.Length <= 15)
-                throw new ArgumentException(Constant.INVALID_SIZE, nameof(array));
-
-            int lo = (array[0]) | (array[1] << 8) | (array[2] << 16) | (array[3] << 24);
-            int mid = (array[4]) | (array[5] << 8) | (array[6] << 16) | (array[7] << 24);
-            int hi = (array[8]) | (array[9] << 8) | (array[10] << 16) | (array[11] << 24);
-            int flags = (array[12]) | (array[13] << 8) | (array[14] << 16) | (array[15] << 24);
-#if NET6_0
-            Span<int> bits = stackalloc int[4];
-            bits[0] = lo;
-            bits[1] = mid;
-            bits[2] = hi;
-            bits[3] = flags;
-            return new decimal(bits);
-#elif NETSTANDARD2_1
-            return new decimal(new[] { lo, mid, hi, flags });
-#endif
+            return BitConverter.ToBoolean(array);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Quantity ReadQuantity(ReadOnlySpan<byte> array)
+        public static short ReadShort(ReadOnlySpan<byte> array)
+        {
+            return BitConverter.ToInt16(array);
+        }
+
+        public static int ReadInt(ReadOnlySpan<byte> array)
+        {
+            return BitConverter.ToInt32(array);
+        }
+
+        public static long ReadLong(ReadOnlySpan<byte> array)
+        {
+            return BitConverter.ToInt64(array);
+        }
+
+        public static ulong ReadULong(ReadOnlySpan<byte> array)
+        {
+            return BitConverter.ToUInt64(array);
+        }
+
+        public static decimal ReadDecimal(ReadOnlySpan<byte> array)
         {
             if (array.Length <= 15)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(array));
