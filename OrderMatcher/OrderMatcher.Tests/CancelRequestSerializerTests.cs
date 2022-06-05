@@ -7,6 +7,8 @@ namespace OrderMatcher.Tests
 {
     public class CancelRequestSerializerTests
     {
+        private static readonly int messageSize = 11;
+
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
@@ -38,23 +40,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[10];
+            var bytes = new byte[messageSize - 1];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Cancel Request Message must be of Size : 11", ex.Message);
+            Assert.Equal($"Cancel Request Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[12];
+            var bytes = new byte[messageSize + 1];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
-            Assert.Equal("Cancel Request Message must be of Size : 11", ex.Message);
+            Assert.Equal($"Cancel Request Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[11];
+            var bytes = new byte[messageSize];
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -62,7 +64,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[11];
+            var bytes = new byte[messageSize];
             bytes[4] = (byte)MessageType.CancelRequest;
             Exception ex = Assert.Throws<Exception>(() => CancelRequestSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -74,7 +76,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[CancelRequestSerializer.MessageSize];
             CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MinValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(11, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, cancelRequest.OrderId);
         }
@@ -85,7 +87,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[CancelRequestSerializer.MessageSize];
             CancelRequestSerializer.Serialize(new CancelRequest { OrderId = OrderId.MaxValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(11, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, cancelRequest.OrderId);
         }
@@ -96,7 +98,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[CancelRequestSerializer.MessageSize];
             CancelRequestSerializer.Serialize(new CancelRequest { OrderId = 12345678 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(11, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelRequest = CancelRequestSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, cancelRequest.OrderId);
         }

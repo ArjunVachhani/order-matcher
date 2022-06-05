@@ -7,6 +7,8 @@ namespace OrderMatcher.Tests
 {
     public class TriggerSerializerTests
     {
+        private static readonly int messageSize = 23;
+
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
@@ -38,23 +40,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[22];
+            var bytes = new byte[messageSize - 1];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
+            Assert.Equal($"Order Trigger Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[24];
+            var bytes = new byte[messageSize + 1];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
-            Assert.Equal("Order Trigger Message must be of Size : 23", ex.Message);
+            Assert.Equal($"Order Trigger Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[23];
+            var bytes = new byte[messageSize];
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -62,7 +64,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[23];
+            var bytes = new byte[messageSize];
             bytes[4] = (byte)MessageType.OrderTrigger;
             Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -74,7 +76,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
             OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MinValue, Timestamp = int.MinValue, MessageSequence = long.MinValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(23, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, orderTrigger.OrderId);
             Assert.Equal(int.MinValue, orderTrigger.Timestamp);
@@ -87,7 +89,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
             OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, MessageSequence = long.MaxValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(23, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, orderTrigger.OrderId);
             Assert.Equal(int.MaxValue, orderTrigger.Timestamp);
@@ -100,7 +102,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[OrderTriggerSerializer.MessageSize];
             OrderTriggerSerializer.Serialize(new OrderTrigger { OrderId = 12345678, Timestamp = 404, MessageSequence = 972 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(23, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var orderTrigger = OrderTriggerSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, orderTrigger.OrderId);
             Assert.Equal(404, orderTrigger.Timestamp);

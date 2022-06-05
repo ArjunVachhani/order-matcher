@@ -7,6 +7,8 @@ namespace OrderMatcher.Tests
 {
     public class CancelledOrderSerializerTests
     {
+        private static readonly int messageSize = 72;
+
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
@@ -38,23 +40,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
-            var bytes = new byte[75];
+            var bytes = new byte[messageSize - 1];
             Exception ex = Assert.Throws<Exception>(() => CancelledOrderSerializer.Deserialize(bytes));
-            Assert.Equal("Canceled Order Message must be of Size : 76", ex.Message);
+            Assert.Equal($"Canceled Order Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
-            var bytes = new byte[77];
+            var bytes = new byte[messageSize + 1];
             Exception ex = Assert.Throws<Exception>(() => CancelledOrderSerializer.Deserialize(bytes));
-            Assert.Equal("Canceled Order Message must be of Size : 76", ex.Message);
+            Assert.Equal($"Canceled Order Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[76];
+            var bytes = new byte[messageSize];
             Exception ex = Assert.Throws<Exception>(() => CancelledOrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -62,7 +64,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[76];
+            var bytes = new byte[messageSize];
             bytes[4] = (byte)MessageType.Cancel;
             Exception ex = Assert.Throws<Exception>(() => CancelledOrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -74,7 +76,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[CancelledOrderSerializer.MessageSize];
             CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MinValue, Timestamp = int.MinValue, RemainingQuantity = int.MinValue, CancelReason = CancelReason.UserRequested, Cost = Quantity.MinValue, Fee = Quantity.MinValue, MessageSequence = long.MinValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(76, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, cancelledOrder.OrderId);
             Assert.Equal(int.MinValue, cancelledOrder.RemainingQuantity);
@@ -92,7 +94,7 @@ namespace OrderMatcher.Tests
             CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = OrderId.MaxValue, Timestamp = int.MaxValue, RemainingQuantity = int.MaxValue, CancelReason = CancelReason.ValidityExpired, Cost = Quantity.MaxValue, Fee = Quantity.MaxValue, MessageSequence = long.MaxValue }, bytes);
 
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(76, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, cancelledOrder.OrderId);
             Assert.Equal(int.MaxValue, cancelledOrder.RemainingQuantity);
@@ -109,7 +111,7 @@ namespace OrderMatcher.Tests
             Span<byte> bytes = stackalloc byte[CancelledOrderSerializer.MessageSize];
             CancelledOrderSerializer.Serialize(new CancelledOrder { OrderId = 12345678, RemainingQuantity = 56789, Timestamp = 404, CancelReason = CancelReason.ValidityExpired, Cost = 12.13m, Fee = 92.005m, MessageSequence = 79242 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(76, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var cancelledOrder = CancelledOrderSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, cancelledOrder.OrderId);
             Assert.Equal(56789, cancelledOrder.RemainingQuantity);
