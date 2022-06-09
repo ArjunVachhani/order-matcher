@@ -13,14 +13,14 @@ namespace OrderMatcher.Tests
         public void Serialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, Timestamp = int.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, BidCost = Quantity.MinValue, BidFee = Quantity.MinValue, AskRemainingQuantity = Quantity.MinValue, AskFee = Quantity.MinValue, MessageSequence = long.MinValue }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, MakerUserId = UserId.MinValue, TakerUserId = UserId.MinValue, Timestamp = int.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, BidCost = Quantity.MinValue, BidFee = Quantity.MinValue, AskRemainingQuantity = Quantity.MinValue, AskFee = Quantity.MinValue, MessageSequence = long.MinValue }, bytes);
         }
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, Timestamp = int.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, BidCost = Quantity.MaxValue, BidFee = Quantity.MaxValue, AskRemainingQuantity = Quantity.MaxValue, AskFee = Quantity.MaxValue, MessageSequence = long.MaxValue }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, MakerUserId = UserId.MaxValue, TakerUserId = UserId.MaxValue, Timestamp = int.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, BidCost = Quantity.MaxValue, BidFee = Quantity.MaxValue, AskRemainingQuantity = Quantity.MaxValue, AskFee = Quantity.MaxValue, MessageSequence = long.MaxValue }, bytes);
         }
 
         [Fact]
@@ -74,12 +74,14 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Min()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, Timestamp = int.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, BidCost = Quantity.MinValue, BidFee = Quantity.MinValue, AskRemainingQuantity = Quantity.MinValue, AskFee = Quantity.MinValue, MessageSequence = long.MinValue }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MinValue, TakerOrderId = OrderId.MinValue, MakerUserId = UserId.MinValue, TakerUserId = UserId.MinValue, Timestamp = int.MinValue, MatchQuantity = int.MinValue, MatchRate = int.MinValue, BidCost = Quantity.MinValue, BidFee = Quantity.MinValue, AskRemainingQuantity = Quantity.MinValue, AskFee = Quantity.MinValue, MessageSequence = long.MinValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MinValue, fill.MakerOrderId);
             Assert.Equal(OrderId.MinValue, fill.TakerOrderId);
+            Assert.Equal(UserId.MinValue, fill.MakerUserId);
+            Assert.Equal(UserId.MinValue, fill.TakerUserId);
             Assert.Equal(int.MinValue, fill.MatchRate);
             Assert.Equal(int.MinValue, fill.MatchQuantity);
             Assert.Equal(int.MinValue, fill.Timestamp);
@@ -94,12 +96,14 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_Max()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, Timestamp = int.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, BidCost = Quantity.MaxValue, BidFee = Quantity.MaxValue, AskRemainingQuantity = Quantity.MaxValue, AskFee = Quantity.MaxValue, MessageSequence = long.MaxValue }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = OrderId.MaxValue, TakerOrderId = OrderId.MaxValue, MakerUserId = UserId.MaxValue, TakerUserId = UserId.MaxValue, Timestamp = int.MaxValue, MatchQuantity = int.MaxValue, MatchRate = int.MaxValue, BidCost = Quantity.MaxValue, BidFee = Quantity.MaxValue, AskRemainingQuantity = Quantity.MaxValue, AskFee = Quantity.MaxValue, MessageSequence = long.MaxValue }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal(OrderId.MaxValue, fill.MakerOrderId);
             Assert.Equal(OrderId.MaxValue, fill.TakerOrderId);
+            Assert.Equal(UserId.MaxValue, fill.MakerUserId);
+            Assert.Equal(UserId.MaxValue, fill.TakerUserId);
             Assert.Equal(int.MaxValue, fill.MatchRate);
             Assert.Equal(int.MaxValue, fill.MatchQuantity);
             Assert.Equal(int.MaxValue, fill.Timestamp);
@@ -114,12 +118,14 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = 4347, BidFee = 76157, AskRemainingQuantity = 87135, AskFee = 12103, MessageSequence = 6812379 }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, MakerUserId = 8728, TakerUserId = 530, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = 4347, BidFee = 76157, AskRemainingQuantity = 87135, AskFee = 12103, MessageSequence = 6812379 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, fill.MakerOrderId);
             Assert.Equal((OrderId)56789, fill.TakerOrderId);
+            Assert.Equal((UserId)8728, fill.MakerUserId);
+            Assert.Equal((UserId)530, fill.TakerUserId);
             Assert.Equal(9534, fill.MatchRate);
             Assert.Equal(2356, fill.MatchQuantity);
             Assert.Equal(404, fill.Timestamp);
@@ -134,12 +140,14 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_BidCostNull()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = null, BidFee = null, AskRemainingQuantity = 87135, AskFee = 5434, MessageSequence = 123879 }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, MakerUserId = 8728, TakerUserId = 530, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = null, BidFee = null, AskRemainingQuantity = 87135, AskFee = 5434, MessageSequence = 123879 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, fill.MakerOrderId);
             Assert.Equal((OrderId)56789, fill.TakerOrderId);
+            Assert.Equal((UserId)8728, fill.MakerUserId);
+            Assert.Equal((UserId)530, fill.TakerUserId);
             Assert.Equal(9534, fill.MatchRate);
             Assert.Equal(2356, fill.MatchQuantity);
             Assert.Equal(404, fill.Timestamp);
@@ -154,12 +162,14 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception_AskRemainingQuantityNull()
         {
             Span<byte> bytes = stackalloc byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = 4347, BidFee = 891434, AskRemainingQuantity = null, AskFee = null, MessageSequence = 8089 }, bytes);
+            FillSerializer.Serialize(new Fill { MakerOrderId = 12345678, TakerOrderId = 56789, MakerUserId = 8728, TakerUserId = 530, Timestamp = 404, MatchQuantity = 2356, MatchRate = 9534, BidCost = 4347, BidFee = 891434, AskRemainingQuantity = null, AskFee = null, MessageSequence = 8089 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
             var fill = FillSerializer.Deserialize(bytes);
             Assert.Equal((OrderId)12345678, fill.MakerOrderId);
             Assert.Equal((OrderId)56789, fill.TakerOrderId);
+            Assert.Equal((UserId)8728, fill.MakerUserId);
+            Assert.Equal((UserId)530, fill.TakerUserId);
             Assert.Equal(9534, fill.MatchRate);
             Assert.Equal(2356, fill.MatchQuantity);
             Assert.Equal(404, fill.Timestamp);

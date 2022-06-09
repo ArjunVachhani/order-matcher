@@ -141,7 +141,7 @@ namespace OrderMatcher
                 _acceptedOrders.Add(incomingOrder.OrderId);
             }
 
-            _tradeListener?.OnAccept(incomingOrder.OrderId);
+            _tradeListener?.OnAccept(incomingOrder.OrderId, incomingOrder.UserId);
 
             Quantity? quantity = null;
             bool canBeFilled = false;
@@ -159,24 +159,24 @@ namespace OrderMatcher
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
                 if (incomingOrder.TotalQuantity == 0)
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
+                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
                 else
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
+                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
             }
             else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount == 0 && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.FillOrKill);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.FillOrKill);
             }
             else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount != 0 && canBeFilled == false)
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, 0, 0, 0, CancelReason.FillOrKill);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, 0, 0, 0, CancelReason.FillOrKill);
             }
             else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timestamp)
             {
                 if (incomingOrder.TotalQuantity == 0)
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
+                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
                 else
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
+                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
             }
             else
             {
@@ -207,7 +207,7 @@ namespace OrderMatcher
                         else
                         {
                             _currentOrders.Remove(incomingOrder.OrderId);
-                            _tradeListener?.OnCancel(incomingOrder.OrderId, 0, 0, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
+                            _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, 0, 0, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
                         }
                     }
                     else
@@ -248,7 +248,7 @@ namespace OrderMatcher
                     RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
                 }
 
-                _tradeListener?.OnCancel(orderId, quantityCancel, order.Cost, order.Fee, cancelReason);
+                _tradeListener?.OnCancel(orderId, order.UserId, quantityCancel, order.Cost, order.Fee, cancelReason);
                 return OrderMatchingResult.CancelAcepted;
             }
             return OrderMatchingResult.OrderDoesNotExists;
@@ -260,7 +260,7 @@ namespace OrderMatcher
             var matchResult = MatchWithOpenOrders(incomingOrder);
             if (orderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
             {
-                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ImmediateOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ImmediateOrCancel);
                 _currentOrders.Remove(incomingOrder.OrderId);
             }
             else if (!incomingOrder.IsFilled)
@@ -274,7 +274,7 @@ namespace OrderMatcher
                     }
                     else
                     {
-                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
+                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
                         _currentOrders.Remove(incomingOrder.OrderId);
                         if (incomingOrder.CancelOn > 0)
                         {
@@ -321,7 +321,7 @@ namespace OrderMatcher
                 {
                     foreach (var order in priceLevels[i])
                     {
-                        _tradeListener?.OnOrderTriggered(order.OrderId);
+                        _tradeListener?.OnOrderTriggered(order.OrderId, order.UserId);
                         if (order.IsBuy && order.OpenQuantity == 0)
                         {
                             var quantityAndFill = GetQuantity(order.OrderAmount);
@@ -333,7 +333,7 @@ namespace OrderMatcher
                             else
                             {
                                 _currentOrders.Remove(order.OrderId);
-                                _tradeListener?.OnCancel(order.OrderId, 0, 0, 0, CancelReason.MarketOrderNoLiquidity);
+                                _tradeListener?.OnCancel(order.OrderId, order.UserId, 0, 0, 0, CancelReason.MarketOrderNoLiquidity);
                             }
                         }
                         else
@@ -432,7 +432,7 @@ namespace OrderMatcher
                         }
                     }
 
-                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, matchPrice, maxQuantity, askRemainingQuanity, askFee, bidCost, bidFee);
+                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, incomingOrder.UserId, restingOrder.UserId, matchPrice, maxQuantity, askRemainingQuanity, askFee, bidCost, bidFee);
                     _marketPrice = matchPrice;
                     anyMatchHappend = true;
                 }
@@ -539,7 +539,7 @@ namespace OrderMatcher
         {
             var quantity = order.TipQuantity < order.TotalQuantity ? order.TipQuantity : order.TotalQuantity;
             var remainigTotalQuantity = order.TotalQuantity - quantity;
-            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity };
+            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId };
         }
 
         private (Quantity? Quantity, bool CanFill) GetQuantity(Quantity orderAmount)

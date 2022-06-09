@@ -11,6 +11,7 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sideOffset;
         private static readonly int orderConditionOffset;
         private static readonly int orderIdOffset;
+        private static readonly int userIdOffset;
         private static readonly int priceOffset;
         private static readonly int quantityOffset;
         private static readonly int stopPriceOffset;
@@ -25,6 +26,7 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sizeOfMessage;
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfOrderId;
+        private static readonly int sizeOfUserId;
         private static readonly int sizeOfVersion;
         private static readonly int sizeOfSide;
         private static readonly int sizeOfCancelOn;
@@ -39,6 +41,7 @@ namespace OrderMatcher.Types.Serializers
         {
             sizeOfMessageLength = sizeof(int);
             sizeOfOrderId = OrderId.SizeOfOrderId;
+            sizeOfUserId = UserId.SizeOfUserId;
             sizeOfVersion = sizeof(short);
             sizeOfSide = sizeof(bool);
             sizeOfCancelOn = sizeof(int);
@@ -55,7 +58,8 @@ namespace OrderMatcher.Types.Serializers
             sideOffset = versionOffset + sizeOfVersion;
             orderConditionOffset = sideOffset + sizeOfSide;
             orderIdOffset = orderConditionOffset + sizeof(OrderCondition);
-            priceOffset = orderIdOffset + sizeOfOrderId;
+            userIdOffset = orderIdOffset + sizeOfOrderId;
+            priceOffset = userIdOffset + sizeOfUserId;
             quantityOffset = priceOffset + Price.SizeOfPrice;
             stopPriceOffset = quantityOffset + Quantity.SizeOfQuantity;
             totalQuantityOffset = stopPriceOffset + Price.SizeOfPrice;
@@ -84,6 +88,7 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(sideOffset), order.IsBuy);
             bytes[orderConditionOffset] = (byte)order.OrderCondition;
             order.OrderId.WriteBytes(bytes.Slice(orderIdOffset));
+            order.UserId.WriteBytes(bytes.Slice(userIdOffset));
             Price.WriteBytes(bytes.Slice(priceOffset), order.Price);
 
             if (order.TipQuantity > 0 && order.TotalQuantity > 0)
@@ -121,8 +126,9 @@ namespace OrderMatcher.Types.Serializers
             var order = new Order();
 
             order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
-            order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];            
+            order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
             order.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
+            order.UserId = UserId.ReadUserId(bytes.Slice(userIdOffset));
             order.Price = Price.ReadPrice(bytes.Slice(priceOffset));
             order.OpenQuantity = Quantity.ReadQuantity(bytes.Slice(quantityOffset));
             order.StopPrice = Price.ReadPrice(bytes.Slice(stopPriceOffset));
