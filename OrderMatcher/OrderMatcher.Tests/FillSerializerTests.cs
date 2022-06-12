@@ -7,7 +7,7 @@ namespace OrderMatcher.Tests
 {
     public class FillSerializerTests
     {
-        private static readonly int messageSize = 135;
+        private static readonly int messageSize = 151;
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()

@@ -6,12 +6,12 @@ namespace OrderMatcher.Types
 {
     public readonly struct UserId : IEquatable<UserId>, IComparable<UserId>
     {
-        public const int SizeOfUserId = sizeof(int);
-        public static readonly UserId MaxValue = int.MaxValue;
-        public static readonly UserId MinValue = int.MinValue;
-        private readonly int _userId;
+        public const int SizeOfUserId = sizeof(long);
+        public static readonly UserId MaxValue = long.MaxValue;
+        public static readonly UserId MinValue = long.MinValue;
+        private readonly long _userId;
 
-        public UserId(int userId)
+        public UserId(long userId)
         {
             _userId = userId;
         }
@@ -29,7 +29,7 @@ namespace OrderMatcher.Types
 
         public override int GetHashCode()
         {
-            return 423399 + _userId;
+            return (423399 + _userId).GetHashCode();
         }
 
         public override string ToString()
@@ -38,13 +38,13 @@ namespace OrderMatcher.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator UserId(int userId)
+        public static implicit operator UserId(long userId)
         {
             return new UserId(userId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator int(UserId userId)
+        public static implicit operator long(UserId userId)
         {
             return userId._userId;
         }
@@ -81,7 +81,7 @@ namespace OrderMatcher.Types
 
         public static UserId ReadUserId(ReadOnlySpan<byte> bytes)
         {
-            return Serializer.ReadInt(bytes);
+            return Serializer.ReadLong(bytes);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace OrderMatcher.Tests
 {
     public class CancelledOrderSerializerTests
     {
-        private static readonly int messageSize = 76;
+        private static readonly int messageSize = 84;
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
