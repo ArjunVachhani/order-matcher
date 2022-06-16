@@ -1,7 +1,5 @@
 ﻿using OrderMatcher.Types;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 namespace OrderMatcher
 {
@@ -57,7 +55,7 @@ namespace OrderMatcher
                 if (!removed && order.IsStop && _stopBid.TryGetValue(order.StopPrice, out PriceLevel? stopPriceLevel))
                 {
                     stopPriceLevel.RemoveOrder(order);
-                    RemoveEmptyPriceLevel(stopPriceLevel, _stopBid);
+                    RemoveEmptyPriceLevel(stopPriceLevel, _stopBid, true);
                 }
             }
             else
@@ -71,7 +69,7 @@ namespace OrderMatcher
                 if (!removed && order.IsStop && _stopAsk.TryGetValue(order.StopPrice, out PriceLevel? stopPriceLevel))
                 {
                     stopPriceLevel.RemoveOrder(order);
-                    RemoveEmptyPriceLevel(stopPriceLevel, _stopAsk);
+                    RemoveEmptyPriceLevel(stopPriceLevel, _stopAsk, false);
                 }
             }
         }
@@ -268,13 +266,30 @@ namespace OrderMatcher
             return false;
         }
 
-        private static bool RemoveEmptyPriceLevel(PriceLevel priceLevel, SortedDictionary<Price, PriceLevel> side)
+        private void RemoveEmptyPriceLevel(PriceLevel priceLevel, SortedDictionary<Price, PriceLevel> side, bool isBuy)
         {
             if (priceLevel.OrderCount == 0)
             {
-                return side.Remove(priceLevel.Price);
+                side.Remove(priceLevel.Price);
+                if (isBuy && _bestStopBidPriceLevel!.Price == priceLevel.Price)
+                {
+                    _bestStopBidPriceLevel = null;
+                    if (side.Count > 0)
+                    {
+                        var keyval = side.FirstOrDefault();
+                        _bestStopBidPriceLevel = keyval.Value;
+                    }
+                }
+                else if (!isBuy && _bestStopAskPriceLevel!.Price == priceLevel.Price)
+                {
+                    _bestStopAskPriceLevel = null;
+                    if (side.Count > 0)
+                    {
+                        var keyval = side.FirstOrDefault();
+                        _bestStopAskPriceLevel = keyval.Value;
+                    }
+                }
             }
-            return false;
         }
 
         private void RemoveEmptyPriceLevel(QuantityTrackingPriceLevel priceLevel, SortedDictionary<Price, QuantityTrackingPriceLevel> side, bool isBuy)
