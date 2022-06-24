@@ -32,40 +32,78 @@ Order Matching Engine / Trading Engine
 
 ## Code
 ```csharp
-class Program
-{
-	static void Main(string[] args)
-	{
-		//create instance of matching engine.
-		MatchingEngine matchingEngine = new MatchingEngine(0, 1, new MyTradeListener(), new TimeProvider());
 
-		Order order1 = new Order { IsBuy = true, OrderId = 1, Quantity = 1000, Price = 10 };
-		//push new order engine.
-		matchingEngine.AddOrder(order1);
-
-		//cancel existing orders
-		matchingEngine.CancelOrder(1);//pass orderId to cancel
-	}
-}
-
-
-
-//create a listener to receive events from matching engine. pass it to constructore of MatchingEngine
-class MyTradeListener : ITradeListener
-{
-    public void OnCancel(ulong orderId, Quantity remainingQuantity, Quantity remainingOrderAmount, CancelReason cancelReason)
+    class Program
     {
-        Console.WriteLine($"Order Cancelled.... orderId : {orderId}, remainingQuantity : {remainingQuantity}, cancelReason : {cancelReason}");
+        static void Main(string[] args)
+        {
+            //timeProvider will provide epoch 
+            var timeProvider = new TimeProvider();
+
+            //create instance of matching engine.
+            MatchingEngine matchingEngine = new MatchingEngine(new MyTradeListener(), new MyFeeProvider(), new Quantity(0.0000_0001m), 8);
+
+            Order order1 = new Order { IsBuy = true, OrderId = 1, OpenQuantity = 0.01m, Price = 69_000 };
+            //push new order engine.
+            var addResult = matchingEngine.AddOrder(order1, timeProvider.GetSecondsFromEpoch());
+            if(addResult == OrderMatchingResult.OrderAccepted)
+            {
+                // matching engine has accepted order
+            }
+
+            //cancel existing orders
+            var cancelResult = matchingEngine.CancelOrder(1);//pass orderId to cancel
+            if (cancelResult == OrderMatchingResult.CancelAcepted)
+            {
+                // cancel request is accepted
+            }
+        }
     }
 
-    public void OnOrderTriggered(ulong orderId)
+
+
+    //create a listener to receive events from matching engine. pass it to constructore of MatchingEngine
+    class MyTradeListener : ITradeListener
     {
-        Console.WriteLine($"Stop Order Triggered.... orderId : {orderId}");
+        public void OnAccept(OrderId orderId)
+        {
+            Console.WriteLine($"Order Accepted.... orderId : {orderId}");
+        }
+
+        public void OnCancel(OrderId orderId, Quantity remainingQuantity, Quantity cost, Quantity fee, CancelReason cancelReason)
+        {
+            Console.WriteLine($"Order Cancelled.... orderId : {orderId}, remainingQuantity : {remainingQuantity}, cancelReason : {cancelReason}");
+        }
+
+        public void OnOrderTriggered(OrderId orderId)
+        {
+            Console.WriteLine($"Stop Order Triggered.... orderId : {orderId}");
+        }
+
+        public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Quantity? askFee, Quantity? bidCost, Quantity? bidFee)
+        {
+            if (bidCost.HasValue)
+            {
+                // buy order completed
+            }
+            if (askRemainingQuantity.HasValue)
+            {
+                // sell order completed
+            }
+
+            Console.WriteLine($"Order matched.... incomingOrderId : {incomingOrderId}, restingOrderId : {restingOrderId}, executedQuantity : {matchQuantiy}, exetedPrice : {matchPrice}");
+        }
     }
 
-    public void OnTrade(ulong incomingOrderId, ulong restingOrderId, Price matchPrice, Quantity matchQuantiy, bool incomingOrderCompleted)
+    class MyFeeProvider : IFeeProvider
     {
-        Console.WriteLine($"Order matched.... incomingOrderId : {incomingOrderId}, restingOrderId : {restingOrderId}, executedQuantity : {matchQuantiy}, exetedPrice : {matchPrice}");
+        public Fee GetFee(short feeId)
+        {
+            return new Fee
+            {
+                TakerFee = 0.5m, //0.5% taker fee
+                MakerFee = 0.1m, //0.1% maker fee
+            };
+        }
     }
-}
 ```
