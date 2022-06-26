@@ -35,7 +35,7 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
-            sizeOfOrderId = sizeof(ulong);
+            sizeOfOrderId = OrderId.SizeOfOrderId;
             sizeOfRemainingQuantity = Quantity.SizeOfQuantity;
             sizeOfCost = Quantity.SizeOfQuantity;
             sizeOfFee = Quantity.SizeOfQuantity;
@@ -79,12 +79,12 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
             bytes[messageTypeOffset] = (byte)MessageType.Cancel;
             Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(orderIdOffset), orderId);
-            Write(bytes.Slice(remainingQuantityOffset), remainingQuantity);
+            OrderId.WriteBytes(bytes.Slice(orderIdOffset), orderId);
+            Quantity.WriteBytes(bytes.Slice(remainingQuantityOffset), remainingQuantity);
             bytes[cancelReasonOffset] = (byte)cancelReason;
             Write(bytes.Slice(timestampOffset), timeStamp);
-            Write(bytes.Slice(costOffset), cost);
-            Write(bytes.Slice(feeOffset), fee);
+            Quantity.WriteBytes(bytes.Slice(costOffset), cost);
+            Quantity.WriteBytes(bytes.Slice(feeOffset), fee);
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
 
@@ -108,12 +108,12 @@ namespace OrderMatcher.Types.Serializers
 
             var cancelledOrder = new CancelledOrder();
 
-            cancelledOrder.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
-            cancelledOrder.RemainingQuantity = ReadQuantity(bytes.Slice(remainingQuantityOffset));
+            cancelledOrder.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
+            cancelledOrder.RemainingQuantity = Quantity.ReadQuantity(bytes.Slice(remainingQuantityOffset));
             cancelledOrder.CancelReason = (CancelReason)bytes[cancelReasonOffset];
             cancelledOrder.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
-            cancelledOrder.Cost = ReadQuantity(bytes.Slice(costOffset));
-            cancelledOrder.Fee = ReadQuantity(bytes.Slice(feeOffset));
+            cancelledOrder.Cost = Quantity.ReadQuantity(bytes.Slice(costOffset));
+            cancelledOrder.Fee = Quantity.ReadQuantity(bytes.Slice(feeOffset));
             cancelledOrder.MessageSequence = BitConverter.ToInt64(bytes.Slice(messageSequenceOffset));
 
             return cancelledOrder;

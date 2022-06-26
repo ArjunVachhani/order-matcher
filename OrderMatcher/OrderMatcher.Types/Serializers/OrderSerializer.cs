@@ -83,21 +83,21 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(versionOffset), version);
             Write(bytes.Slice(sideOffset), order.IsBuy);
             bytes[orderConditionOffset] = (byte)order.OrderCondition;
-            Write(bytes.Slice(orderIdOffset), order.OrderId);
-            Write(bytes.Slice(priceOffset), order.Price);
+            order.OrderId.WriteBytes(bytes.Slice(orderIdOffset));
+            Price.WriteBytes(bytes.Slice(priceOffset), order.Price);
 
             if (order.TipQuantity > 0 && order.TotalQuantity > 0)
-                Write(bytes.Slice(quantityOffset), order.TipQuantity);
+                Quantity.WriteBytes(bytes.Slice(quantityOffset), order.TipQuantity);
             else
-                Write(bytes.Slice(quantityOffset), order.OpenQuantity);
+                Quantity.WriteBytes(bytes.Slice(quantityOffset), order.OpenQuantity);
 
-            Write(bytes.Slice(stopPriceOffset), order.StopPrice);
-            Write(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
+            Price.WriteBytes(bytes.Slice(stopPriceOffset), order.StopPrice);
+            Quantity.WriteBytes(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
             Write(bytes.Slice(cancelOnOffset), order.CancelOn);
-            Write(bytes.Slice(orderAmountOffset), order.OrderAmount);
+            Quantity.WriteBytes(bytes.Slice(orderAmountOffset), order.OrderAmount);
             Write(bytes.Slice(feeIdOffset), order.FeeId);
-            Write(bytes.Slice(costOffset), order.Cost);
-            Write(bytes.Slice(feeOffset), order.Fee);
+            Quantity.WriteBytes(bytes.Slice(costOffset), order.Cost);
+            Quantity.WriteBytes(bytes.Slice(feeOffset), order.Fee);
         }
 
         public static Order Deserialize(ReadOnlySpan<byte> bytes)
@@ -121,21 +121,21 @@ namespace OrderMatcher.Types.Serializers
             var order = new Order();
 
             order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
-            order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
-            order.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
-            order.Price = ReadPrice(bytes.Slice(priceOffset));
-            order.OpenQuantity = ReadQuantity(bytes.Slice(quantityOffset));
-            order.StopPrice = ReadPrice(bytes.Slice(stopPriceOffset));
+            order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];            
+            order.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
+            order.Price = Price.ReadPrice(bytes.Slice(priceOffset));
+            order.OpenQuantity = Quantity.ReadQuantity(bytes.Slice(quantityOffset));
+            order.StopPrice = Price.ReadPrice(bytes.Slice(stopPriceOffset));
 
-            order.TotalQuantity = ReadQuantity(bytes.Slice(totalQuantityOffset));
+            order.TotalQuantity = Quantity.ReadQuantity(bytes.Slice(totalQuantityOffset));
             if (order.TotalQuantity > 0)
                 order.TipQuantity = order.OpenQuantity;
 
             order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
-            order.OrderAmount = ReadQuantity(bytes.Slice(orderAmountOffset));
+            order.OrderAmount = Quantity.ReadQuantity(bytes.Slice(orderAmountOffset));
             order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
-            order.Cost = ReadQuantity(bytes.Slice(costOffset));
-            order.Fee = ReadQuantity(bytes.Slice(feeOffset));
+            order.Cost = Quantity.ReadQuantity(bytes.Slice(costOffset));
+            order.Fee = Quantity.ReadQuantity(bytes.Slice(feeOffset));
             return order;
         }
     }

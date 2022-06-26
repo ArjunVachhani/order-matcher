@@ -78,7 +78,7 @@ namespace OrderMatcher.Types.Serializers
             bytes[messageTypeOffset] = (byte)MessageType.Book;
             Write(bytes.Slice(versionOffset), version);
             Write(bytes.Slice(timeStampOffset), book.TimeStamp);
-            Write(bytes.Slice(ltpOffset), book.LTP ?? 0);
+            Price.WriteBytes(bytes.Slice(ltpOffset), book.LTP ?? 0);
             Write(bytes.Slice(bidCountOffset), (short)book.Bid.Count);
             Write(bytes.Slice(askCountOffset), (short)book.Ask.Count);
 
@@ -86,8 +86,8 @@ namespace OrderMatcher.Types.Serializers
             foreach (var level in book.Bid)
             {
                 var start = bidStartOffset + (i * sizeOfLevel);
-                Write(bytes.Slice(start), level.Key);
-                Write(bytes.Slice(start + sizeOfPrice), level.Value);
+                Price.WriteBytes(bytes.Slice(start), level.Key);
+                Quantity.WriteBytes(bytes.Slice(start + sizeOfPrice), level.Value);
                 if (++i == book.Bid.Count)
                 {
                     break;
@@ -98,8 +98,8 @@ namespace OrderMatcher.Types.Serializers
             foreach (var level in book.Ask)
             {
                 var start = bidStartOffset + (book.Bid.Count * sizeOfLevel) + (i * sizeOfLevel);
-                Write(bytes.Slice(start), level.Key);
-                Write(bytes.Slice(start + sizeOfPrice), level.Value);
+                Price.WriteBytes(bytes.Slice(start), level.Key);
+                Quantity.WriteBytes(bytes.Slice(start + sizeOfPrice), level.Value);
                 if (++i == book.Ask.Count)
                 {
                     break;
@@ -128,7 +128,7 @@ namespace OrderMatcher.Types.Serializers
             }
 
             var timeStamp = BitConverter.ToInt32(bytes.Slice(timeStampOffset));
-            Price? ltp = ReadPrice(bytes.Slice(ltpOffset));
+            Price? ltp = Price.ReadPrice(bytes.Slice(ltpOffset));
             if (ltp == 0)
             {
                 ltp = null;
@@ -142,19 +142,19 @@ namespace OrderMatcher.Types.Serializers
             Dictionary<Price, Quantity> ask = new Dictionary<Price, Quantity>(askCount);
             for (int i = 0; i < bidCount; i++)
             {
-                var price = ReadPrice(bytes.Slice(bidStartOffset + (i * sizeOfLevel)));
-                var quantity = ReadQuantity(bytes.Slice(bidStartOffset + (i * sizeOfLevel) + sizeOfPrice));
+                var price = Price.ReadPrice(bytes.Slice(bidStartOffset + (i * sizeOfLevel)));
+                var quantity = Quantity.ReadQuantity(bytes.Slice(bidStartOffset + (i * sizeOfLevel) + sizeOfPrice));
                 bid.Add(price, quantity);
             }
             var askStartOffset = bidStartOffset + (bidCount * sizeOfLevel);
             for (int i = 0; i < askCount; i++)
             {
-                var price = ReadPrice(bytes.Slice(askStartOffset + (i * sizeOfLevel)));
-                var quantity = ReadQuantity(bytes.Slice(askStartOffset + (i * sizeOfLevel) + sizeOfPrice));
+                var price = Price.ReadPrice(bytes.Slice(askStartOffset + (i * sizeOfLevel)));
+                var quantity = Quantity.ReadQuantity(bytes.Slice(askStartOffset + (i * sizeOfLevel) + sizeOfPrice));
                 ask.Add(price, quantity);
             }
 
-            var book = new BookDepth(timeStamp, ltp, bid,ask);
+            var book = new BookDepth(timeStamp, ltp, bid, ask);
             return book;
         }
     }
