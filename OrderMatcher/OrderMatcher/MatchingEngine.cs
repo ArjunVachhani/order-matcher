@@ -10,6 +10,7 @@ namespace OrderMatcher
         private readonly Book _book;
         private readonly Dictionary<OrderId, Order> _currentOrders;
         private readonly HashSet<OrderId> _acceptedOrders;
+        private readonly Queue<List<PriceLevel>> _stopOrderQueue;
         private readonly ITradeListener _tradeListener;
         private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
@@ -51,6 +52,7 @@ namespace OrderMatcher
             _book = new Book();
             _currentOrders = new Dictionary<OrderId, Order>();
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
+            _stopOrderQueue = new Queue<List<PriceLevel>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
             _feeProvider = feeProvider;
@@ -200,6 +202,7 @@ namespace OrderMatcher
                         {
                             incomingOrder.OpenQuantity = quantity.Value;
                             MatchAndAddOrder(incomingOrder, incomingOrder.OrderCondition);
+                            AddStopToOrderBook();
                         }
                         else
                         {
@@ -210,6 +213,7 @@ namespace OrderMatcher
                     else
                     {
                         MatchAndAddOrder(incomingOrder, incomingOrder.OrderCondition);
+                        AddStopToOrderBook();
                     }
                 }
             }
@@ -300,39 +304,42 @@ namespace OrderMatcher
             if (_marketPrice > previousMarketPrice)
             {
                 var priceLevels = _book.RemoveStopBids(_marketPrice);
-                AddStopToOrderBook(priceLevels);
+                _stopOrderQueue.Enqueue(priceLevels);
             }
             else if (_marketPrice < previousMarketPrice)
             {
                 var priceLevels = _book.RemoveStopAsks(_marketPrice);
-                AddStopToOrderBook(priceLevels);
+                _stopOrderQueue.Enqueue(priceLevels);
             }
         }
 
-        private void AddStopToOrderBook(List<PriceLevel> priceLevels)
+        private void AddStopToOrderBook()
         {
-            for (int i = 0; i < priceLevels.Count; i++)
+            while (_stopOrderQueue.TryDequeue(out var priceLevels))
             {
-                foreach (var order in priceLevels[i])
+                for (int i = 0; i < priceLevels.Count; i++)
                 {
-                    _tradeListener?.OnOrderTriggered(order.OrderId);
-                    if (order.IsBuy && order.OpenQuantity == 0)
+                    foreach (var order in priceLevels[i])
                     {
-                        var quantityAndFill = GetQuantity(order.OrderAmount);
-                        if (quantityAndFill.Quantity.HasValue)
+                        _tradeListener?.OnOrderTriggered(order.OrderId);
+                        if (order.IsBuy && order.OpenQuantity == 0)
                         {
-                            order.OpenQuantity = quantityAndFill.Quantity.Value;
-                            MatchAndAddOrder(order);
+                            var quantityAndFill = GetQuantity(order.OrderAmount);
+                            if (quantityAndFill.Quantity.HasValue)
+                            {
+                                order.OpenQuantity = quantityAndFill.Quantity.Value;
+                                MatchAndAddOrder(order);
+                            }
+                            else
+                            {
+                                _currentOrders.Remove(order.OrderId);
+                                _tradeListener?.OnCancel(order.OrderId, 0, 0, 0, CancelReason.MarketOrderNoLiquidity);
+                            }
                         }
                         else
                         {
-                            _currentOrders.Remove(order.OrderId);
-                            _tradeListener?.OnCancel(order.OrderId, 0, 0, 0, CancelReason.MarketOrderNoLiquidity);
+                            MatchAndAddOrder(order);
                         }
-                    }
-                    else
-                    {
-                        MatchAndAddOrder(order);
                     }
                 }
             }
