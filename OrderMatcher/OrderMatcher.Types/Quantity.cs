@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderMatcher.Types.Serializers;
+using System;
 
 namespace OrderMatcher.Types
 {
@@ -93,6 +94,21 @@ namespace OrderMatcher.Types
         public int CompareTo(Quantity other)
         {
             return _quantity.CompareTo(other._quantity);
+        }
+
+        public void WriteBytes(Span<byte> bytes)
+        {
+            WriteBytes(bytes, this);
+        }
+
+        public static void WriteBytes(Span<byte> bytes, Quantity quantity)
+        {
+            Serializer.Write(bytes, quantity._quantity);
+        }
+
+        public static Quantity ReadQuantity(ReadOnlySpan<byte> bytes)
+        {
+            return Serializer.ReadDecimal(bytes);
         }
     }
 }

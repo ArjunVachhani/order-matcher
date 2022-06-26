@@ -63,7 +63,7 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageLengthOffset, 4), sizeOfMessage);
             bytes[messageTypeOffset] = (byte)MessageType.OrderTrigger;
             Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(orderIdOffset), orderId);
+            OrderId.WriteBytes(bytes.Slice(orderIdOffset), orderId);
             Write(bytes.Slice(timestampOffset), timestamp);
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
@@ -87,7 +87,7 @@ namespace OrderMatcher.Types.Serializers
 
             var orderTrigger = new OrderTrigger();
 
-            orderTrigger.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
+            orderTrigger.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
             orderTrigger.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
             orderTrigger.MessageSequence = BitConverter.ToInt64(bytes.Slice(messageSequenceOffset));
 

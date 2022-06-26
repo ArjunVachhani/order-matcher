@@ -49,7 +49,7 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
             bytes[messageTypeOffset] = (byte)MessageType.CancelRequest;
             Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(orderIdOffset), cancelRequest.OrderId);
+            OrderId.WriteBytes(bytes.Slice(orderIdOffset), cancelRequest.OrderId);
         }
 
         public static CancelRequest Deserialize(ReadOnlySpan<byte> bytes)
@@ -72,7 +72,7 @@ namespace OrderMatcher.Types.Serializers
 
             var cancelRequest = new CancelRequest();
 
-            cancelRequest.OrderId = BitConverter.ToInt32(bytes.Slice(orderIdOffset));
+            cancelRequest.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
 
             return cancelRequest;
         }

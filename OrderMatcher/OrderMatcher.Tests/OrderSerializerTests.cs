@@ -7,6 +7,8 @@ namespace OrderMatcher.Tests
 {
     public class OrderSerializerTests
     {
+        private static readonly int messageSize = 131;
+
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
         {
@@ -70,23 +72,23 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan37Bytes()
         {
-            var bytes = new byte[130];
+            var bytes = new byte[messageSize - 1];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
-            Assert.Equal("Order Message must be of Size : 131", ex.Message);
+            Assert.Equal($"Order Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan37Bytes()
         {
-            var bytes = new byte[132];
+            var bytes = new byte[messageSize + 1];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
-            Assert.Equal("Order Message must be of Size : 131", ex.Message);
+            Assert.Equal($"Order Message must be of Size : {messageSize}", ex.Message);
         }
 
         [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
-            var bytes = new byte[131];
+            var bytes = new byte[messageSize];
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
@@ -94,7 +96,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Deserialize_ThrowsExecption_IfVersionIsNotSet()
         {
-            var bytes = new byte[131];
+            var bytes = new byte[messageSize];
             bytes[4] = (byte)MessageType.NewOrderRequest;
             Exception ex = Assert.Throws<Exception>(() => OrderSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
@@ -122,7 +124,7 @@ namespace OrderMatcher.Tests
             };
             OrderSerializer.Serialize(inputOrder, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(131, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
             Assert.Equal(int.MinValue, order.CancelOn);
             Assert.False(order.IsBuy);
@@ -161,7 +163,7 @@ namespace OrderMatcher.Tests
             };
             OrderSerializer.Serialize(orderWrapper, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(131, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
             Assert.Equal(int.MaxValue, order.CancelOn);
             Assert.True(order.IsBuy);
@@ -185,7 +187,7 @@ namespace OrderMatcher.Tests
             var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546 };
             OrderSerializer.Serialize(orderWrapper, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
-            Assert.Equal(131, messageLength);
+            Assert.Equal(messageSize, messageLength);
             var order = OrderSerializer.Deserialize(bytes);
             Assert.Equal(12345678, order.CancelOn);
             Assert.True(order.IsBuy);

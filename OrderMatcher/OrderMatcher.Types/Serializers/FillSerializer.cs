@@ -107,29 +107,29 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
             bytes[messageTypeOffset] = (byte)MessageType.Fill;
             Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(makerOrderIdOffset), makerOrderId);
-            Write(bytes.Slice(takerOrderIdOffset), takerOrderId);
-            Write(bytes.Slice(matchRateOffset), matchRate);
-            Write(bytes.Slice(matchQuantityOffset), matchQuantity);
+            OrderId.WriteBytes(bytes.Slice(makerOrderIdOffset), makerOrderId);
+            OrderId.WriteBytes(bytes.Slice(takerOrderIdOffset), takerOrderId);
+            Price.WriteBytes(bytes.Slice(matchRateOffset), matchRate);
+            Quantity.WriteBytes(bytes.Slice(matchQuantityOffset), matchQuantity);
             bytes[isAskRemainingNullOffset] = Convert.ToByte(remainingAskQuantiy.HasValue ? true : false);
 
             if (remainingAskQuantiy.HasValue)
-                Write(bytes.Slice(askRemainingQuantityOffset), remainingAskQuantiy.Value);
+                Quantity.WriteBytes(bytes.Slice(askRemainingQuantityOffset), remainingAskQuantiy.Value);
 
             bytes[isAskFeeNullOffset] = Convert.ToByte(askFee.HasValue ? true : false);
 
             if (askFee.HasValue)
-                Write(bytes.Slice(askFeeOffset), askFee.Value);
+                Quantity.WriteBytes(bytes.Slice(askFeeOffset), askFee.Value);
 
             bytes[isBidCostNullOffset] = Convert.ToByte(bidCost.HasValue ? true : false);
 
             if (bidCost.HasValue)
-                Write(bytes.Slice(bidCostOffset), bidCost.Value);
+                Quantity.WriteBytes(bytes.Slice(bidCostOffset), bidCost.Value);
 
             bytes[isBidFeeNullOffset] = Convert.ToByte(bidFee.HasValue ? true : false);
 
             if (bidFee.HasValue)
-                Write(bytes.Slice(bidFeeOffset), bidFee.Value);
+                Quantity.WriteBytes(bytes.Slice(bidFeeOffset), bidFee.Value);
 
             Write(bytes.Slice(timestampOffset), timeStamp);
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
@@ -154,24 +154,24 @@ namespace OrderMatcher.Types.Serializers
                 throw new Exception(Constant.INVALID_VERSION);
 
             var fill = new Fill();
-            fill.MakerOrderId = BitConverter.ToInt32(bytes.Slice(makerOrderIdOffset));
-            fill.TakerOrderId = BitConverter.ToInt32(bytes.Slice(takerOrderIdOffset));
-            fill.MatchRate = ReadPrice(bytes.Slice(matchRateOffset));
-            fill.MatchQuantity = ReadQuantity(bytes.Slice(matchQuantityOffset));
+            fill.MakerOrderId = OrderId.ReadOrderId(bytes.Slice(makerOrderIdOffset));
+            fill.TakerOrderId = OrderId.ReadOrderId(bytes.Slice(takerOrderIdOffset));
+            fill.MatchRate = Price.ReadPrice(bytes.Slice(matchRateOffset));
+            fill.MatchQuantity = Quantity.ReadQuantity(bytes.Slice(matchQuantityOffset));
             fill.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
             fill.MessageSequence = BitConverter.ToInt64(bytes.Slice(messageSequenceOffset));
 
             if (Convert.ToBoolean(bytes[isAskRemainingNullOffset]))
-                fill.AskRemainingQuantity = ReadQuantity(bytes.Slice(askRemainingQuantityOffset));
+                fill.AskRemainingQuantity = Quantity.ReadQuantity(bytes.Slice(askRemainingQuantityOffset));
 
             if (Convert.ToBoolean(bytes[isAskFeeNullOffset]))
-                fill.AskFee = ReadQuantity(bytes.Slice(askFeeOffset));
+                fill.AskFee = Quantity.ReadQuantity(bytes.Slice(askFeeOffset));
 
             if (Convert.ToBoolean(bytes[isBidCostNullOffset]))
-                fill.BidCost = ReadQuantity(bytes.Slice(bidCostOffset));
+                fill.BidCost = Quantity.ReadQuantity(bytes.Slice(bidCostOffset));
 
             if (Convert.ToBoolean(bytes[isBidFeeNullOffset]))
-                fill.BidFee = ReadQuantity(bytes.Slice(bidFeeOffset));
+                fill.BidFee = Quantity.ReadQuantity(bytes.Slice(bidFeeOffset));
 
             return fill;
         }
