@@ -19,17 +19,10 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void Deserialize_ThrowsException_IfNullPassed()
-        {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => BookSerializer.Deserialize(null));
-            Assert.Equal("bytes", ex.ParamName);
-        }
-
-        [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
             var bytes = new byte[30];
-            Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookSerializer.Deserialize(bytes));
             Assert.Equal("Book Message must be greater than of Size : 31", ex.Message);
         }
 
@@ -37,7 +30,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
             var bytes = new byte[31];
-            Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
@@ -46,7 +39,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[31];
             bytes[4] = (byte)MessageType.Book;
-            Exception ex = Assert.Throws<Exception>(() => BookSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
         }
 

@@ -98,17 +98,11 @@ namespace OrderMatcher.Types.Serializers
             if (fill == null)
                 throw new ArgumentNullException(nameof(fill));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             Serialize(fill.MessageSequence, fill.MakerOrderId, fill.TakerOrderId, fill.MakerUserId, fill.TakerUserId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp, bytes);
         }
 
         public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, UserId makerUserId, UserId takerUserId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? askFee, Quantity? bidCost, Quantity? bidFee, int timeStamp, Span<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -121,22 +115,22 @@ namespace OrderMatcher.Types.Serializers
             UserId.WriteBytes(bytes.Slice(takerUserIdOffset), takerUserId);
             Price.WriteBytes(bytes.Slice(matchRateOffset), matchRate);
             Quantity.WriteBytes(bytes.Slice(matchQuantityOffset), matchQuantity);
-            bytes[isAskRemainingNullOffset] = Convert.ToByte(remainingAskQuantiy.HasValue ? true : false);
+            bytes[isAskRemainingNullOffset] = Convert.ToByte(remainingAskQuantiy.HasValue);
 
             if (remainingAskQuantiy.HasValue)
                 Quantity.WriteBytes(bytes.Slice(askRemainingQuantityOffset), remainingAskQuantiy.Value);
 
-            bytes[isAskFeeNullOffset] = Convert.ToByte(askFee.HasValue ? true : false);
+            bytes[isAskFeeNullOffset] = Convert.ToByte(askFee.HasValue);
 
             if (askFee.HasValue)
                 Quantity.WriteBytes(bytes.Slice(askFeeOffset), askFee.Value);
 
-            bytes[isBidCostNullOffset] = Convert.ToByte(bidCost.HasValue ? true : false);
+            bytes[isBidCostNullOffset] = Convert.ToByte(bidCost.HasValue);
 
             if (bidCost.HasValue)
                 Quantity.WriteBytes(bytes.Slice(bidCostOffset), bidCost.Value);
 
-            bytes[isBidFeeNullOffset] = Convert.ToByte(bidFee.HasValue ? true : false);
+            bytes[isBidFeeNullOffset] = Convert.ToByte(bidFee.HasValue);
 
             if (bidFee.HasValue)
                 Quantity.WriteBytes(bytes.Slice(bidFeeOffset), bidFee.Value);
@@ -147,21 +141,17 @@ namespace OrderMatcher.Types.Serializers
 
         public static Fill Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != sizeOfMessage)
-                throw new Exception("Fill Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("Fill Message must be of Size : " + sizeOfMessage);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
 
             if (messageType != MessageType.Fill)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != FillSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var fill = new Fill();
             fill.MakerOrderId = OrderId.ReadOrderId(bytes.Slice(makerOrderIdOffset));

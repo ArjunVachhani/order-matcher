@@ -126,7 +126,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(2, quantityTrackingPriceLevel.OrderCount);
 
-            Exception ex = Assert.Throws<Exception>(() => quantityTrackingPriceLevel.Fill(order1, 1100));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => quantityTrackingPriceLevel.Fill(order1, 1100));
             Assert.Equal("Order quantity is less then requested fill quanity", ex.Message);
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(2, quantityTrackingPriceLevel.OrderCount);

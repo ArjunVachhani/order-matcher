@@ -66,9 +66,6 @@ namespace OrderMatcher.Types.Serializers
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             var sizeOfMessage = GetMessageSize(book);
 
             if (bytes.Length != sizeOfMessage)
@@ -109,23 +106,18 @@ namespace OrderMatcher.Types.Serializers
 
         public static BookDepth Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < minMessageSize)
-                throw new Exception("Book Message must be greater than of Size : " + minMessageSize);
+                throw new OrderMatcherException("Book Message must be greater than of Size : " + minMessageSize);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
             if (messageType != MessageType.Book)
             {
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
             }
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-            if (version != BookSerializer.version)
-            {
-                throw new Exception(Constant.INVALID_VERSION);
-            }
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var timeStamp = BitConverter.ToInt32(bytes.Slice(timeStampOffset));
             Price? ltp = Price.ReadPrice(bytes.Slice(ltpOffset));

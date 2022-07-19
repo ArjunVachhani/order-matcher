@@ -58,9 +58,6 @@ namespace OrderMatcher.Types.Serializers
 
         public static void Serialize(long messageSequence, OrderId orderId, UserId userId, int timestamp, Span<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < MessageSize)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -75,20 +72,17 @@ namespace OrderMatcher.Types.Serializers
 
         public static OrderTrigger Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != MessageSize)
-                throw new Exception("Order Trigger Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("Order Trigger Message must be of Size : " + sizeOfMessage);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
 
             if (messageType != MessageType.OrderTrigger)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-            if (version != OrderTriggerSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var orderTrigger = new OrderTrigger();
 

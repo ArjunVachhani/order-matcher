@@ -46,17 +46,11 @@ namespace OrderMatcher.Types.Serializers
             if (matchingEngineResult == null)
                 throw new ArgumentNullException(nameof(matchingEngineResult));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             Serialize(matchingEngineResult.OrderId, matchingEngineResult.Result, matchingEngineResult.Timestamp, bytes);
         }
 
         public static void Serialize(ulong orderId, OrderMatchingResult result, long timeStamp, Span<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -70,21 +64,17 @@ namespace OrderMatcher.Types.Serializers
 
         public static MatchingEngineResult Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != sizeOfMessage)
-                throw new Exception("OrderMatchingResult Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("OrderMatchingResult Message must be of Size : " + sizeOfMessage);
 
-            var messageType = (MessageType)(bytes[messageTypeOffset]);
+            var messageType = (MessageType)bytes[messageTypeOffset];
 
             if (messageType != MessageType.OrderMatchingResult)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != MatchingEngineResultSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var result = new MatchingEngineResult();
             result.OrderId = BitConverter.ToUInt64(bytes.Slice(orderIdOffset));

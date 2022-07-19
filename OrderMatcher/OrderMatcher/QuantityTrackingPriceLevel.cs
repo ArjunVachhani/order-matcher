@@ -1,8 +1,6 @@
 ﻿using OrderMatcher.Types;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OrderMatcher
 {
@@ -16,7 +14,7 @@ namespace OrderMatcher
         public Price Price => _price;
 
         private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
-        
+
         public QuantityTrackingPriceLevel(Price price)
         {
             _price = price;
@@ -36,7 +34,6 @@ namespace OrderMatcher
             return _orders.Remove(order);
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303")]
         internal bool Fill(Order order, Quantity quantity)
         {
             if (order.OpenQuantity >= quantity)
@@ -51,7 +48,7 @@ namespace OrderMatcher
             }
             else
             {
-                throw new Exception(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
+                throw new OrderMatcherException(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
             }
         }
 

@@ -64,8 +64,8 @@ namespace OrderMatcher.Tests
         public void WriteLongTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 5l);
-            var arr2 = BitConverter.GetBytes(5l);
+            Serializer.Write(arr1, 5L);
+            var arr2 = BitConverter.GetBytes(5L);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
@@ -244,9 +244,9 @@ namespace OrderMatcher.Tests
         [Fact]
         public void ReadLongTest()
         {
-            var arr = BitConverter.GetBytes(5l);
+            var arr = BitConverter.GetBytes(5L);
             var actual = Serializer.ReadLong(arr);
-            Assert.Equal(5l, actual);
+            Assert.Equal(5L, actual);
         }
 
         [Fact]
@@ -298,12 +298,6 @@ namespace OrderMatcher.Tests
             Serializer.Write(arr, 5m);
             var actual = Serializer.ReadDecimal(arr);
             Assert.Equal(5m, actual);
-        }
-
-        [Fact]
-        public void GetMessageType_ThrowsExceptionForNullArguement()
-        {
-            Assert.Throws<ArgumentNullException>(() => Serializer.GetMessageType(null));
         }
 
         [Fact]

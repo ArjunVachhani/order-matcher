@@ -401,7 +401,6 @@ namespace OrderMatcher.Tests
             AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.BidSide.Select(x => x.Key).ToList());
             AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
 
-
             book.RemoveOrder(order2);
             Assert.Equal(12, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
@@ -1120,7 +1119,6 @@ namespace OrderMatcher.Tests
 
             List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
             Assert.Equal(2, priceLevels.Count());
-
 
             List<Order> expectedResult = new List<Order> { order1, order2, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, priceLevels.SelectMany(x => x.ToList()));
