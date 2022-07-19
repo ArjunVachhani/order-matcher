@@ -155,9 +155,6 @@ namespace OrderMatcher.Types.Serializers
 
         public static MessageType? GetMessageType(ReadOnlySpan<byte> data)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
             if (data.Length < 7)
                 return null;
 

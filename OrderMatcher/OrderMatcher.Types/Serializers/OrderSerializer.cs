@@ -76,9 +76,6 @@ namespace OrderMatcher.Types.Serializers
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -107,21 +104,17 @@ namespace OrderMatcher.Types.Serializers
 
         public static Order Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != sizeOfMessage)
-                throw new Exception("Order Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("Order Message must be of Size : " + sizeOfMessage);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
 
             if (messageType != MessageType.NewOrderRequest)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != OrderSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var order = new Order();
 

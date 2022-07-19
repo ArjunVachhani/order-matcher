@@ -1,5 +1,4 @@
 ﻿using OrderMatcher.Types;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -44,7 +43,7 @@ namespace OrderMatcher
             }
             else
             {
-                throw new Exception(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
+                throw new OrderMatcherException(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
             }
         }
 

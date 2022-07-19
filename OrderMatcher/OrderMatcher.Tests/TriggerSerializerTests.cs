@@ -31,17 +31,10 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void Deserialize_ThrowsExecption_IfNullPassed()
-        {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => OrderTriggerSerializer.Deserialize(null));
-            Assert.Equal("bytes", ex.ParamName);
-        }
-
-        [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
             var bytes = new byte[messageSize - 1];
-            Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal($"Order Trigger Message must be of Size : {messageSize}", ex.Message);
         }
 
@@ -49,7 +42,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
             var bytes = new byte[messageSize + 1];
-            Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal($"Order Trigger Message must be of Size : {messageSize}", ex.Message);
         }
 
@@ -57,7 +50,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
             var bytes = new byte[messageSize];
-            Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
@@ -66,7 +59,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[messageSize];
             bytes[4] = (byte)MessageType.OrderTrigger;
-            Exception ex = Assert.Throws<Exception>(() => OrderTriggerSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => OrderTriggerSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
         }
 

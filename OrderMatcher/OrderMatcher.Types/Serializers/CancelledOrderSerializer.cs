@@ -66,17 +66,11 @@ namespace OrderMatcher.Types.Serializers
             if (cancelledOrder == null)
                 throw new ArgumentNullException(nameof(cancelledOrder));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             Serialize(cancelledOrder.MessageSequence, cancelledOrder.OrderId, cancelledOrder.UserId, cancelledOrder.RemainingQuantity, cancelledOrder.Cost, cancelledOrder.Fee, cancelledOrder.CancelReason, cancelledOrder.Timestamp, bytes);
         }
 
         public static void Serialize(long messageSequence, OrderId orderId, UserId userId, Quantity remainingQuantity, Quantity cost, Quantity fee, CancelReason cancelReason, int timeStamp, Span<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -95,21 +89,17 @@ namespace OrderMatcher.Types.Serializers
 
         public static CancelledOrder Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != sizeOfMessage)
-                throw new Exception("Canceled Order Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("Canceled Order Message must be of Size : " + sizeOfMessage);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
 
             if (messageType != MessageType.Cancel)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != CancelledOrderSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var cancelledOrder = new CancelledOrder();
 

@@ -40,9 +40,6 @@ namespace OrderMatcher.Types.Serializers
             if (cancelRequest == null)
                 throw new ArgumentNullException(nameof(cancelRequest));
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
@@ -54,21 +51,18 @@ namespace OrderMatcher.Types.Serializers
 
         public static CancelRequest Deserialize(ReadOnlySpan<byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
             if (bytes.Length != sizeOfMessage)
-                throw new Exception("Cancel Request Message must be of Size : " + sizeOfMessage);
+                throw new OrderMatcherException("Cancel Request Message must be of Size : " + sizeOfMessage);
 
             var messageType = (MessageType)(bytes[messageTypeOffset]);
 
             if (messageType != MessageType.CancelRequest)
-                throw new Exception(Constant.INVALID_MESSAGE);
+                throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
+            var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
 
-            if (version != CancelRequestSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
+            if (messageVersion != version)
+                throw new OrderMatcherException(Constant.INVALID_VERSION);
 
             var cancelRequest = new CancelRequest();
 

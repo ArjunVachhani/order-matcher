@@ -29,17 +29,10 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void Deserialize_ThrowsExecption_IfNullPassed()
-        {
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => BookRequestSerializer.Deserialize(null));
-            Assert.Equal("bytes", ex.ParamName);
-        }
-
-        [Fact]
         public void Deserialize_ThrowsExecption_IfMessageIsLessThan35Bytes()
         {
             var bytes = new byte[10];
-            Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal("Book Request Message must be of Size : 11", ex.Message);
         }
 
@@ -47,7 +40,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_ThrowsExecption_IfMessageIsGreaterThan35Bytes()
         {
             var bytes = new byte[12];
-            Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal("Book Request Message must be of Size : 11", ex.Message);
         }
 
@@ -55,7 +48,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_ThrowsExecption_IfMessageIsNothaveValidType()
         {
             var bytes = new byte[11];
-            Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_MESSAGE, ex.Message);
         }
 
@@ -64,7 +57,7 @@ namespace OrderMatcher.Tests
         {
             var bytes = new byte[11];
             bytes[4] = (byte)MessageType.BookRequest;
-            Exception ex = Assert.Throws<Exception>(() => BookRequestSerializer.Deserialize(bytes));
+            OrderMatcherException ex = Assert.Throws<OrderMatcherException>(() => BookRequestSerializer.Deserialize(bytes));
             Assert.Equal(Types.Constant.INVALID_VERSION, ex.Message);
         }
 

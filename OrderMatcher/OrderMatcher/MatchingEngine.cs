@@ -367,7 +367,7 @@ namespace OrderMatcher
                     }
                     else
                     {
-                        throw new Exception(Constant.NOT_EXPECTED);
+                        throw new OrderMatcherException(Constant.NOT_EXPECTED);
                     }
 
                     var cost = Math.Round(maxQuantity * matchPrice, _quoteCurrencyDecimalPlaces);
@@ -394,7 +394,7 @@ namespace OrderMatcher
                     }
 
                     bool isIncomingOrderFilled = incomingOrder.IsFilled;
-                    if (incomingOrder.IsTip == true)
+                    if (incomingOrder.IsTip)
                     {
                         isIncomingOrderFilled = incomingOrder.TotalQuantity == 0;
                     }
