@@ -4,16 +4,24 @@ using System.Collections.Generic;
 
 namespace OrderMatcher
 {
-    public class QuantityTrackingPriceLevel : IEnumerable<Order>
+    public class QuantityTrackingPriceLevel : IPriceLevel
     {
         private readonly SortedSet<Order> _orders;
-        private readonly Price _price;
+
+        private Price _price;
         private Quantity _quantity;
+
         public int OrderCount => _orders.Count;
         public Quantity Quantity => _quantity;
         public Price Price => _price;
 
         private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
+
+        public QuantityTrackingPriceLevel()
+        {
+            _quantity = 0;
+            _orders = new SortedSet<Order>(_orderSequenceComparer);
+        }
 
         public QuantityTrackingPriceLevel(Price price)
         {
@@ -22,19 +30,27 @@ namespace OrderMatcher
             _orders = new SortedSet<Order>(_orderSequenceComparer);
         }
 
-        internal void AddOrder(Order order)
+        public void SetPrice(Price price)
+        {
+            if (_orders.Count > 0)
+                throw new OrderMatcherException($"Cannot set price because pricelevel has {_orders.Count} orders.");
+
+            _price = price;
+        }
+
+        public void AddOrder(Order order)
         {
             _quantity += order.OpenQuantity;
             _orders.Add(order);
         }
 
-        internal bool RemoveOrder(Order order)
+        public bool RemoveOrder(Order order)
         {
             _quantity -= order.OpenQuantity;
             return _orders.Remove(order);
         }
 
-        internal bool Fill(Order order, Quantity quantity)
+        public bool Fill(Order order, Quantity quantity)
         {
             if (order.OpenQuantity >= quantity)
             {
