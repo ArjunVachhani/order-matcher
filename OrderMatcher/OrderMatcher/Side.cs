@@ -1,24 +1,24 @@
 ﻿using OrderMatcher.Types;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OrderMatcher
 {
     internal class Side<T> where T : IPriceLevel, new()
     {
-        private readonly SortedDictionary<Price, T> _priceLevels;
+        private readonly SortedSet<T> _priceLevels;
         private readonly IComparer<Price> _priceComparer;
+        private readonly T _priceLevelForSearch = new T();
 
         private T _bestPriceLevel;
 
         public T BestPriceLevel => _bestPriceLevel;
         public int PriceLevelCount => _priceLevels.Count;
-        public IEnumerable<KeyValuePair<Price, T>> PriceLevels => _priceLevels;
+        public IEnumerable<T> PriceLevels => _priceLevels;
 
-        public Side(IComparer<Price> comparer)
+        public Side(IComparer<Price> priceComparer, IComparer<T> priceLevelComparer)
         {
-            _priceComparer = comparer;
-            _priceLevels = new SortedDictionary<Price, T>(comparer);
+            _priceComparer = priceComparer;
+            _priceLevels = new SortedSet<T>(priceLevelComparer);
         }
 
         public void AddOrder(Order order, Price price)
@@ -30,7 +30,8 @@ namespace OrderMatcher
         public bool RemoveOrder(Order order, Price price)
         {
             bool removed = false;
-            if (_priceLevels.TryGetValue(price, out T priceLevel))
+            _priceLevelForSearch.SetPrice(price);
+            if (_priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel))
             {
                 removed = priceLevel.RemoveOrder(order);
                 RemovePriceLevelIfEmpty(priceLevel);
@@ -44,21 +45,21 @@ namespace OrderMatcher
             if (_bestPriceLevel != null && _priceComparer.Compare(_bestPriceLevel.Price, price) <= 0)
             {
                 _bestPriceLevel = default;
-                foreach (KeyValuePair<Price, T> stopPriceLevel in _priceLevels)
+                foreach (T stopPriceLevel in _priceLevels)
                 {
-                    if (_priceComparer.Compare(stopPriceLevel.Key, price) <= 0)
+                    if (_priceComparer.Compare(stopPriceLevel.Price, price) <= 0)
                     {
-                        priceLevels.Add(stopPriceLevel.Value);
+                        priceLevels.Add(stopPriceLevel);
                     }
                     else
                     {
-                        _bestPriceLevel = stopPriceLevel.Value;
+                        _bestPriceLevel = stopPriceLevel;
                         break;
                     }
                 }
                 for (var i = 0; i < priceLevels.Count; i++)
                 {
-                    _priceLevels.Remove(priceLevels[i].Price);
+                    _priceLevels.Remove(priceLevels[i]);
                 }
             }
             return priceLevels;
@@ -66,7 +67,8 @@ namespace OrderMatcher
 
         public bool FillOrder(Order order, Quantity quantity)
         {
-            T priceLevel = _priceLevels[order.Price];
+            _priceLevelForSearch.SetPrice(order.Price);
+            _priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel);
             bool orderFilled = priceLevel.Fill(order, quantity);
             RemovePriceLevelIfEmpty(priceLevel);
             return orderFilled;
@@ -77,9 +79,9 @@ namespace OrderMatcher
             Quantity cummulativeQuantity = 0;
             foreach (var priceLevel in _priceLevels)
             {
-                if ((_priceComparer.Compare(limitPrice, priceLevel.Key) >= 0 || limitPrice == 0) && cummulativeQuantity <= requestedQuantity)
+                if ((_priceComparer.Compare(limitPrice, priceLevel.Price) >= 0 || limitPrice == 0) && cummulativeQuantity <= requestedQuantity)
                 {
-                    cummulativeQuantity += priceLevel.Value.Quantity;
+                    cummulativeQuantity += priceLevel.Quantity;
                 }
                 else
                 {
@@ -100,7 +102,7 @@ namespace OrderMatcher
             {
                 if (cummulativeOrderAmount <= orderAmount)
                 {
-                    cummulativeOrderAmount += (priceLevel.Value.Quantity * priceLevel.Key);
+                    cummulativeOrderAmount += (priceLevel.Quantity * priceLevel.Price);
                 }
                 else
                 {
@@ -117,11 +119,12 @@ namespace OrderMatcher
 
         private T GetOrAddPriceLevel(Price price)
         {
-            if (!_priceLevels.TryGetValue(price, out T priceLevel))
+            _priceLevelForSearch.SetPrice(price);
+            if (!_priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel))
             {
                 priceLevel = new T();
                 priceLevel.SetPrice(price);
-                _priceLevels.Add(price, priceLevel);
+                _priceLevels.Add(priceLevel);
                 if (_bestPriceLevel == null || _priceComparer.Compare(price, _bestPriceLevel.Price) < 0)
                 {
                     _bestPriceLevel = priceLevel;
@@ -134,10 +137,10 @@ namespace OrderMatcher
         {
             if (priceLevel.OrderCount == 0)
             {
-                _priceLevels.Remove(priceLevel.Price);
+                _priceLevels.Remove(priceLevel);
                 if (_bestPriceLevel!.Price == priceLevel.Price)
                 {
-                    _bestPriceLevel = _priceLevels.FirstOrDefault().Value;
+                    _bestPriceLevel = _priceLevels.Min;
                 }
             }
         }

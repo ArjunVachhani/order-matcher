@@ -17,24 +17,24 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, Price = 14, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(14, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, Price = 9, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(14, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 14, 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 14, 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order = book.GetBestBuyOrderToMatch(true);
             Assert.Equal(order, order2);
@@ -50,24 +50,24 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, Price = 7, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, Price = 9, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
             Order order = book.GetBestBuyOrderToMatch(false);
             Assert.Equal(order, order2);
         }
@@ -79,8 +79,8 @@ namespace OrderMatcher.Tests
             Order order = book.GetBestBuyOrderToMatch(true);
             Assert.Null(order);
 
-            AssertHelper.SequentiallyEqual(new Price[] { }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { }, book.BidSide.Select(x => x.Quantity).ToList());
             Assert.Null(book.BestBidPrice);
             Assert.Null(book.BestBidQuantity);
         }
@@ -92,8 +92,8 @@ namespace OrderMatcher.Tests
             Order order = book.GetBestBuyOrderToMatch(false);
             Assert.Null(order);
 
-            AssertHelper.SequentiallyEqual(new Price[] { }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { }, book.AskSide.Select(x => x.Quantity).ToList());
             Assert.Null(book.BestAskPrice);
             Assert.Null(book.BestAskQuantity);
         }
@@ -105,22 +105,22 @@ namespace OrderMatcher.Tests
 
             Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order1);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, Price = 14, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
-            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
             Assert.Equal(14, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, Price = 14, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
-            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 14, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
             Assert.Equal(14, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
 
@@ -129,8 +129,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(14, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 14, 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 14, 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
             Order order = book.GetBestBuyOrderToMatch(true);
             Assert.Equal(order, order2);
         }
@@ -142,22 +142,22 @@ namespace OrderMatcher.Tests
 
             Order order1 = new Order { IsBuy = false, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order1);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, Price = 7, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, Price = 9, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
 
@@ -166,8 +166,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(2000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
             Order order = book.GetBestBuyOrderToMatch(false);
             Assert.Equal(order, order2);
         }
@@ -180,24 +180,24 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 10, StopPrice = 9 };
             book.AddStopOrder(order1);
             Assert.Equal(9, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, Price = 10, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(9, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, Price = 10, StopPrice = 7 };
             book.AddStopOrder(order3);
             Assert.Equal(7, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
 
             Assert.Equal(7, book.BestStopBidPrice);
-            List<Order> orders = book.StopBidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.StopBidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -210,31 +210,31 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 10, StopPrice = 9 };
             book.AddStopOrder(order1);
             Assert.Equal(9, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 10, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(9, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 10, StopPrice = 7 };
             book.AddStopOrder(order3);
             Assert.Equal(7, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order4 = new Order { IsBuy = true, OrderId = 4, UserId = 4, Price = 10, OpenQuantity = 10, StopPrice = 9 };
             book.AddStopOrder(order4);
             Assert.Equal(7, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order5 = new Order { IsBuy = true, OrderId = 5, UserId = 5, Price = 10, OpenQuantity = 10, StopPrice = 10 };
             book.AddStopOrder(order5);
             Assert.Equal(7, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order6 = new Order { IsBuy = true, OrderId = 6, UserId = 6, Price = 10, OpenQuantity = 10, StopPrice = 7 };
             book.AddStopOrder(order6);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
@@ -244,7 +244,7 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)6, order6.Sequence);
 
             Assert.Equal(7, book.BestStopBidPrice);
-            List<Order> orders = book.StopBidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.StopBidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order6, order1, order4, order2, order5 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -257,24 +257,24 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = false, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 10, StopPrice = 9 };
             book.AddStopOrder(order1);
             Assert.Equal(9, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 10, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 10, StopPrice = 7 };
             book.AddStopOrder(order3);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
 
             Assert.Equal(10, book.BestStopAskPrice);
-            List<Order> orders = book.StopAskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.StopAskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -287,32 +287,32 @@ namespace OrderMatcher.Tests
             Order order1 = new Order { IsBuy = false, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 10, StopPrice = 9 };
             book.AddStopOrder(order1);
             Assert.Equal(9, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 10, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 10, StopPrice = 7 };
             book.AddStopOrder(order3);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order4 = new Order { IsBuy = false, OrderId = 4, UserId = 4, Price = 10, OpenQuantity = 10, StopPrice = 9 };
             book.AddStopOrder(order4);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order5 = new Order { IsBuy = false, OrderId = 5, UserId = 5, Price = 10, OpenQuantity = 10, StopPrice = 10 };
             book.AddStopOrder(order5);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order6 = new Order { IsBuy = false, OrderId = 6, UserId = 6, Price = 10, OpenQuantity = 10, StopPrice = 7 };
             book.AddStopOrder(order6);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
@@ -322,7 +322,7 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)6, order6.Sequence);
 
             Assert.Equal(10, book.BestStopAskPrice);
-            List<Order> orders = book.StopAskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.StopAskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order5, order1, order4, order3, order6 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -336,32 +336,32 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(order1);
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(3000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 3000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 3000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             book.RemoveOrder(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order3 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.BidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.BidSide.SelectMany(x => x));
 
             Order order = book.GetBestBuyOrderToMatch(true);
             Assert.Equal(order1, order);
@@ -376,39 +376,39 @@ namespace OrderMatcher.Tests
             book.AddOrderOpenBook(order1);
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 11, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
             Assert.Equal(11, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 11, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 11, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
             Assert.Equal(12, book.BestBidPrice);
             Assert.Equal(1000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order4 = new Order() { IsBuy = true, OrderId = 4, UserId = 4, Price = 12, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order4);
 
             Assert.Equal(12, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             book.RemoveOrder(order2);
             Assert.Equal(12, book.BestBidPrice);
             Assert.Equal(2000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000, 1000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             List<Order> expectedResult = new List<Order> { order3, order4, order1 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.BidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.BidSide.SelectMany(x => x));
 
             Assert.Equal(2, book.BidSide.Count());
 
@@ -424,39 +424,39 @@ namespace OrderMatcher.Tests
             Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order1);
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order3);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order4 = new Order() { IsBuy = true, OrderId = 4, UserId = 4, Price = 10, OpenQuantity = 100000, StopPrice = 11 };
             book.AddStopOrder(order4);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Assert.Equal(10, book.BestStopBidPrice);
 
             book.RemoveOrder(order2);
 
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order3, order4 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x));
 
             book.RemoveOrder(order1);
             book.RemoveOrder(order3);
 
             Assert.Equal(11, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 11 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 11 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             expectedResult = new List<Order> { order4 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x));
 
             book.RemoveOrder(order4);
             Assert.Null(book.BestStopBidPrice);
@@ -471,24 +471,24 @@ namespace OrderMatcher.Tests
             Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 100000, StopPrice = 12 };
             book.AddStopOrder(order3);
             Assert.Equal(12, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order1);
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 12 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 12 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 11, OpenQuantity = 100000, StopPrice = 11 };
             book.AddStopOrder(order2);
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             Order order4 = new Order() { IsBuy = true, OrderId = 4, UserId = 4, Price = 12, OpenQuantity = 100000, StopPrice = 12 };
             book.AddStopOrder(order4);
 
 
             Assert.Equal(10, book.BestStopBidPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.StopBidSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.StopBidSide.Select(x => x.Price).ToList());
 
             book.RemoveOrder(order2);
 
@@ -496,7 +496,7 @@ namespace OrderMatcher.Tests
 
             List<Order> expectedResult = new List<Order> { order1, order3, order4 };
 
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopBidSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopBidSide.Count());
         }
@@ -511,34 +511,34 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order() { IsBuy = false, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(2000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(3000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 3000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 3000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             book.RemoveOrder(order2);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(2000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 2000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order3 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.AskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.AskSide.SelectMany(x => x));
 
             Order order = book.GetBestBuyOrderToMatch(false);
             Assert.Equal(order1, order);
@@ -554,42 +554,42 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order() { IsBuy = false, OrderId = 2, UserId = 2, Price = 11, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order4 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order4);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 2000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 2000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             book.RemoveOrder(order2);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(1000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 12 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 2000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 12 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 2000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order3, order4 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.AskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.AskSide.SelectMany(x => x));
 
             Assert.Equal(2, book.AskSide.Count());
 
@@ -605,26 +605,26 @@ namespace OrderMatcher.Tests
             Order order1 = new Order() { IsBuy = false, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order1);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order() { IsBuy = false, OrderId = 2, UserId = 2, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order3);
 
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             book.RemoveOrder(order2);
 
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order3 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x));
         }
 
         [Fact]
@@ -635,40 +635,40 @@ namespace OrderMatcher.Tests
             Order order1 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 100000, StopPrice = 12 };
             book.AddStopOrder(order1);
             Assert.Equal(12, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order2 = new Order() { IsBuy = false, OrderId = 1, UserId = 1, Price = 10, OpenQuantity = 100000, StopPrice = 10 };
             book.AddStopOrder(order2);
             Assert.Equal(12, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order3 = new Order() { IsBuy = false, OrderId = 2, UserId = 2, Price = 11, OpenQuantity = 100000, StopPrice = 11 };
             book.AddStopOrder(order3);
             Assert.Equal(12, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             Order order4 = new Order() { IsBuy = false, OrderId = 4, UserId = 4, Price = 12, OpenQuantity = 100000, StopPrice = 12 };
             book.AddStopOrder(order4);
             Assert.Equal(12, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 11, 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             book.RemoveOrder(order3);
 
             Assert.Equal(12, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 12, 10 }, book.StopAskSide.Select(x => x.Price).ToList());
 
             List<Order> expectedResult = new List<Order> { order1, order4, order2 };
 
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopAskSide.Count());
 
             book.RemoveOrder(order1);
             book.RemoveOrder(order4);
             Assert.Equal(10, book.BestStopAskPrice);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Key).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.StopAskSide.Select(x => x.Price).ToList());
             expectedResult = new List<Order> { order2 };
-            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult, book.StopAskSide.SelectMany(x => x));
             Assert.Single(book.StopAskSide);
 
             book.RemoveOrder(order2);
@@ -686,16 +686,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -703,13 +703,13 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
 
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -724,40 +724,40 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order4 = new Order { IsBuy = true, OrderId = 4, UserId = 4, OpenQuantity = 10, Price = 9 };
             book.AddOrderOpenBook(order4);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order5 = new Order { IsBuy = true, OrderId = 5, UserId = 5, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order5);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(20, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order6 = new Order { IsBuy = true, OrderId = 6, UserId = 6, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order6);
@@ -771,10 +771,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(20, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 20 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 20 }, book.BidSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order5, order1, order4, order3, order6 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -789,16 +789,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -809,10 +809,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -827,40 +827,40 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order4 = new Order { IsBuy = false, OrderId = 4, UserId = 4, OpenQuantity = 10, Price = 9 };
             book.AddOrderOpenBook(order4);
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order5 = new Order { IsBuy = false, OrderId = 5, UserId = 5, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order5);
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 20 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 20, 20 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order6 = new Order { IsBuy = false, OrderId = 6, UserId = 6, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order6);
@@ -874,10 +874,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(20, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 20 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 20, 20, 20 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order6, order1, order4, order2, order5 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
         }
@@ -892,16 +892,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(100000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 100000, Sequence = 2, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(200000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             bool fillResult1 = book.FillOrder(order1, 900);
             Assert.False(fillResult1);
@@ -909,8 +909,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(199100, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 199100 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 199100 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             bool fillResult2 = book.FillOrder(order1, 100);
             Assert.False(fillResult2);
@@ -918,8 +918,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(199000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 199000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 199000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(100000, order2.OpenQuantity);
         }
@@ -934,24 +934,24 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(100000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 100000, Sequence = 2, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(200000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 100000, Sequence = 3, Price = 9 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(200000, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000, 100000 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000, 100000 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             bool fillResult1 = book.FillOrder(order1, 90000);
             Assert.False(fillResult1);
@@ -989,16 +989,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(100000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 100000, Sequence = 2, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(200000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             bool fillResult1 = book.FillOrder(order1, 900);
             Assert.False(fillResult1);
@@ -1006,8 +1006,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(199100, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 199100 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 199100 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             bool fillResult2 = book.FillOrder(order1, 100);
             Assert.False(fillResult2);
@@ -1015,8 +1015,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(199000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 199000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 199000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(100000, order2.OpenQuantity);
         }
@@ -1031,24 +1031,24 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(100000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 100000, Sequence = 2, Price = 9 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(200000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 100000, Sequence = 3, Price = 10 };
             book.AddOrderOpenBook(order3);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(200000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 200000, 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 200000, 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             bool fillResult1 = book.FillOrder(order1, 90000);
             Assert.False(fillResult1);
@@ -1056,14 +1056,14 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(110000, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 110000, 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 110000, 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             bool fillResult2 = book.FillOrder(order1, 10000);
             Assert.True(fillResult2);
             Assert.Equal(0, order1.OpenQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000, 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000, 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(100000, book.BestAskQuantity);
@@ -1071,8 +1071,8 @@ namespace OrderMatcher.Tests
             bool fillResult3 = book.FillOrder(order2, 100000);
             Assert.True(fillResult3);
             Assert.Equal(0, order2.OpenQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 100000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestAskPrice);
             Assert.Equal(100000, book.BestAskQuantity);
@@ -1124,10 +1124,10 @@ namespace OrderMatcher.Tests
             AssertHelper.SequentiallyEqual(expectedResult, priceLevels.SelectMany(x => x.ToList()));
 
             Assert.Equal(7, book.BestStopAskPrice);
-            Assert.Equal(new Price(7), book.StopAskSide.First().Key);
+            Assert.Equal(new Price(7), book.StopAskSide.First().Price);
 
             List<Order> expectedResult2 = new List<Order> { order4, order5, order6 };
-            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopAskSide.Count());
         }
@@ -1157,10 +1157,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestStopAskPrice);
 
-            Assert.Equal(new Price(7), book.StopAskSide.First().Key);
+            Assert.Equal(new Price(7), book.StopAskSide.First().Price);
 
             List<Order> expectedResult2 = new List<Order> { order4, order5, order6 };
-            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopAskSide.Count());
         }
@@ -1190,10 +1190,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestStopAskPrice);
 
-            Assert.Equal(new Price(7), book.StopAskSide.First().Key);
+            Assert.Equal(new Price(7), book.StopAskSide.First().Price);
 
             List<Order> expectedResult2 = new List<Order> { order4, order5, order6 };
-            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult2, book.StopAskSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopAskSide.Count());
         }
@@ -1241,10 +1241,10 @@ namespace OrderMatcher.Tests
             List<Order> expectedResult = new List<Order> { order1, order2, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, priceLevels.SelectMany(x => x.ToList()));
 
-            Assert.Equal(new Price(12), book.StopBidSide.First().Key);
+            Assert.Equal(new Price(12), book.StopBidSide.First().Price);
 
             List<Order> expectedResult2 = new List<Order> { order4, order5, order6 };
-            AssertHelper.SequentiallyEqual(expectedResult2, book.StopBidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult2, book.StopBidSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopBidSide.Count());
         }
@@ -1274,10 +1274,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(12, book.BestStopBidPrice);
 
-            Assert.Equal(new Price(12), book.StopBidSide.First().Key);
+            Assert.Equal(new Price(12), book.StopBidSide.First().Price);
 
             List<Order> expectedResult2 = new List<Order> { order4, order5, order6 };
-            AssertHelper.SequentiallyEqual(expectedResult2, book.StopBidSide.SelectMany(x => x.Value));
+            AssertHelper.SequentiallyEqual(expectedResult2, book.StopBidSide.SelectMany(x => x));
 
             Assert.Equal(2, book.StopBidSide.Count());
         }
@@ -1309,16 +1309,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1326,12 +1326,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1369,16 +1369,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1386,12 +1386,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1413,16 +1413,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1430,12 +1430,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1459,16 +1459,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1476,12 +1476,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1499,16 +1499,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1519,10 +1519,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1560,16 +1560,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1580,10 +1580,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1605,16 +1605,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1625,10 +1625,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1652,16 +1652,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1672,10 +1672,10 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1708,8 +1708,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             var result = book.CheckCanFillMarketOrderAmount(false, 90);
             Assert.True(result);
@@ -1733,16 +1733,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = true, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1750,12 +1750,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 10, 9, 7 }, book.BidSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.BidSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(10, book.BestBidPrice);
             Assert.Equal(10, book.BestBidQuantity);
-            List<Order> orders = book.BidSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.BidSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order2, order1, order3 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
@@ -1796,8 +1796,8 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             var result = book.CheckCanFillMarketOrderAmount(true, 90);
             Assert.True(result);
@@ -1819,16 +1819,16 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order2 = new Order { IsBuy = false, OrderId = 2, UserId = 2, OpenQuantity = 10, Price = 10 };
             book.AddOrderOpenBook(order2);
 
             Assert.Equal(9, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Order order3 = new Order { IsBuy = false, OrderId = 3, UserId = 3, OpenQuantity = 10, Price = 7 };
             book.AddOrderOpenBook(order3);
@@ -1836,12 +1836,12 @@ namespace OrderMatcher.Tests
             Assert.Equal((ulong)1, order1.Sequence);
             Assert.Equal((ulong)2, order2.Sequence);
             Assert.Equal((ulong)3, order3.Sequence);
-            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Key).ToList());
-            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Value.Quantity).ToList());
+            AssertHelper.SequentiallyEqual(new Price[] { 7, 9, 10 }, book.AskSide.Select(x => x.Price).ToList());
+            AssertHelper.SequentiallyEqual(new Quantity[] { 10, 10, 10 }, book.AskSide.Select(x => x.Quantity).ToList());
 
             Assert.Equal(7, book.BestAskPrice);
             Assert.Equal(10, book.BestAskQuantity);
-            List<Order> orders = book.AskSide.SelectMany(x => x.Value).ToList();
+            List<Order> orders = book.AskSide.SelectMany(x => x).ToList();
             List<Order> expectedResult = new List<Order> { order3, order1, order2 };
             AssertHelper.SequentiallyEqual(expectedResult, orders);
 
