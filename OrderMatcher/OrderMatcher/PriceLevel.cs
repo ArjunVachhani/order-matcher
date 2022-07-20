@@ -4,15 +4,33 @@ using System.Collections.Generic;
 
 namespace OrderMatcher
 {
-    public class PriceLevel : IEnumerable<Order>
+    public class PriceLevel : IPriceLevel
     {
         private readonly SortedSet<Order> _orders;
-        private readonly Price _price;
+
+        private Price _price;
 
         public int OrderCount => _orders.Count;
         public Price Price => _price;
+        public Quantity Quantity
+        {
+            get
+            {
+                Quantity totalQuantity = 0;
+                foreach (var order in _orders)
+                {
+                    totalQuantity += order.OpenQuantity;
+                }
+                return totalQuantity;
+            }
+        }
 
         private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
+
+        public PriceLevel()
+        {
+            _orders = new SortedSet<Order>(_orderSequenceComparer);
+        }
 
         public PriceLevel(Price price)
         {
@@ -20,17 +38,25 @@ namespace OrderMatcher
             _orders = new SortedSet<Order>(_orderSequenceComparer);
         }
 
-        internal void AddOrder(Order order)
+        public void SetPrice(Price price)
+        {
+            if (_orders.Count > 0)
+                throw new OrderMatcherException($"Cannot set price because pricelevel has {_orders.Count} orders.");
+
+            _price = price;
+        }
+
+        public void AddOrder(Order order)
         {
             _orders.Add(order);
         }
 
-        internal bool RemoveOrder(Order order)
+        public bool RemoveOrder(Order order)
         {
             return _orders.Remove(order);
         }
 
-        internal bool Fill(Order order, Quantity quantity)
+        public bool Fill(Order order, Quantity quantity)
         {
             if (order.OpenQuantity >= quantity)
             {
