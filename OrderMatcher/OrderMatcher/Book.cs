@@ -11,12 +11,12 @@ namespace OrderMatcher
 
         private ulong _sequence;
 
-        public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> BidSide => _bids.PriceLevels;
-        public IEnumerable<KeyValuePair<Price, QuantityTrackingPriceLevel>> AskSide => _asks.PriceLevels;
+        public IEnumerable<QuantityTrackingPriceLevel> BidSide => _bids.PriceLevels;
+        public IEnumerable<QuantityTrackingPriceLevel> AskSide => _asks.PriceLevels;
         internal int AskPriceLevelCount => _asks.PriceLevelCount;
         internal int BidPriceLevelCount => _bids.PriceLevelCount;
-        public IEnumerable<KeyValuePair<Price, PriceLevel>> StopBidSide => _stopBids.PriceLevels;
-        public IEnumerable<KeyValuePair<Price, PriceLevel>> StopAskSide => _stopAsks.PriceLevels;
+        public IEnumerable<PriceLevel> StopBidSide => _stopBids.PriceLevels;
+        public IEnumerable<PriceLevel> StopAskSide => _stopAsks.PriceLevels;
         public Price? BestBidPrice => _bids.BestPriceLevel?.Price;
         public Price? BestAskPrice => _asks.BestPriceLevel?.Price;
         public Quantity? BestBidQuantity => _bids.BestPriceLevel?.Quantity;
@@ -28,10 +28,11 @@ namespace OrderMatcher
         {
             var _priceComparerAscending = new PriceComparerAscending();
             var _priceComparerDescending = new PriceComparerDescending();
-            _bids = new Side<QuantityTrackingPriceLevel>(_priceComparerDescending);
-            _asks = new Side<QuantityTrackingPriceLevel>(_priceComparerAscending);
-            _stopBids = new Side<PriceLevel>(_priceComparerAscending);
-            _stopAsks = new Side<PriceLevel>(_priceComparerDescending);
+
+            _bids = new Side<QuantityTrackingPriceLevel>(_priceComparerDescending, new PriceLevelComparerDescending<QuantityTrackingPriceLevel>());
+            _asks = new Side<QuantityTrackingPriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<QuantityTrackingPriceLevel>());
+            _stopBids = new Side<PriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<PriceLevel>());
+            _stopAsks = new Side<PriceLevel>(_priceComparerDescending, new PriceLevelComparerDescending<PriceLevel>());
             _sequence = 0;
         }
 

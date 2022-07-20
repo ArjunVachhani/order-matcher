@@ -548,7 +548,7 @@ namespace OrderMatcher
             Quantity quantity = 0;
             foreach (var level in Book.AskSide)
             {
-                foreach (var order in level.Value)
+                foreach (var order in level)
                 {
                     if (orderAmount == 0)
                         goto outOfLoop;

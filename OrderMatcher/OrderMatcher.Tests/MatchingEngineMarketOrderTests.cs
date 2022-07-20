@@ -29,7 +29,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -46,10 +46,10 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Equal(10, matchingEngine.Book.AskSide.First().Key);
+            Assert.Equal(10, matchingEngine.Book.AskSide.First().Price);
             Assert.Equal(10, order2.Price);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
@@ -63,7 +63,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.CancelAcepted, result3);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Equal(10, order2.Price);
@@ -84,7 +84,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -101,9 +101,9 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
-            Assert.Equal(10, matchingEngine.Book.BidSide.First().Key);
+            Assert.Equal(10, matchingEngine.Book.BidSide.First().Price);
             Assert.Equal(10, order2.Price);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -118,7 +118,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.CancelAcepted, result3);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Equal(10, order2.Price);
             Assert.Empty(matchingEngine.Book.AskSide);
@@ -139,7 +139,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -156,7 +156,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -176,7 +176,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -193,7 +193,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -213,7 +213,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -230,7 +230,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -247,7 +247,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order3, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -267,7 +267,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -284,7 +284,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -301,7 +301,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -321,7 +321,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -337,7 +337,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -355,7 +355,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order3, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -375,7 +375,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -391,7 +391,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Equal(2, matchingEngine.Book.AskSide.Count());
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -409,7 +409,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.DoesNotContain(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -430,7 +430,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -451,7 +451,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result1);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -471,7 +471,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -488,10 +488,10 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Equal(10, matchingEngine.Book.AskSide.First().Key);
+            Assert.Equal(10, matchingEngine.Book.AskSide.First().Price);
             Assert.Equal(10, order2.Price);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
@@ -510,7 +510,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -527,9 +527,9 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
-            Assert.Equal(10, matchingEngine.Book.BidSide.First().Key);
+            Assert.Equal(10, matchingEngine.Book.BidSide.First().Price);
             Assert.Equal(10, order2.Price);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -549,7 +549,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
             Assert.Contains(order1, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -565,7 +565,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.Contains(order2, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order2, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -581,7 +581,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
             Assert.Contains(order3, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order3, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -598,7 +598,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order4, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order4.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order4, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order4, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -615,7 +615,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order5.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order5, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order5, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -631,7 +631,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Contains(order6, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order6.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order6, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order6, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Equal(2, matchingEngine.Book.AskSide.Count());
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -650,7 +650,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result7);
             Assert.Contains(order7, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order7.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order7, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order7, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -666,7 +666,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result8);
             Assert.Contains(order8, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order8.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order8, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order8, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -682,7 +682,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result9);
             Assert.Contains(order9, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order9.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order9, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order9, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -701,7 +701,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order10, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order10.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order10, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order10, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -718,7 +718,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order11, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order11.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order11, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order11, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -735,7 +735,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order12, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order12.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order12, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order12, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -751,7 +751,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result13);
             Assert.Contains(order13, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order13.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order13, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order13, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -767,7 +767,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result14);
             Assert.Contains(order14, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order14.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order14, matchingEngine.Book.AskSide.SelectMany(x => x.Value));
+            Assert.Contains(order14, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Single(matchingEngine.Book.BidSide);
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -783,7 +783,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(OrderMatchingResult.OrderAccepted, result15);
             Assert.Contains(order15, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order15.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order15, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.Contains(order15, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
@@ -800,7 +800,7 @@ namespace OrderMatcher.Tests
             mockTradeListener.VerifyNoOtherCalls();
             Assert.DoesNotContain(order16, matchingEngine.CurrentOrders.Select(x => x.Value));
             Assert.Contains(order16.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order16, matchingEngine.Book.BidSide.SelectMany(x => x.Value));
+            Assert.DoesNotContain(order16, matchingEngine.Book.BidSide.SelectMany(x => x));
             Assert.Equal(2, matchingEngine.Book.BidSide.Count());
             Assert.Single(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
