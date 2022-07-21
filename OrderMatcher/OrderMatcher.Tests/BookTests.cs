@@ -573,7 +573,7 @@ namespace OrderMatcher.Tests
             AssertHelper.SequentiallyEqual(new Price[] { 10, 11, 12 }, book.AskSide.Select(x => x.Price).ToList());
             AssertHelper.SequentiallyEqual(new Quantity[] { 1000, 1000, 1000 }, book.AskSide.Select(x => x.Quantity).ToList());
 
-            Order order4 = new Order() { IsBuy = false, OrderId = 3, UserId = 3, Price = 12, OpenQuantity = 1000 };
+            Order order4 = new Order() { IsBuy = false, OrderId = 4, UserId = 4, Price = 12, OpenQuantity = 1000 };
             book.AddOrderOpenBook(order4);
 
             Assert.Equal(10, book.BestAskPrice);

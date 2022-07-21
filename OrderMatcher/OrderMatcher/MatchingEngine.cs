@@ -8,7 +8,6 @@ namespace OrderMatcher
     public class MatchingEngine
     {
         private readonly Book _book;
-        private readonly Dictionary<OrderId, Order> _currentOrders;
         private readonly HashSet<OrderId> _acceptedOrders;
         private readonly Queue<List<PriceLevel>> _stopOrderQueue;
         private readonly ITradeListener _tradeListener;
@@ -20,7 +19,7 @@ namespace OrderMatcher
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
         private bool _acceptedOrderTrackingEnabled = true;
 
-        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
+        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _book.CurrentOrders;
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
@@ -50,7 +49,6 @@ namespace OrderMatcher
                 throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
 
             _book = new Book();
-            _currentOrders = new Dictionary<OrderId, Order>();
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _stopOrderQueue = new Queue<List<PriceLevel>>();
             _acceptedOrders = new HashSet<OrderId>();
@@ -188,7 +186,6 @@ namespace OrderMatcher
                 {
                     AddGoodTillDateOrder(incomingOrder.CancelOn, incomingOrder.OrderId);
                 }
-                _currentOrders.Add(incomingOrder.OrderId, incomingOrder);
 
                 if (incomingOrder.StopPrice != 0 && !isOrderTriggered && ((incomingOrder.IsBuy && incomingOrder.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (incomingOrder.StopPrice < _marketPrice || _marketPrice == 0))))
                 {
@@ -202,18 +199,17 @@ namespace OrderMatcher
                         {
                             incomingOrder.OpenQuantity = quantity.Value;
                             MatchAndAddOrder(incomingOrder, incomingOrder.OrderCondition);
-                            AddStopToOrderBook();
+                            MatchAndAddTriggeredStopOrders();
                         }
                         else
                         {
-                            _currentOrders.Remove(incomingOrder.OrderId);
                             _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, 0, 0, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
                         }
                     }
                     else
                     {
                         MatchAndAddOrder(incomingOrder, incomingOrder.OrderCondition);
-                        AddStopToOrderBook();
+                        MatchAndAddTriggeredStopOrders();
                     }
                 }
             }
@@ -233,11 +229,10 @@ namespace OrderMatcher
 
         private OrderMatchingResult CancelOrder(OrderId orderId, CancelReason cancelReason)
         {
-            if (_currentOrders.TryGetValue(orderId, out Order? order))
+            if (Book.TryGetOrder(orderId, out Order? order))
             {
                 var quantityCancel = order.OpenQuantity;
                 _book.RemoveOrder(order);
-                _currentOrders.Remove(orderId);
                 if (order.IsTip)
                 {
                     quantityCancel += order.TotalQuantity;
@@ -261,7 +256,6 @@ namespace OrderMatcher
             if (orderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ImmediateOrCancel);
-                _currentOrders.Remove(incomingOrder.OrderId);
             }
             else if (!incomingOrder.IsFilled)
             {
@@ -275,7 +269,6 @@ namespace OrderMatcher
                     else
                     {
                         _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
-                        _currentOrders.Remove(incomingOrder.OrderId);
                         if (incomingOrder.CancelOn > 0)
                         {
                             RemoveGoodTillDateOrder(incomingOrder.CancelOn, incomingOrder.OrderId);
@@ -289,7 +282,6 @@ namespace OrderMatcher
             }
             else
             {
-                _currentOrders.Remove(incomingOrder.OrderId);
                 if (incomingOrder.IsTip)
                 {
                     AddTip(incomingOrder);
@@ -313,7 +305,7 @@ namespace OrderMatcher
             }
         }
 
-        private void AddStopToOrderBook()
+        private void MatchAndAddTriggeredStopOrders()
         {
             while (_stopOrderQueue.TryDequeue(out var priceLevels))
             {
@@ -332,7 +324,6 @@ namespace OrderMatcher
                             }
                             else
                             {
-                                _currentOrders.Remove(order.OrderId);
                                 _tradeListener?.OnCancel(order.OrderId, order.UserId, 0, 0, 0, CancelReason.MarketOrderNoLiquidity);
                             }
                         }
@@ -381,7 +372,6 @@ namespace OrderMatcher
                     bool isRestingTipAdded = false;
                     if (orderFilled)
                     {
-                        _currentOrders.Remove(restingOrder.OrderId);
                         if (restingOrder.CancelOn > 0)
                         {
                             RemoveGoodTillDateOrder(restingOrder.CancelOn, restingOrder.OrderId);
@@ -454,7 +444,6 @@ namespace OrderMatcher
             if (order.TotalQuantity > 0)
             {
                 var tip = GetTip(order);
-                _currentOrders.Add(tip.OrderId, tip);
 
                 if (order.CancelOn > 0)
                 {
