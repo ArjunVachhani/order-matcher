@@ -11,16 +11,14 @@ namespace OrderMatcher
         private readonly HashSet<OrderId> _acceptedOrders;
         private readonly Queue<List<PriceLevel>> _stopOrderQueue;
         private readonly ITradeListener _tradeListener;
-        private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Quantity _stepSize;
         private readonly IFeeProvider _feeProvider;
         private readonly int _quoteCurrencyDecimalPlaces;
         private Price _marketPrice;
-        private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
         private bool _acceptedOrderTrackingEnabled = true;
 
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _book.CurrentOrders;
-        public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
+        public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _book.GoodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;
         public Book Book => _book;
@@ -49,7 +47,6 @@ namespace OrderMatcher
                 throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
 
             _book = new Book();
-            _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _stopOrderQueue = new Queue<List<PriceLevel>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
@@ -182,10 +179,6 @@ namespace OrderMatcher
                 {
                     incomingOrder = GetTip(incomingOrder);
                 }
-                if (incomingOrder.CancelOn > 0)
-                {
-                    AddGoodTillDateOrder(incomingOrder.CancelOn, incomingOrder.OrderId);
-                }
 
                 if (incomingOrder.StopPrice != 0 && !isOrderTriggered && ((incomingOrder.IsBuy && incomingOrder.StopPrice > _marketPrice) || (!incomingOrder.IsBuy && (incomingOrder.StopPrice < _marketPrice || _marketPrice == 0))))
                 {
@@ -238,11 +231,6 @@ namespace OrderMatcher
                     quantityCancel += order.TotalQuantity;
                 }
 
-                if (order.CancelOn > 0)
-                {
-                    RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
-                }
-
                 _tradeListener?.OnCancel(orderId, order.UserId, quantityCancel, order.Cost, order.Fee, cancelReason);
                 return OrderMatchingResult.CancelAcepted;
             }
@@ -269,10 +257,6 @@ namespace OrderMatcher
                     else
                     {
                         _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
-                        if (incomingOrder.CancelOn > 0)
-                        {
-                            RemoveGoodTillDateOrder(incomingOrder.CancelOn, incomingOrder.OrderId);
-                        }
                     }
                 }
                 else
@@ -280,17 +264,9 @@ namespace OrderMatcher
                     _book.AddOrderOpenBook(incomingOrder);
                 }
             }
-            else
+            else if (incomingOrder.IsTip)
             {
-                if (incomingOrder.IsTip)
-                {
-                    AddTip(incomingOrder);
-                }
-
-                if (incomingOrder.CancelOn > 0)
-                {
-                    RemoveGoodTillDateOrder(incomingOrder.CancelOn, incomingOrder.OrderId);
-                }
+                AddTip(incomingOrder);
             }
 
             if (_marketPrice > previousMarketPrice)
@@ -370,17 +346,9 @@ namespace OrderMatcher
                     incomingOrder.Fee += Math.Round((cost * incomingFee.TakerFee) / 100, _quoteCurrencyDecimalPlaces);
                     bool orderFilled = _book.FillOrder(restingOrder, maxQuantity);
                     bool isRestingTipAdded = false;
-                    if (orderFilled)
+                    if (orderFilled && restingOrder.IsTip)
                     {
-                        if (restingOrder.CancelOn > 0)
-                        {
-                            RemoveGoodTillDateOrder(restingOrder.CancelOn, restingOrder.OrderId);
-                        }
-
-                        if (restingOrder.IsTip)
-                        {
-                            isRestingTipAdded = AddTip(restingOrder);
-                        }
+                        isRestingTipAdded = AddTip(restingOrder);
                     }
 
                     bool isIncomingOrderFilled = incomingOrder.IsFilled;
@@ -445,11 +413,6 @@ namespace OrderMatcher
             {
                 var tip = GetTip(order);
 
-                if (order.CancelOn > 0)
-                {
-                    AddGoodTillDateOrder(order.CancelOn, order.OrderId);
-                }
-
                 MatchAndAddOrder(tip);
                 return true;
             }
@@ -458,68 +421,12 @@ namespace OrderMatcher
 
         private void CancelExpiredOrders(int timeNow)
         {
-            if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
+            var expiredOrderIds = _book.GetExpiredOrders(timeNow);
+            for (var i = 0; i < expiredOrderIds.Count; i++)
             {
-                List<HashSet<OrderId>> expiredOrderIds = new List<HashSet<OrderId>>();
-                List<int> timeCollection = new List<int>();
-                foreach (var time in _goodTillDateOrders)
+                foreach (var orderId in expiredOrderIds[i])
                 {
-                    if (time.Key <= timeNow)
-                    {
-                        timeCollection.Add(time.Key);
-                        expiredOrderIds.Add(time.Value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                for (var i = 0; i < timeCollection.Count; i++)
-                {
-                    _goodTillDateOrders.Remove(timeCollection[i]);
-                }
-
-                for (var i = 0; i < expiredOrderIds.Count; i++)
-                {
-                    foreach (var orderId in expiredOrderIds[i])
-                    {
-                        CancelOrder(orderId, CancelReason.ValidityExpired);
-                    }
-                }
-
-                _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
-            }
-        }
-
-        private void AddGoodTillDateOrder(int time, OrderId orderId)
-        {
-            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId>? orderIds))
-            {
-                orderIds = new HashSet<OrderId>();
-                _goodTillDateOrders.Add(time, orderIds);
-            }
-            orderIds.Add(orderId);
-
-            if (_firstGoodTillDate == null || time < _firstGoodTillDate.Value.Key)
-            {
-                _firstGoodTillDate = _goodTillDateOrders.First();
-            }
-        }
-
-        private void RemoveGoodTillDateOrder(int time, OrderId orderId)
-        {
-            if (_goodTillDateOrders.TryGetValue(time, out var orderIds))
-            {
-                orderIds.Remove(orderId);
-                if (orderIds.Count == 0)
-                {
-                    _goodTillDateOrders.Remove(time);
-
-                    if (time == _firstGoodTillDate!.Value.Key)
-                    {
-                        _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
-                    }
+                    CancelOrder(orderId, CancelReason.ValidityExpired);
                 }
             }
         }

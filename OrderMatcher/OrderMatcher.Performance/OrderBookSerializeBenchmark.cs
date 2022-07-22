@@ -26,8 +26,8 @@ namespace OrderMatcher.Performance
             book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, OpenQuantity = 1000, OrderId = 3441, Price = 242 });
             book.AddOrderOpenBook(new Order { CancelOn = 1000, IsBuy = false, OpenQuantity = 1000, OrderId = 3442, Price = 243 });
 
-            var bid = book.BidSide.ToDictionary(x => x.Key, x => x.Value.Quantity);
-            var ask = book.AskSide.ToDictionary(x => x.Key, x => x.Value.Quantity);
+            var bid = book.BidSide.ToDictionary(x => x.Price, x => x.Quantity);
+            var ask = book.AskSide.ToDictionary(x => x.Price, x => x.Quantity);
 
             bookDepth = new BookDepth(1234, 100, bid, ask);
         }
