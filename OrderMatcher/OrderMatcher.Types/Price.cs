@@ -30,35 +30,35 @@ namespace OrderMatcher.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator >(Price a, Price b)
         {
-            return (a._price > b._price);
+            return a._price > b._price;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <(Price a, Price b)
         {
-            return (a._price < b._price);
+            return a._price < b._price;
         }
 
         public static bool operator <=(Price a, Price b)
         {
-            return (a._price <= b._price);
+            return a._price <= b._price;
         }
 
         public static bool operator >=(Price a, Price b)
         {
-            return (a._price >= b._price);
+            return a._price >= b._price;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Price a, Price b)
         {
-            return (a._price == b._price);
+            return a._price == b._price;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Price a, Price b)
         {
-            return (a._price != b._price);
+            return a._price != b._price;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,6 +73,11 @@ namespace OrderMatcher.Types
             return _price == price._price;
         }
 
+        public bool Equals(Price other)
+        {
+            return _price == other._price;
+        }
+
         public override int GetHashCode()
         {
             return 326187671 + _price.GetHashCode();
@@ -81,11 +86,6 @@ namespace OrderMatcher.Types
         public override string ToString()
         {
             return _price.ToString();
-        }
-
-        public bool Equals(Price other)
-        {
-            return _price == other._price;
         }
 
         public int CompareTo(Price other)

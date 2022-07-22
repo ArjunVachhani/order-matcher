@@ -29,33 +29,33 @@ namespace OrderMatcher.Types
 
         public static bool operator >(OrderId a, OrderId b)
         {
-            return (a._orderId > b._orderId);
+            return a._orderId > b._orderId;
         }
 
         public static bool operator <(OrderId a, OrderId b)
         {
-            return (a._orderId < b._orderId);
+            return a._orderId < b._orderId;
         }
 
 
         public static bool operator <=(OrderId a, OrderId b)
         {
-            return (a._orderId <= b._orderId);
+            return a._orderId <= b._orderId;
         }
 
         public static bool operator >=(OrderId a, OrderId b)
         {
-            return (a._orderId >= b._orderId);
+            return a._orderId >= b._orderId;
         }
 
         public static bool operator ==(OrderId a, OrderId b)
         {
-            return (a._orderId == b._orderId);
+            return a._orderId == b._orderId;
         }
 
         public static bool operator !=(OrderId a, OrderId b)
         {
-            return (a._orderId != b._orderId);
+            return a._orderId != b._orderId;
         }
 
         public override bool Equals(object? obj)
@@ -69,19 +69,19 @@ namespace OrderMatcher.Types
             return _orderId == OrderId._orderId;
         }
 
+        public bool Equals(OrderId other)
+        {
+            return _orderId == other._orderId;
+        }
+
         public override int GetHashCode()
         {
-            return -5579697 + _orderId.GetHashCode();
+            return 2729 + _orderId.GetHashCode();
         }
 
         public override string ToString()
         {
             return _orderId.ToString();
-        }
-
-        public bool Equals(OrderId other)
-        {
-            return _orderId == other._orderId;
         }
 
         public int CompareTo(OrderId other)

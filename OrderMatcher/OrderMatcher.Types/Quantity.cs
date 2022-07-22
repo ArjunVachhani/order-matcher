@@ -16,12 +16,12 @@ namespace OrderMatcher.Types
 
         public static Quantity operator -(Quantity a, Quantity b)
         {
-            return (a._quantity - b._quantity);
+            return a._quantity - b._quantity;
         }
 
         public static Quantity operator +(Quantity a, Quantity b)
         {
-            return (a._quantity + b._quantity);
+            return a._quantity + b._quantity;
         }
 
         public static implicit operator Quantity(decimal quantity)
@@ -36,33 +36,33 @@ namespace OrderMatcher.Types
 
         public static bool operator >(Quantity a, Quantity b)
         {
-            return (a._quantity > b._quantity);
+            return a._quantity > b._quantity;
         }
 
         public static bool operator <(Quantity a, Quantity b)
         {
-            return (a._quantity < b._quantity);
+            return a._quantity < b._quantity;
         }
 
 
         public static bool operator <=(Quantity a, Quantity b)
         {
-            return (a._quantity <= b._quantity);
+            return a._quantity <= b._quantity;
         }
 
         public static bool operator >=(Quantity a, Quantity b)
         {
-            return (a._quantity >= b._quantity);
+            return a._quantity >= b._quantity;
         }
 
         public static bool operator ==(Quantity a, Quantity b)
         {
-            return (a._quantity == b._quantity);
+            return a._quantity == b._quantity;
         }
 
         public static bool operator !=(Quantity a, Quantity b)
         {
-            return (a._quantity != b._quantity);
+            return a._quantity != b._quantity;
         }
 
         public override bool Equals(object? obj)
@@ -76,6 +76,11 @@ namespace OrderMatcher.Types
             return _quantity == quantity._quantity;
         }
 
+        public bool Equals(Quantity other)
+        {
+            return _quantity == other._quantity;
+        }
+
         public override int GetHashCode()
         {
             return -5579697 + _quantity.GetHashCode();
@@ -84,11 +89,6 @@ namespace OrderMatcher.Types
         public override string ToString()
         {
             return _quantity.ToString();
-        }
-
-        public bool Equals(Quantity other)
-        {
-            return _quantity == other._quantity;
         }
 
         public int CompareTo(Quantity other)

@@ -40,8 +40,8 @@ namespace OrderMatcher.Types.Serializers
             sizeOfOrderId = OrderId.SizeOfOrderId;
             sizeOfUserId = UserId.SizeOfUserId;
             sizeOfRemainingQuantity = Quantity.SizeOfQuantity;
-            sizeOfCost = Quantity.SizeOfQuantity;
-            sizeOfFee = Quantity.SizeOfQuantity;
+            sizeOfCost = Cost.SizeOfCost;
+            sizeOfFee = Cost.SizeOfCost;
             sizeOfCancelReason = sizeof(CancelReason);
             sizeOfTimestamp = sizeof(int);
             sizeOfMessageSequence = sizeof(long);
@@ -69,7 +69,7 @@ namespace OrderMatcher.Types.Serializers
             Serialize(cancelledOrder.MessageSequence, cancelledOrder.OrderId, cancelledOrder.UserId, cancelledOrder.RemainingQuantity, cancelledOrder.Cost, cancelledOrder.Fee, cancelledOrder.CancelReason, cancelledOrder.Timestamp, bytes);
         }
 
-        public static void Serialize(long messageSequence, OrderId orderId, UserId userId, Quantity remainingQuantity, Quantity cost, Quantity fee, CancelReason cancelReason, int timeStamp, Span<byte> bytes)
+        public static void Serialize(long messageSequence, OrderId orderId, UserId userId, Quantity remainingQuantity, Cost cost, Cost fee, CancelReason cancelReason, int timeStamp, Span<byte> bytes)
         {
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
@@ -82,8 +82,8 @@ namespace OrderMatcher.Types.Serializers
             Quantity.WriteBytes(bytes.Slice(remainingQuantityOffset), remainingQuantity);
             bytes[cancelReasonOffset] = (byte)cancelReason;
             Write(bytes.Slice(timestampOffset), timeStamp);
-            Quantity.WriteBytes(bytes.Slice(costOffset), cost);
-            Quantity.WriteBytes(bytes.Slice(feeOffset), fee);
+            Cost.WriteBytes(bytes.Slice(costOffset), cost);
+            Cost.WriteBytes(bytes.Slice(feeOffset), fee);
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
         }
 
@@ -108,8 +108,8 @@ namespace OrderMatcher.Types.Serializers
             cancelledOrder.RemainingQuantity = Quantity.ReadQuantity(bytes.Slice(remainingQuantityOffset));
             cancelledOrder.CancelReason = (CancelReason)bytes[cancelReasonOffset];
             cancelledOrder.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
-            cancelledOrder.Cost = Quantity.ReadQuantity(bytes.Slice(costOffset));
-            cancelledOrder.Fee = Quantity.ReadQuantity(bytes.Slice(feeOffset));
+            cancelledOrder.Cost = Cost.ReadCost(bytes.Slice(costOffset));
+            cancelledOrder.Fee = Cost.ReadCost(bytes.Slice(feeOffset));
             cancelledOrder.MessageSequence = BitConverter.ToInt64(bytes.Slice(messageSequenceOffset));
 
             return cancelledOrder;

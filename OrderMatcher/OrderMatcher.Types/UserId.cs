@@ -27,6 +27,11 @@ namespace OrderMatcher.Types
             return _userId == userId._userId;
         }
 
+        public bool Equals(UserId other)
+        {
+            return _userId == other._userId;
+        }
+
         public override int GetHashCode()
         {
             return (423399 + _userId).GetHashCode();
@@ -59,14 +64,24 @@ namespace OrderMatcher.Types
             return a._userId != b._userId;
         }
 
-        public int CompareTo(UserId other)
+        public static bool operator <(UserId left, UserId right)
         {
-            return _userId.CompareTo(other._userId);
+            return left._userId < right._userId;
         }
 
-        public bool Equals(UserId other)
+        public static bool operator <=(UserId left, UserId right)
         {
-            return _userId == other._userId;
+            return left._userId <= right._userId;
+        }
+
+        public static bool operator >(UserId left, UserId right)
+        {
+            return left._userId > right._userId;
+        }
+
+        public static bool operator >=(UserId left, UserId right)
+        {
+            return left._userId >= right._userId;
         }
 
         public void WriteBytes(Span<byte> bytes)
@@ -82,6 +97,11 @@ namespace OrderMatcher.Types
         public static UserId ReadUserId(ReadOnlySpan<byte> bytes)
         {
             return Serializer.ReadLong(bytes);
+        }
+
+        public int CompareTo(UserId other)
+        {
+            return _userId.CompareTo(other._userId);
         }
     }
 }
