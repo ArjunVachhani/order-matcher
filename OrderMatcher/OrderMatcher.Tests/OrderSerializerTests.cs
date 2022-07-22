@@ -19,15 +19,15 @@ namespace OrderMatcher.Tests
                 TotalQuantity = Quantity.MinValue,
                 TipQuantity = Quantity.MinValue,
                 OrderCondition = OrderCondition.None,
-                OrderAmount = Quantity.MinValue,
+                OrderAmount = Cost.MinValue,
                 CancelOn = int.MinValue,
                 IsBuy = false,
                 OrderId = OrderId.MinValue,
                 UserId = UserId.MinValue,
                 Price = Price.MinValue,
                 FeeId = short.MinValue,
-                Cost = Quantity.MinValue,
-                Fee = Quantity.MinValue,
+                Cost = Cost.MinValue,
+                Fee = Cost.MinValue,
                 OpenQuantity = Quantity.MinValue
             };
             OrderSerializer.Serialize(orderWrapper, bytes);
@@ -43,15 +43,15 @@ namespace OrderMatcher.Tests
                 TotalQuantity = Quantity.MaxValue,
                 TipQuantity = Quantity.MaxValue,
                 OrderCondition = OrderCondition.FillOrKill,
-                OrderAmount = Quantity.MaxValue,
+                OrderAmount = Cost.MaxValue,
                 CancelOn = int.MaxValue,
                 IsBuy = true,
                 OrderId = OrderId.MaxValue,
                 UserId = UserId.MaxValue,
                 Price = Price.MaxValue,
                 FeeId = short.MaxValue,
-                Cost = Quantity.MaxValue,
-                Fee = Quantity.MaxValue,
+                Cost = Cost.MaxValue,
+                Fee = Cost.MaxValue,
                 OpenQuantity = Quantity.MaxValue
             };
             OrderSerializer.Serialize(orderWrapper, bytes);
@@ -107,15 +107,15 @@ namespace OrderMatcher.Tests
                 TotalQuantity = Quantity.MinValue,
                 TipQuantity = Quantity.MinValue,
                 OrderCondition = OrderCondition.None,
-                OrderAmount = Quantity.MinValue,
+                OrderAmount = Cost.MinValue,
                 CancelOn = int.MinValue,
                 IsBuy = false,
                 OrderId = OrderId.MinValue,
                 UserId = UserId.MinValue,
                 Price = Price.MinValue,
                 FeeId = short.MinValue,
-                Cost = Quantity.MinValue,
-                Fee = Quantity.MinValue,
+                Cost = Cost.MinValue,
+                Fee = Cost.MinValue,
                 OpenQuantity = Quantity.MinValue
             };
             OrderSerializer.Serialize(inputOrder, bytes);
@@ -132,10 +132,10 @@ namespace OrderMatcher.Tests
             Assert.False(order.IsStop);
             Assert.Equal(Price.MinValue, order.StopPrice);
             Assert.Equal(Quantity.MinValue, order.TotalQuantity);
-            Assert.Equal(Quantity.MinValue, order.OrderAmount);
+            Assert.Equal(Cost.MinValue, order.OrderAmount);
             Assert.Equal(short.MinValue, order.FeeId);
-            Assert.Equal(Quantity.MinValue, order.Cost);
-            Assert.Equal(Quantity.MinValue, order.Fee);
+            Assert.Equal(Cost.MinValue, order.Cost);
+            Assert.Equal(Cost.MinValue, order.Fee);
         }
 
         [Fact]
@@ -148,15 +148,15 @@ namespace OrderMatcher.Tests
                 TotalQuantity = Quantity.MaxValue,
                 TipQuantity = Quantity.MaxValue,
                 OrderCondition = OrderCondition.FillOrKill,
-                OrderAmount = Quantity.MaxValue,
+                OrderAmount = Cost.MaxValue,
                 CancelOn = int.MaxValue,
                 IsBuy = true,
                 OrderId = OrderId.MaxValue,
                 UserId = UserId.MaxValue,
                 Price = Price.MaxValue,
                 FeeId = short.MaxValue,
-                Cost = Quantity.MaxValue,
-                Fee = Quantity.MaxValue,
+                Cost = Cost.MaxValue,
+                Fee = Cost.MaxValue,
                 OpenQuantity = Quantity.MaxValue
             };
             OrderSerializer.Serialize(orderWrapper, bytes);
@@ -173,10 +173,10 @@ namespace OrderMatcher.Tests
             Assert.True(order.IsStop);
             Assert.Equal(Price.MaxValue, order.StopPrice);
             Assert.Equal(Quantity.MaxValue, order.TotalQuantity);
-            Assert.Equal(Quantity.MaxValue, order.OrderAmount);
+            Assert.Equal(Cost.MaxValue, order.OrderAmount);
             Assert.Equal(short.MaxValue, order.FeeId);
-            Assert.Equal(Quantity.MaxValue, order.Cost);
-            Assert.Equal(Quantity.MaxValue, order.Fee);
+            Assert.Equal(Cost.MaxValue, order.Cost);
+            Assert.Equal(Cost.MaxValue, order.Fee);
         }
 
         [Fact]
@@ -198,10 +198,10 @@ namespace OrderMatcher.Tests
             Assert.True(order.IsStop);
             Assert.Equal(9534, order.StopPrice);
             Assert.Equal(7878234, order.TotalQuantity);
-            Assert.Equal((Quantity)12345.6789m, order.OrderAmount);
+            Assert.Equal((Cost)12345.6789m, order.OrderAmount);
             Assert.Equal(69, order.FeeId);
-            Assert.Equal((Quantity)253.15m, order.Cost);
-            Assert.Equal((Quantity)8649.123m, order.Fee);
+            Assert.Equal((Cost)253.15m, order.Cost);
+            Assert.Equal((Cost)8649.123m, order.Fee);
             Assert.Equal((Quantity)2356, order.OpenQuantity);
         }
     }

@@ -1,7 +1,6 @@
 ﻿using OrderMatcher.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OrderMatcher
 {
@@ -360,9 +359,9 @@ namespace OrderMatcher
                     bool isRestingOrderFilled = restingOrder.IsFilled && !isRestingTipAdded;
 
                     Quantity? askRemainingQuanity = null;
-                    Quantity? askFee = null;
-                    Quantity? bidCost = null;
-                    Quantity? bidFee = null;
+                    Cost? askFee = null;
+                    Cost? bidCost = null;
+                    Cost? bidFee = null;
                     if (incomingOrder.IsBuy)
                     {
                         if (isIncomingOrderFilled)
@@ -438,7 +437,7 @@ namespace OrderMatcher
             return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId };
         }
 
-        private (Quantity? Quantity, bool CanFill) GetQuantity(Quantity orderAmount)
+        private (Quantity? Quantity, bool CanFill) GetQuantity(Cost orderAmount)
         {
             bool dustRemaining = false;
             Quantity quantity = 0;

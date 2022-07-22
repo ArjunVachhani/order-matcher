@@ -110,7 +110,7 @@ namespace OrderMatcher
                     _currentOrders.Remove(order.OrderId);
                     if (order.CancelOn > 0)
                     {
-                        AddGoodTillDateOrder(order.CancelOn, order.OrderId);
+                        RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
                     }
                 }
             }
