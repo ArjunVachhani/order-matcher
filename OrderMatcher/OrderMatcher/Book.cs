@@ -1,9 +1,13 @@
 ﻿using OrderMatcher.Types;
 using System.Collections.Generic;
+using System.Linq;
+
 namespace OrderMatcher
 {
     public class Book
     {
+        private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
+        private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
         private readonly Dictionary<OrderId, Order> _currentOrders;
         private readonly Side<QuantityTrackingPriceLevel> _bids;
         private readonly Side<QuantityTrackingPriceLevel> _asks;
@@ -12,6 +16,7 @@ namespace OrderMatcher
 
         private ulong _sequence;
 
+        public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
         public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
         public IEnumerable<QuantityTrackingPriceLevel> BidSide => _bids.PriceLevels;
         public IEnumerable<QuantityTrackingPriceLevel> AskSide => _asks.PriceLevels;
@@ -32,6 +37,7 @@ namespace OrderMatcher
             var _priceComparerDescending = new PriceComparerDescending();
 
             _currentOrders = new Dictionary<OrderId, Order>();
+            _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _bids = new Side<QuantityTrackingPriceLevel>(_priceComparerDescending, new PriceLevelComparerDescending<QuantityTrackingPriceLevel>());
             _asks = new Side<QuantityTrackingPriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<QuantityTrackingPriceLevel>());
             _stopBids = new Side<PriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<PriceLevel>());
@@ -55,6 +61,10 @@ namespace OrderMatcher
             }
 
             _currentOrders.Remove(order.OrderId);
+            if (order.CancelOn > 0)
+            {
+                RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
+            }
         }
 
         internal void AddStopOrder(Order order)
@@ -63,6 +73,10 @@ namespace OrderMatcher
             var side = order.IsBuy ? _stopBids : _stopAsks;
             side.AddOrder(order, order.StopPrice);
             _currentOrders.Add(order.OrderId, order);
+            if (order.CancelOn > 0)
+            {
+                AddGoodTillDateOrder(order.CancelOn, order.OrderId);
+            }
         }
 
         internal void AddOrderOpenBook(Order order)
@@ -71,25 +85,33 @@ namespace OrderMatcher
             var side = order.IsBuy ? _bids : _asks;
             side.AddOrder(order, order.Price);
             _currentOrders.Add(order.OrderId, order);
+            if (order.CancelOn > 0)
+            {
+                AddGoodTillDateOrder(order.CancelOn, order.OrderId);
+            }
         }
 
         internal List<PriceLevel> RemoveStopAsks(Price price)
         {
-            return RemoveFromCurrentOrders(_stopAsks.RemovePriceLevelTill(price));
+            return RemoveFromTracking(_stopAsks.RemovePriceLevelTill(price));
         }
 
         internal List<PriceLevel> RemoveStopBids(Price price)
         {
-            return RemoveFromCurrentOrders(_stopBids.RemovePriceLevelTill(price));
+            return RemoveFromTracking(_stopBids.RemovePriceLevelTill(price));
         }
 
-        private List<PriceLevel> RemoveFromCurrentOrders(List<PriceLevel> priceLevels)
+        private List<PriceLevel> RemoveFromTracking(List<PriceLevel> priceLevels)
         {
             foreach (var priceLevel in priceLevels)
             {
                 foreach (var order in priceLevel)
                 {
                     _currentOrders.Remove(order.OrderId);
+                    if (order.CancelOn > 0)
+                    {
+                        AddGoodTillDateOrder(order.CancelOn, order.OrderId);
+                    }
                 }
             }
             return priceLevels;
@@ -100,12 +122,36 @@ namespace OrderMatcher
             return _currentOrders.TryGetValue(orderId, out order);
         }
 
+        internal List<HashSet<OrderId>> GetExpiredOrders(int timeNow)
+        {
+            List<HashSet<OrderId>> expiredOrderIds = new List<HashSet<OrderId>>();
+            if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
+            {
+                foreach (var time in GoodTillDateOrders)
+                {
+                    if (time.Key <= timeNow)
+                    {
+                        expiredOrderIds.Add(time.Value);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            return expiredOrderIds;
+        }
+
         internal bool FillOrder(Order order, Quantity quantity)
         {
             var side = order.IsBuy ? _bids : _asks;
             if (side.FillOrder(order, quantity))
             {
                 _currentOrders.Remove(order.OrderId);
+                if (order.CancelOn > 0)
+                {
+                    RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
+                }
                 return true;
             }
             return false;
@@ -126,6 +172,36 @@ namespace OrderMatcher
         {
             var side = isBuy ? _asks : _bids;
             return side.CheckMarketOrderAmountCanBeFilled(orderAmount);
+        }
+
+        private void AddGoodTillDateOrder(int time, OrderId orderId)
+        {
+            if (!_goodTillDateOrders.TryGetValue(time, out HashSet<OrderId>? orderIds))
+            {
+                orderIds = new HashSet<OrderId>();
+                _goodTillDateOrders.Add(time, orderIds);
+            }
+            orderIds.Add(orderId);
+
+            if (_firstGoodTillDate == null || time < _firstGoodTillDate.Value.Key)
+            {
+                _firstGoodTillDate = _goodTillDateOrders.First();
+            }
+        }
+
+        private void RemoveGoodTillDateOrder(int time, OrderId orderId)
+        {
+            _goodTillDateOrders.TryGetValue(time, out var orderIds);
+            orderIds.Remove(orderId);
+            if (orderIds.Count == 0)
+            {
+                _goodTillDateOrders.Remove(time);
+
+                if (time == _firstGoodTillDate!.Value.Key)
+                {
+                    _firstGoodTillDate = _goodTillDateOrders.Count > 0 ? _goodTillDateOrders.First() : (KeyValuePair<int, HashSet<OrderId>>?)null;
+                }
+            }
         }
     }
 }
