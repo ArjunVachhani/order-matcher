@@ -271,12 +271,14 @@ namespace OrderMatcher
             if (_marketPrice > previousMarketPrice)
             {
                 var priceLevels = _book.RemoveStopBids(_marketPrice);
-                _stopOrderQueue.Enqueue(priceLevels);
+                if (priceLevels != null)
+                    _stopOrderQueue.Enqueue(priceLevels);
             }
             else if (_marketPrice < previousMarketPrice)
             {
                 var priceLevels = _book.RemoveStopAsks(_marketPrice);
-                _stopOrderQueue.Enqueue(priceLevels);
+                if (priceLevels != null)
+                    _stopOrderQueue.Enqueue(priceLevels);
             }
         }
 
@@ -421,11 +423,14 @@ namespace OrderMatcher
         private void CancelExpiredOrders(int timeNow)
         {
             var expiredOrderIds = _book.GetExpiredOrders(timeNow);
-            for (var i = 0; i < expiredOrderIds.Count; i++)
+            if (expiredOrderIds != null)
             {
-                foreach (var orderId in expiredOrderIds[i])
+                for (var i = 0; i < expiredOrderIds.Count; i++)
                 {
-                    CancelOrder(orderId, CancelReason.ValidityExpired);
+                    foreach (var orderId in expiredOrderIds[i])
+                    {
+                        CancelOrder(orderId, CancelReason.ValidityExpired);
+                    }
                 }
             }
         }

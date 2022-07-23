@@ -1133,7 +1133,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void RemoveStopAsks_Returns_Empty_List_If_No_Price_Level_In_Limit()
+        public void RemoveStopAsks_Returns_Null_If_No_Price_Level_In_Limit()
         {
             Book book = new Book();
 
@@ -1153,7 +1153,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(7, book.BestStopAskPrice);
 
             List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
-            Assert.Empty(priceLevels);
+            Assert.Null(priceLevels);
 
             Assert.Equal(7, book.BestStopAskPrice);
 
@@ -1166,7 +1166,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void RemoveStopAsks_Returns_Empty_List_If_No_Price_Level_Exists()
+        public void RemoveStopAsks_Returns_Null_If_No_Price_Level_Exists()
         {
             Book book = new Book();
 
@@ -1186,7 +1186,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(7, book.BestStopAskPrice);
 
             List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
-            Assert.Empty(priceLevels);
+            Assert.Null(priceLevels);
 
             Assert.Equal(7, book.BestStopAskPrice);
 
@@ -1250,7 +1250,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void RemoveStopBids_Returns_Empty_List_If_No_Price_Level_In_Limit()
+        public void RemoveStopBids_Returns_Null_If_No_Price_Level_In_Limit()
         {
             Book book = new Book();
 
@@ -1270,7 +1270,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(12, book.BestStopBidPrice);
 
             List<PriceLevel> priceLevels = book.RemoveStopBids(new Price(11));
-            Assert.Empty(priceLevels);
+            Assert.Null(priceLevels);
 
             Assert.Equal(12, book.BestStopBidPrice);
 
@@ -1283,12 +1283,12 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void RemoveStopBids_Returns_Empty_List_If_No_Price_Level_Exists()
+        public void RemoveStopBids_Returns_Null_If_No_Price_Level_Exists()
         {
             Book book = new Book();
 
             List<PriceLevel> priceLevels = book.RemoveStopBids(new Price(11));
-            Assert.Empty(priceLevels);
+            Assert.Null(priceLevels);
 
             Assert.Null(book.BestStopBidPrice);
 
