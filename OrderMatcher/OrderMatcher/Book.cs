@@ -91,26 +91,29 @@ namespace OrderMatcher
             }
         }
 
-        internal List<PriceLevel> RemoveStopAsks(Price price)
+        internal List<PriceLevel>? RemoveStopAsks(Price price)
         {
             return RemoveFromTracking(_stopAsks.RemovePriceLevelTill(price));
         }
 
-        internal List<PriceLevel> RemoveStopBids(Price price)
+        internal List<PriceLevel>? RemoveStopBids(Price price)
         {
             return RemoveFromTracking(_stopBids.RemovePriceLevelTill(price));
         }
 
-        private List<PriceLevel> RemoveFromTracking(List<PriceLevel> priceLevels)
+        private List<PriceLevel>? RemoveFromTracking(List<PriceLevel>? priceLevels)
         {
-            foreach (var priceLevel in priceLevels)
+            if (priceLevels != null)
             {
-                foreach (var order in priceLevel)
+                foreach (var priceLevel in priceLevels)
                 {
-                    _currentOrders.Remove(order.OrderId);
-                    if (order.CancelOn > 0)
+                    foreach (var order in priceLevel)
                     {
-                        RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
+                        _currentOrders.Remove(order.OrderId);
+                        if (order.CancelOn > 0)
+                        {
+                            RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
+                        }
                     }
                 }
             }
@@ -122,11 +125,12 @@ namespace OrderMatcher
             return _currentOrders.TryGetValue(orderId, out order);
         }
 
-        internal List<HashSet<OrderId>> GetExpiredOrders(int timeNow)
+        internal List<HashSet<OrderId>>? GetExpiredOrders(int timeNow)
         {
-            List<HashSet<OrderId>> expiredOrderIds = new List<HashSet<OrderId>>();
+            List<HashSet<OrderId>> expiredOrderIds = null;
             if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
             {
+                expiredOrderIds = new List<HashSet<OrderId>>();
                 foreach (var time in GoodTillDateOrders)
                 {
                     if (time.Key <= timeNow)

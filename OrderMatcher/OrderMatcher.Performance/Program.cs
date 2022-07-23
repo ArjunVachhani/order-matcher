@@ -26,6 +26,7 @@ namespace OrderMatcher.Performance
             BenchmarkRunner.Run<PriceLevelBenchmark>();
             BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
             BenchmarkRunner.Run<SpanBenchmark>();
+            BenchmarkRunner.Run<MatchingEngineBenchmark>();
 
 
             //TODO check for aggresive inline performance improvement
