@@ -9,7 +9,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_ReturnsNegativeValue_IfSecondItemIsLarger()
         {
-            OrderSequenceComparer comparer = new OrderSequenceComparer();
+            OrderSequenceComparer comparer = OrderSequenceComparer.Shared;
             Order order1 = new Order() { Sequence = 1 };
             Order order2 = new Order() { Sequence = 2 };
 
@@ -19,7 +19,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_ReturnsPositiveValue_IfSecondItemIsSmaller()
         {
-            OrderSequenceComparer comparer = new OrderSequenceComparer();
+            OrderSequenceComparer comparer = OrderSequenceComparer.Shared;
             Order order1 = new Order() { Sequence = 2 };
             Order order2 = new Order() { Sequence = 1 };
 
@@ -29,7 +29,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void Compare_Returns0Value_IfBothItemIsEqual()
         {
-            OrderSequenceComparer comparer = new OrderSequenceComparer();
+            OrderSequenceComparer comparer = OrderSequenceComparer.Shared;
             Order order1 = new Order() { Sequence = 2 };
             Order order2 = new Order() { Sequence = 2 };
 
@@ -39,7 +39,7 @@ namespace OrderMatcher.Tests
         [Fact]
         public void PriceLevelSortsOrderBasedOnSequence()
         {
-            OrderSequenceComparer comparer = new OrderSequenceComparer();
+            OrderSequenceComparer comparer = OrderSequenceComparer.Shared;
             Price price = new Price(1);
             PriceLevel priceLevel = new PriceLevel(price);
 

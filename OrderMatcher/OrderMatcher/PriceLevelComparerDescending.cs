@@ -4,14 +4,14 @@ namespace OrderMatcher
 {
     internal class PriceLevelComparerDescending<T> : IComparer<T> where T : IPriceLevel
     {
+        private PriceLevelComparerDescending() { }
+
         public int Compare(T x, T y)
         {
-            if (x.Price > y.Price)
-                return -1;
-            else if (x.Price < y.Price)
-                return 1;
-            else
-                return 0;
+            return y.Price.CompareTo(x.Price);
         }
+
+        private static readonly PriceLevelComparerDescending<T> _shared = new PriceLevelComparerDescending<T>();
+        public static PriceLevelComparerDescending<T> Shared => _shared;
     }
 }
