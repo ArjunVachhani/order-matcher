@@ -25,17 +25,15 @@ namespace OrderMatcher
             }
         }
 
-        private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
-
         public PriceLevel()
         {
-            _orders = new SortedSet<Order>(_orderSequenceComparer);
+            _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
         }
 
         public PriceLevel(Price price)
         {
             _price = price;
-            _orders = new SortedSet<Order>(_orderSequenceComparer);
+            _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
         }
 
         public void SetPrice(Price price)

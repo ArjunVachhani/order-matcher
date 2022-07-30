@@ -15,19 +15,17 @@ namespace OrderMatcher
         public Quantity Quantity => _quantity;
         public Price Price => _price;
 
-        private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
-
         public QuantityTrackingPriceLevel()
         {
             _quantity = 0;
-            _orders = new SortedSet<Order>(_orderSequenceComparer);
+            _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
         }
 
         public QuantityTrackingPriceLevel(Price price)
         {
             _price = price;
             _quantity = 0;
-            _orders = new SortedSet<Order>(_orderSequenceComparer);
+            _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
         }
 
         public void SetPrice(Price price)

@@ -33,15 +33,12 @@ namespace OrderMatcher
 
         public Book()
         {
-            var _priceComparerAscending = new PriceComparerAscending();
-            var _priceComparerDescending = new PriceComparerDescending();
-
             _currentOrders = new Dictionary<OrderId, Order>();
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
-            _bids = new Side<QuantityTrackingPriceLevel>(_priceComparerDescending, new PriceLevelComparerDescending<QuantityTrackingPriceLevel>());
-            _asks = new Side<QuantityTrackingPriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<QuantityTrackingPriceLevel>());
-            _stopBids = new Side<PriceLevel>(_priceComparerAscending, new PriceLevelComparerAscending<PriceLevel>());
-            _stopAsks = new Side<PriceLevel>(_priceComparerDescending, new PriceLevelComparerDescending<PriceLevel>());
+            _bids = new Side<QuantityTrackingPriceLevel>(PriceComparerDescending.Shared, PriceLevelComparerDescending<QuantityTrackingPriceLevel>.Shared);
+            _asks = new Side<QuantityTrackingPriceLevel>(PriceComparerAscending.Shared, PriceLevelComparerAscending<QuantityTrackingPriceLevel>.Shared);
+            _stopBids = new Side<PriceLevel>(PriceComparerAscending.Shared, PriceLevelComparerAscending<PriceLevel>.Shared);
+            _stopAsks = new Side<PriceLevel>(PriceComparerDescending.Shared, PriceLevelComparerDescending<PriceLevel>.Shared);
             _sequence = 0;
         }
 
@@ -131,7 +128,7 @@ namespace OrderMatcher
             if (_firstGoodTillDate != null && _firstGoodTillDate.Value.Key <= timeNow)
             {
                 expiredOrderIds = new List<HashSet<OrderId>>();
-                foreach (var time in GoodTillDateOrders)
+                foreach (var time in _goodTillDateOrders)
                 {
                     if (time.Key <= timeNow)
                     {

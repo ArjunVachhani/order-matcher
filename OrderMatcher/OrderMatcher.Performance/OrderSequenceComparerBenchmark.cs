@@ -11,7 +11,7 @@ namespace OrderMatcher.Performance
         private readonly Order _order2;
         public OrderSequenceComparerBenchmark()
         {
-            _orderSequenceComparer = new OrderSequenceComparer();
+            _orderSequenceComparer = OrderSequenceComparer.Shared;
 
             _order1 = new Order() { Sequence = 1 };
             _order2 = new Order() { Sequence = 2 };
