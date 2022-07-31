@@ -46,10 +46,10 @@ namespace OrderMatcher.Types.Serializers
             sizeOfSide = sizeof(bool);
             sizeOfCancelOn = sizeof(int);
             sizeOfMessagetType = sizeof(MessageType);
-            sizeOfOrderAmount = Cost.SizeOfCost;
+            sizeOfOrderAmount = Amount.SizeOfAmount;
             sizeOfFeeId = sizeof(short);
-            sizeOfCost = Cost.SizeOfCost;
-            sizeOfFee = Cost.SizeOfCost;
+            sizeOfCost = Amount.SizeOfAmount;
+            sizeOfFee = Amount.SizeOfAmount;
             version = 1;
 
             messageLengthOffset = 0;
@@ -96,10 +96,10 @@ namespace OrderMatcher.Types.Serializers
             Price.WriteBytes(bytes.Slice(stopPriceOffset), order.StopPrice);
             Quantity.WriteBytes(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
             Write(bytes.Slice(cancelOnOffset), order.CancelOn);
-            Cost.WriteBytes(bytes.Slice(orderAmountOffset), order.OrderAmount);
+            Amount.WriteBytes(bytes.Slice(orderAmountOffset), order.OrderAmount);
             Write(bytes.Slice(feeIdOffset), order.FeeId);
-            Cost.WriteBytes(bytes.Slice(costOffset), order.Cost);
-            Cost.WriteBytes(bytes.Slice(feeOffset), order.Fee);
+            Amount.WriteBytes(bytes.Slice(costOffset), order.Cost);
+            Amount.WriteBytes(bytes.Slice(feeOffset), order.Fee);
         }
 
         public static Order Deserialize(ReadOnlySpan<byte> bytes)
@@ -131,10 +131,10 @@ namespace OrderMatcher.Types.Serializers
                 order.TipQuantity = order.OpenQuantity;
 
             order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
-            order.OrderAmount = Cost.ReadCost(bytes.Slice(orderAmountOffset));
+            order.OrderAmount = Amount.ReadAmount(bytes.Slice(orderAmountOffset));
             order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
-            order.Cost = Cost.ReadCost(bytes.Slice(costOffset));
-            order.Fee = Cost.ReadCost(bytes.Slice(feeOffset));
+            order.Cost = Amount.ReadAmount(bytes.Slice(costOffset));
+            order.Fee = Amount.ReadAmount(bytes.Slice(feeOffset));
             return order;
         }
     }

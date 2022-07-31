@@ -98,7 +98,7 @@ namespace OrderMatcher
 
         public bool CheckMarketOrderAmountCanBeFilled(Quantity orderAmount)
         {
-            Cost cummulativeOrderAmount = 0;
+            Amount cummulativeOrderAmount = 0;
             foreach (var priceLevel in _priceLevels)
             {
                 if (cummulativeOrderAmount <= orderAmount)
