@@ -9,9 +9,9 @@
         public Price MatchRate { get; set; }
         public Quantity MatchQuantity { get; set; }
         public Quantity? AskRemainingQuantity { get; set; }
-        public Cost? AskFee { get; set; }
-        public Cost? BidCost { get; set; }
-        public Cost? BidFee { get; set; }
+        public Amount? AskFee { get; set; }
+        public Amount? BidCost { get; set; }
+        public Amount? BidFee { get; set; }
         public int Timestamp { get; set; }
         public long MessageSequence { get; set; }
     }

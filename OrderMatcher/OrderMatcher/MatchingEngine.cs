@@ -361,9 +361,9 @@ namespace OrderMatcher
                     bool isRestingOrderFilled = restingOrder.IsFilled && !isRestingTipAdded;
 
                     Quantity? askRemainingQuanity = null;
-                    Cost? askFee = null;
-                    Cost? bidCost = null;
-                    Cost? bidFee = null;
+                    Amount? askFee = null;
+                    Amount? bidCost = null;
+                    Amount? bidFee = null;
                     if (incomingOrder.IsBuy)
                     {
                         if (isIncomingOrderFilled)
@@ -442,7 +442,7 @@ namespace OrderMatcher
             return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId };
         }
 
-        private (Quantity? Quantity, bool CanFill) GetQuantity(Cost orderAmount)
+        private (Quantity? Quantity, bool CanFill) GetQuantity(Amount orderAmount)
         {
             bool dustRemaining = false;
             Quantity quantity = 0;

@@ -9,12 +9,12 @@
         public Quantity OpenQuantity { get; set; }
         public Price Price { get; set; }
         public int CancelOn { get; set; }
-        public Cost Cost { get; set; }
-        public Cost Fee { get; set; }
+        public Amount Cost { get; set; }
+        public Amount Fee { get; set; }
         public short FeeId { get; set; }
         public Quantity TipQuantity { get; set; }
         public Quantity TotalQuantity { get; set; }
-        public Cost OrderAmount { get; set; }
+        public Amount OrderAmount { get; set; }
         public Price StopPrice { get; set; }
         public OrderCondition OrderCondition { get; set; }
         public bool IsFilled

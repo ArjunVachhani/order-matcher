@@ -60,13 +60,13 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMatchRate = Price.SizeOfPrice;
             sizeOfMatchQuantity = Quantity.SizeOfQuantity;
             sizeOfAskRemainingQuantity = Quantity.SizeOfQuantity;
-            sizeOfBidCost = Cost.SizeOfCost;
+            sizeOfBidCost = Amount.SizeOfAmount;
             sizeOfTimestamp = sizeof(int);
             sizeOfIsAskRemainingNull = sizeof(bool);
             sizeOfIsAskFeeNull = sizeof(bool);
-            sizeOfAskFee = Cost.SizeOfCost;
+            sizeOfAskFee = Amount.SizeOfAmount;
             sizeOfIsBidFeeNull = sizeof(bool);
-            sizeOfBidFee = Cost.SizeOfCost;
+            sizeOfBidFee = Amount.SizeOfAmount;
             sizeOfIsBidCostNull = sizeof(bool);
             sizeOfMessageSequence = sizeof(long);
             version = 1;
@@ -101,7 +101,7 @@ namespace OrderMatcher.Types.Serializers
             Serialize(fill.MessageSequence, fill.MakerOrderId, fill.TakerOrderId, fill.MakerUserId, fill.TakerUserId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp, bytes);
         }
 
-        public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, UserId makerUserId, UserId takerUserId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Cost? askFee, Cost? bidCost, Cost? bidFee, int timeStamp, Span<byte> bytes)
+        public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, UserId makerUserId, UserId takerUserId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Amount? askFee, Amount? bidCost, Amount? bidFee, int timeStamp, Span<byte> bytes)
         {
             if (bytes.Length < sizeOfMessage)
                 throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
@@ -123,17 +123,17 @@ namespace OrderMatcher.Types.Serializers
             bytes[isAskFeeNullOffset] = Convert.ToByte(askFee.HasValue);
 
             if (askFee.HasValue)
-                Cost.WriteBytes(bytes.Slice(askFeeOffset), askFee.Value);
+                Amount.WriteBytes(bytes.Slice(askFeeOffset), askFee.Value);
 
             bytes[isBidCostNullOffset] = Convert.ToByte(bidCost.HasValue);
 
             if (bidCost.HasValue)
-                Cost.WriteBytes(bytes.Slice(bidCostOffset), bidCost.Value);
+                Amount.WriteBytes(bytes.Slice(bidCostOffset), bidCost.Value);
 
             bytes[isBidFeeNullOffset] = Convert.ToByte(bidFee.HasValue);
 
             if (bidFee.HasValue)
-                Cost.WriteBytes(bytes.Slice(bidFeeOffset), bidFee.Value);
+                Amount.WriteBytes(bytes.Slice(bidFeeOffset), bidFee.Value);
 
             Write(bytes.Slice(timestampOffset), timeStamp);
             Write(bytes.Slice(messageSequenceOffset), messageSequence);
@@ -167,13 +167,13 @@ namespace OrderMatcher.Types.Serializers
                 fill.AskRemainingQuantity = Quantity.ReadQuantity(bytes.Slice(askRemainingQuantityOffset));
 
             if (Convert.ToBoolean(bytes[isAskFeeNullOffset]))
-                fill.AskFee = Cost.ReadCost(bytes.Slice(askFeeOffset));
+                fill.AskFee = Amount.ReadAmount(bytes.Slice(askFeeOffset));
 
             if (Convert.ToBoolean(bytes[isBidCostNullOffset]))
-                fill.BidCost = Cost.ReadCost(bytes.Slice(bidCostOffset));
+                fill.BidCost = Amount.ReadAmount(bytes.Slice(bidCostOffset));
 
             if (Convert.ToBoolean(bytes[isBidFeeNullOffset]))
-                fill.BidFee = Cost.ReadCost(bytes.Slice(bidFeeOffset));
+                fill.BidFee = Amount.ReadAmount(bytes.Slice(bidFeeOffset));
 
             return fill;
         }

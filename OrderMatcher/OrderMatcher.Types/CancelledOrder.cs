@@ -5,8 +5,8 @@
         public OrderId OrderId { get; set; }
         public UserId UserId { get; set; }
         public Quantity RemainingQuantity { get; set; }
-        public Cost Cost { get; set; }
-        public Cost Fee { get; set; }
+        public Amount Cost { get; set; }
+        public Amount Fee { get; set; }
         public CancelReason CancelReason { get; set; }
         public int Timestamp { get; set; }
         public long MessageSequence { get; set; }

@@ -178,7 +178,7 @@ namespace OrderMatcher.Performance
             OrderAcceptSerializer.Serialize(++messageSequence, orderId, userId, 123, bytes);
         }
 
-        public void OnCancel(OrderId orderId, UserId userId, Quantity remainingQuantity, Cost cost, Cost fee, CancelReason cancelReason)
+        public void OnCancel(OrderId orderId, UserId userId, Quantity remainingQuantity, Amount cost, Amount fee, CancelReason cancelReason)
         {
             var bytes = new byte[CancelledOrderSerializer.MessageSize];
             CancelledOrderSerializer.Serialize(++messageSequence, orderId, userId, remainingQuantity, cost, fee, cancelReason, 123, bytes);
@@ -190,7 +190,7 @@ namespace OrderMatcher.Performance
             OrderTriggerSerializer.Serialize(++messageSequence, orderId, userId, 123, bytes);
         }
 
-        public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, UserId incomingUserId, UserId restingUserId, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Cost? askFee, Cost? bidCost, Cost? bidFee)
+        public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, UserId incomingUserId, UserId restingUserId, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Amount? askFee, Amount? bidCost, Amount? bidFee)
         {
             var bytes = new byte[FillSerializer.MessageSize];
             FillSerializer.Serialize(++messageSequence, restingOrderId, incomingOrderId, restingUserId, incomingUserId, matchPrice, matchQuantiy, askRemainingQuantity, askFee, bidCost, bidFee, 123, bytes);
