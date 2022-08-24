@@ -16,7 +16,7 @@ namespace OrderMatcher
         private Price _marketPrice;
         private bool _acceptedOrderTrackingEnabled = true;
 
-        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _book.CurrentOrders;
+        public IEnumerable<Order> CurrentOrders => _book.CurrentOrders;
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _book.GoodTillDateOrders;
         public IEnumerable<OrderId> AcceptedOrders => _acceptedOrders;
         public Price MarketPrice => _marketPrice;

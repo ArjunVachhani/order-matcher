@@ -8,7 +8,7 @@ namespace OrderMatcher
     {
         private KeyValuePair<int, HashSet<OrderId>>? _firstGoodTillDate;
         private readonly SortedDictionary<int, HashSet<OrderId>> _goodTillDateOrders;
-        private readonly Dictionary<OrderId, Order> _currentOrders;
+        private readonly CurrentOrders _currentOrders;
         private readonly Side<QuantityTrackingPriceLevel> _bids;
         private readonly Side<QuantityTrackingPriceLevel> _asks;
         private readonly Side<PriceLevel> _stopBids;
@@ -17,7 +17,7 @@ namespace OrderMatcher
         private ulong _sequence;
 
         public IEnumerable<KeyValuePair<int, HashSet<OrderId>>> GoodTillDateOrders => _goodTillDateOrders;
-        public IEnumerable<KeyValuePair<OrderId, Order>> CurrentOrders => _currentOrders;
+        public IEnumerable<Order> CurrentOrders => _currentOrders;
         public IEnumerable<QuantityTrackingPriceLevel> BidSide => _bids.PriceLevels;
         public IEnumerable<QuantityTrackingPriceLevel> AskSide => _asks.PriceLevels;
         internal int AskPriceLevelCount => _asks.PriceLevelCount;
@@ -33,7 +33,7 @@ namespace OrderMatcher
 
         public Book()
         {
-            _currentOrders = new Dictionary<OrderId, Order>();
+            _currentOrders = new CurrentOrders();
             _goodTillDateOrders = new SortedDictionary<int, HashSet<OrderId>>();
             _bids = new Side<QuantityTrackingPriceLevel>(PriceComparerDescending.Shared, PriceLevelComparerDescending<QuantityTrackingPriceLevel>.Shared);
             _asks = new Side<QuantityTrackingPriceLevel>(PriceComparerAscending.Shared, PriceLevelComparerAscending<QuantityTrackingPriceLevel>.Shared);
@@ -57,7 +57,7 @@ namespace OrderMatcher
                     _stopAsks.RemoveOrder(order, order.StopPrice);
             }
 
-            _currentOrders.Remove(order.OrderId);
+            _currentOrders.Remove(order);
             if (order.CancelOn > 0)
             {
                 RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
@@ -69,7 +69,7 @@ namespace OrderMatcher
             order.Sequence = ++_sequence;
             var side = order.IsBuy ? _stopBids : _stopAsks;
             side.AddOrder(order, order.StopPrice);
-            _currentOrders.Add(order.OrderId, order);
+            _currentOrders.Add(order);
             if (order.CancelOn > 0)
             {
                 AddGoodTillDateOrder(order.CancelOn, order.OrderId);
@@ -81,7 +81,7 @@ namespace OrderMatcher
             order.Sequence = ++_sequence;
             var side = order.IsBuy ? _bids : _asks;
             side.AddOrder(order, order.Price);
-            _currentOrders.Add(order.OrderId, order);
+            _currentOrders.Add(order);
             if (order.CancelOn > 0)
             {
                 AddGoodTillDateOrder(order.CancelOn, order.OrderId);
@@ -106,7 +106,7 @@ namespace OrderMatcher
                 {
                     foreach (var order in priceLevel)
                     {
-                        _currentOrders.Remove(order.OrderId);
+                        _currentOrders.Remove(order);
                         if (order.CancelOn > 0)
                         {
                             RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
@@ -119,7 +119,7 @@ namespace OrderMatcher
 
         internal bool TryGetOrder(OrderId orderId, out Order order)
         {
-            return _currentOrders.TryGetValue(orderId, out order);
+            return _currentOrders.TryGetOrder(orderId, out order);
         }
 
         internal List<HashSet<OrderId>>? GetExpiredOrders(int timeNow)
@@ -148,7 +148,7 @@ namespace OrderMatcher
             var side = order.IsBuy ? _bids : _asks;
             if (side.FillOrder(order, quantity))
             {
-                _currentOrders.Remove(order.OrderId);
+                _currentOrders.Remove(order);
                 if (order.CancelOn > 0)
                 {
                     RemoveGoodTillDateOrder(order.CancelOn, order.OrderId);
