@@ -38,5 +38,20 @@
                 return TipQuantity > 0 && TotalQuantity > 0;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Order order)
+            {
+                return OrderId == order.OrderId;
+            }
+
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return OrderId.GetHashCode();
+        }
     }
 }
