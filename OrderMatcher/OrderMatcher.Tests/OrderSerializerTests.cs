@@ -7,7 +7,7 @@ namespace OrderMatcher.Tests
 {
     public class OrderSerializerTests
     {
-        private static readonly int messageSize = 131;
+        private static readonly int messageSize = 143;
 
         [Fact]
         public void Serialize_Doesnotthrowexception_Min()
@@ -23,6 +23,7 @@ namespace OrderMatcher.Tests
                 CancelOn = int.MinValue,
                 IsBuy = false,
                 OrderId = OrderId.MinValue,
+                UserId = UserId.MinValue,
                 Price = Price.MinValue,
                 FeeId = short.MinValue,
                 Cost = Quantity.MinValue,
@@ -46,6 +47,7 @@ namespace OrderMatcher.Tests
                 CancelOn = int.MaxValue,
                 IsBuy = true,
                 OrderId = OrderId.MaxValue,
+                UserId = UserId.MaxValue,
                 Price = Price.MaxValue,
                 FeeId = short.MaxValue,
                 Cost = Quantity.MaxValue,
@@ -116,6 +118,7 @@ namespace OrderMatcher.Tests
                 CancelOn = int.MinValue,
                 IsBuy = false,
                 OrderId = OrderId.MinValue,
+                UserId = UserId.MinValue,
                 Price = Price.MinValue,
                 FeeId = short.MinValue,
                 Cost = Quantity.MinValue,
@@ -130,6 +133,7 @@ namespace OrderMatcher.Tests
             Assert.False(order.IsBuy);
             Assert.Equal(OrderCondition.None, order.OrderCondition);
             Assert.Equal(OrderId.MinValue, order.OrderId);
+            Assert.Equal(UserId.MinValue, order.UserId);
             Assert.Equal(Price.MinValue, order.Price);
             Assert.Equal(0, order.TipQuantity);
             Assert.False(order.IsStop);
@@ -155,6 +159,7 @@ namespace OrderMatcher.Tests
                 CancelOn = int.MaxValue,
                 IsBuy = true,
                 OrderId = OrderId.MaxValue,
+                UserId = UserId.MaxValue,
                 Price = Price.MaxValue,
                 FeeId = short.MaxValue,
                 Cost = Quantity.MaxValue,
@@ -169,6 +174,7 @@ namespace OrderMatcher.Tests
             Assert.True(order.IsBuy);
             Assert.Equal(OrderCondition.FillOrKill, order.OrderCondition);
             Assert.Equal(OrderId.MaxValue, order.OrderId);
+            Assert.Equal(UserId.MaxValue, order.UserId);
             Assert.Equal(Price.MaxValue, order.Price);
             Assert.Equal(Quantity.MaxValue, order.TipQuantity);
             Assert.True(order.IsStop);
@@ -184,7 +190,7 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception()
         {
             Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-            var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546 };
+            var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546, UserId = 841549 };
             OrderSerializer.Serialize(orderWrapper, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(messageSize, messageLength);
@@ -193,6 +199,7 @@ namespace OrderMatcher.Tests
             Assert.True(order.IsBuy);
             Assert.Equal(OrderCondition.ImmediateOrCancel, order.OrderCondition);
             Assert.Equal((OrderId)56789, order.OrderId);
+            Assert.Equal((UserId)841549, order.UserId);
             Assert.Equal(404, order.Price);
             Assert.Equal(2356, order.TipQuantity);
             Assert.True(order.IsStop);

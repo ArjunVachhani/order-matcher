@@ -10,13 +10,13 @@ namespace OrderMatcher.Tests
         public void AddOrder_AddsOrder()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
@@ -29,25 +29,25 @@ namespace OrderMatcher.Tests
         public void RemoveOrder_RemovesOrder()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(2, quantityTrackingPriceLevel.OrderCount);
 
-            Order order3 = new Order() { IsBuy = true, OrderId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
+            Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order3);
 
             Assert.Equal(3000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(3, quantityTrackingPriceLevel.OrderCount);
 
-            Order order4 = new Order() { IsBuy = true, OrderId = 4, Price = 100, Sequence = 4, OpenQuantity = 1000 };
+            Order order4 = new Order() { IsBuy = true, OrderId = 4, UserId = 4, Price = 100, Sequence = 4, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order4);
 
             Assert.Equal(4000, quantityTrackingPriceLevel.Quantity);
@@ -66,13 +66,13 @@ namespace OrderMatcher.Tests
         public void Fill_RemovesOrder_IfOpenQuantityIs0()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, OpenQuantity = 1000, Sequence = 1 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, OpenQuantity = 1000, Sequence = 1 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, OpenQuantity = 1000, Sequence = 2 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, OpenQuantity = 1000, Sequence = 2 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
@@ -89,13 +89,13 @@ namespace OrderMatcher.Tests
         public void Fill_DoesNotRemoveOrder_IfOpenQuantityIsNot0()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, OpenQuantity = 1000, Price = 100, Sequence = 1 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, OpenQuantity = 1000, Price = 100, Sequence = 1 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, OpenQuantity = 1000, Price = 100, Sequence = 2 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, OpenQuantity = 1000, Price = 100, Sequence = 2 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
@@ -114,13 +114,13 @@ namespace OrderMatcher.Tests
         public void Fill_ThrowsException_IfOpenQuantityIsLessThanFillQuantity()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
             Assert.Equal(2000, quantityTrackingPriceLevel.Quantity);
@@ -137,16 +137,16 @@ namespace OrderMatcher.Tests
         public void First_ReturnsFirstOrder_1()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequence = 2, OpenQuantity = 1000 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, Sequence = 2, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequence = 1, OpenQuantity = 1000 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, Sequence = 1, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
-            Order order3 = new Order() { IsBuy = true, OrderId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
+            Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order3);
 
             Assert.Equal(order2, quantityTrackingPriceLevel.First);
@@ -157,16 +157,16 @@ namespace OrderMatcher.Tests
         public void First_ReturnsFirstOrder_2()
         {
             QuantityTrackingPriceLevel quantityTrackingPriceLevel = new QuantityTrackingPriceLevel(100);
-            Order order1 = new Order() { IsBuy = true, OrderId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
+            Order order1 = new Order() { IsBuy = true, OrderId = 1, UserId = 1, Price = 100, Sequence = 1, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order1);
 
             Assert.Equal(1000, quantityTrackingPriceLevel.Quantity);
             Assert.Equal(1, quantityTrackingPriceLevel.OrderCount);
 
-            Order order2 = new Order() { IsBuy = true, OrderId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
+            Order order2 = new Order() { IsBuy = true, OrderId = 2, UserId = 2, Price = 100, Sequence = 2, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order2);
 
-            Order order3 = new Order() { IsBuy = true, OrderId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
+            Order order3 = new Order() { IsBuy = true, OrderId = 3, UserId = 3, Price = 100, Sequence = 3, OpenQuantity = 1000 };
             quantityTrackingPriceLevel.AddOrder(order3);
 
             Assert.Equal(order1, quantityTrackingPriceLevel.First);

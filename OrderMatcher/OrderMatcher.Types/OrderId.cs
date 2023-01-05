@@ -6,23 +6,23 @@ namespace OrderMatcher.Types
 {
     public readonly struct OrderId : IEquatable<OrderId>, IComparable<OrderId>
     {
-        public const int SizeOfOrderId = sizeof(int);
-        public static readonly OrderId MaxValue = int.MaxValue;
-        public static readonly OrderId MinValue = int.MinValue;
-        private readonly int _orderId;
-        public OrderId(int orderId)
+        public const int SizeOfOrderId = sizeof(long);
+        public static readonly OrderId MaxValue = long.MaxValue;
+        public static readonly OrderId MinValue = long.MinValue;
+        private readonly long _orderId;
+        public OrderId(long orderId)
         {
             _orderId = orderId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator OrderId(int orderId)
+        public static implicit operator OrderId(long orderId)
         {
             return new OrderId(orderId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator int(OrderId c)
+        public static implicit operator long(OrderId c)
         {
             return c._orderId;
         }
@@ -101,7 +101,7 @@ namespace OrderMatcher.Types
 
         public static OrderId ReadOrderId(ReadOnlySpan<byte> bytes)
         {
-            return Serializer.ReadInt(bytes);
+            return Serializer.ReadLong(bytes);
         }
     }
 }

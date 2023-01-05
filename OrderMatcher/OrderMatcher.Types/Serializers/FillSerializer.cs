@@ -10,6 +10,8 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int versionOffset;
         private static readonly int makerOrderIdOffset;
         private static readonly int takerOrderIdOffset;
+        private static readonly int makerUserIdOffset;
+        private static readonly int takerUserIdOffset;
         private static readonly int matchRateOffset;
         private static readonly int matchQuantityOffset;
         private static readonly int timestampOffset;
@@ -29,6 +31,8 @@ namespace OrderMatcher.Types.Serializers
         private static readonly int sizeOfMessagetType;
         private static readonly int sizeOfMakerOrderId;
         private static readonly int sizeOfTakerOrderId;
+        private static readonly int sizeOfMakerUserId;
+        private static readonly int sizeOfTakerUserId;
         private static readonly int sizeOfMatchRate;
         private static readonly int sizeOfMatchQuantity;
         private static readonly int sizeOfTimestamp;
@@ -49,8 +53,10 @@ namespace OrderMatcher.Types.Serializers
             sizeOfMessageLength = sizeof(int);
             sizeOfVersion = sizeof(short);
             sizeOfMessagetType = sizeof(MessageType);
-            sizeOfMakerOrderId = sizeof(ulong);
-            sizeOfTakerOrderId = sizeof(ulong);
+            sizeOfMakerOrderId = OrderId.SizeOfOrderId;
+            sizeOfTakerOrderId = OrderId.SizeOfOrderId;
+            sizeOfMakerUserId = UserId.SizeOfUserId;
+            sizeOfTakerUserId = UserId.SizeOfUserId;
             sizeOfMatchRate = Price.SizeOfPrice;
             sizeOfMatchQuantity = Quantity.SizeOfQuantity;
             sizeOfAskRemainingQuantity = Quantity.SizeOfQuantity;
@@ -70,7 +76,9 @@ namespace OrderMatcher.Types.Serializers
             versionOffset = messageTypeOffset + sizeOfMessagetType;
             makerOrderIdOffset = versionOffset + sizeOfVersion;
             takerOrderIdOffset = makerOrderIdOffset + sizeOfMakerOrderId;
-            matchRateOffset = takerOrderIdOffset + sizeOfTakerOrderId;
+            makerUserIdOffset = takerOrderIdOffset + sizeOfTakerOrderId;
+            takerUserIdOffset = makerUserIdOffset + sizeOfMakerUserId;
+            matchRateOffset = takerUserIdOffset + sizeOfTakerUserId;
             matchQuantityOffset = matchRateOffset + sizeOfMatchRate;
             isAskRemainingNullOffset = matchQuantityOffset + sizeOfMatchQuantity;
             askRemainingQuantityOffset = isAskRemainingNullOffset + sizeOfIsAskRemainingNull;
@@ -93,10 +101,10 @@ namespace OrderMatcher.Types.Serializers
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
-            Serialize(fill.MessageSequence, fill.MakerOrderId, fill.TakerOrderId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp, bytes);
+            Serialize(fill.MessageSequence, fill.MakerOrderId, fill.TakerOrderId, fill.MakerUserId, fill.TakerUserId, fill.MatchRate, fill.MatchQuantity, fill.AskRemainingQuantity, fill.AskFee, fill.BidCost, fill.BidFee, fill.Timestamp, bytes);
         }
 
-        public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? askFee, Quantity? bidCost, Quantity? bidFee, int timeStamp, Span<byte> bytes)
+        public static void Serialize(long messageSequence, OrderId makerOrderId, OrderId takerOrderId, UserId makerUserId, UserId takerUserId, Price matchRate, Quantity matchQuantity, Quantity? remainingAskQuantiy, Quantity? askFee, Quantity? bidCost, Quantity? bidFee, int timeStamp, Span<byte> bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
@@ -109,6 +117,8 @@ namespace OrderMatcher.Types.Serializers
             Write(bytes.Slice(versionOffset), version);
             OrderId.WriteBytes(bytes.Slice(makerOrderIdOffset), makerOrderId);
             OrderId.WriteBytes(bytes.Slice(takerOrderIdOffset), takerOrderId);
+            UserId.WriteBytes(bytes.Slice(makerUserIdOffset), makerUserId);
+            UserId.WriteBytes(bytes.Slice(takerUserIdOffset), takerUserId);
             Price.WriteBytes(bytes.Slice(matchRateOffset), matchRate);
             Quantity.WriteBytes(bytes.Slice(matchQuantityOffset), matchQuantity);
             bytes[isAskRemainingNullOffset] = Convert.ToByte(remainingAskQuantiy.HasValue ? true : false);
@@ -156,6 +166,8 @@ namespace OrderMatcher.Types.Serializers
             var fill = new Fill();
             fill.MakerOrderId = OrderId.ReadOrderId(bytes.Slice(makerOrderIdOffset));
             fill.TakerOrderId = OrderId.ReadOrderId(bytes.Slice(takerOrderIdOffset));
+            fill.MakerUserId = UserId.ReadUserId(bytes.Slice(makerUserIdOffset));
+            fill.TakerUserId = UserId.ReadUserId(bytes.Slice(takerUserIdOffset));
             fill.MatchRate = Price.ReadPrice(bytes.Slice(matchRateOffset));
             fill.MatchQuantity = Quantity.ReadQuantity(bytes.Slice(matchQuantityOffset));
             fill.Timestamp = BitConverter.ToInt32(bytes.Slice(timestampOffset));
