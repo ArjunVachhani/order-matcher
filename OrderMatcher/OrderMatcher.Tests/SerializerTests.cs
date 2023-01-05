@@ -6,7 +6,6 @@ namespace OrderMatcher.Tests
 {
     public class SerializerTests
     {
-
         [Fact]
         public void WriteShortTest()
         {
@@ -61,13 +60,12 @@ namespace OrderMatcher.Tests
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
-
         [Fact]
         public void WriteLongTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 5);
-            var arr2 = BitConverter.GetBytes((long)5);
+            Serializer.Write(arr1, 5l);
+            var arr2 = BitConverter.GetBytes(5l);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
@@ -93,8 +91,8 @@ namespace OrderMatcher.Tests
         public void WriteULongTest()
         {
             var arr1 = new byte[8];
-            Serializer.Write(arr1, 5);
-            var arr2 = BitConverter.GetBytes((ulong)5);
+            Serializer.Write(arr1, 5ul);
+            var arr2 = BitConverter.GetBytes(5ul);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
@@ -120,7 +118,7 @@ namespace OrderMatcher.Tests
         public void WriteDecimalTest()
         {
             var arr1 = new byte[16];
-            Serializer.Write(arr1, 5);
+            Serializer.Write(arr1, 5m);
             var bits = decimal.GetBits(5);
             var arr2 = new byte[16];
             Array.Copy(BitConverter.GetBytes(bits[0]), 0, arr2, 0, 4);
@@ -158,22 +156,148 @@ namespace OrderMatcher.Tests
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
-        [Fact]
-        public void WriteboolMinTest()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void WriteBoolTest(bool data)
         {
             var arr1 = new byte[1];
-            Serializer.Write(arr1, true);
-            var arr2 = BitConverter.GetBytes(true);
+            Serializer.Write(arr1, data);
+            var arr2 = BitConverter.GetBytes(data);
             AssertHelper.SequentiallyEqual(arr1, arr2);
         }
 
-        [Fact]
-        public void WriteboolMaxTest()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ReadBoolTest(bool data)
         {
-            var arr1 = new byte[1];
-            Serializer.Write(arr1, false);
-            var arr2 = BitConverter.GetBytes(false);
-            AssertHelper.SequentiallyEqual(arr1, arr2);
+            var arr = BitConverter.GetBytes(data);
+            var actual = Serializer.ReadBool(arr);
+            Assert.Equal(data, actual);
+        }
+
+        [Fact]
+        public void ReadShortMinTest()
+        {
+            var arr = BitConverter.GetBytes(short.MinValue);
+            var actual = Serializer.ReadShort(arr);
+            Assert.Equal(short.MinValue, actual);
+        }
+
+        [Fact]
+        public void ReadShortMaxTest()
+        {
+            var arr = BitConverter.GetBytes(short.MaxValue);
+            var actual = Serializer.ReadShort(arr);
+            Assert.Equal(short.MaxValue, actual);
+        }
+
+        [Fact]
+        public void ReadShortTest()
+        {
+            var arr = BitConverter.GetBytes(5);
+            var actual = Serializer.ReadShort(arr);
+            Assert.Equal(5, actual);
+        }
+
+        [Fact]
+        public void ReadIntMinTest()
+        {
+            var arr = BitConverter.GetBytes(int.MinValue);
+            var actual = Serializer.ReadInt(arr);
+            Assert.Equal(int.MinValue, actual);
+        }
+
+        [Fact]
+        public void ReadIntMaxTest()
+        {
+            var arr = BitConverter.GetBytes(int.MaxValue);
+            var actual = Serializer.ReadInt(arr);
+            Assert.Equal(int.MaxValue, actual);
+        }
+
+        [Fact]
+        public void ReadIntTest()
+        {
+            var arr = BitConverter.GetBytes(5);
+            var actual = Serializer.ReadInt(arr);
+            Assert.Equal(5, actual);
+        }
+
+        [Fact]
+        public void ReadLongMinTest()
+        {
+            var arr = BitConverter.GetBytes(long.MinValue);
+            var actual = Serializer.ReadLong(arr);
+            Assert.Equal(long.MinValue, actual);
+        }
+
+        [Fact]
+        public void ReadLongMaxTest()
+        {
+            var arr = BitConverter.GetBytes(long.MaxValue);
+            var actual = Serializer.ReadLong(arr);
+            Assert.Equal(long.MaxValue, actual);
+        }
+
+        [Fact]
+        public void ReadLongTest()
+        {
+            var arr = BitConverter.GetBytes(5l);
+            var actual = Serializer.ReadLong(arr);
+            Assert.Equal(5l, actual);
+        }
+
+        [Fact]
+        public void ReadULongMinTest()
+        {
+            var arr = BitConverter.GetBytes(ulong.MinValue);
+            var actual = Serializer.ReadULong(arr);
+            Assert.Equal(ulong.MinValue, actual);
+        }
+
+        [Fact]
+        public void ReadULongMaxTest()
+        {
+            var arr = BitConverter.GetBytes(ulong.MaxValue);
+            var actual = Serializer.ReadULong(arr);
+            Assert.Equal(ulong.MaxValue, actual);
+        }
+
+        [Fact]
+        public void ReadULongTest()
+        {
+            var arr = BitConverter.GetBytes(5ul);
+            var actual = Serializer.ReadULong(arr);
+            Assert.Equal(5ul, actual);
+        }
+
+        [Fact]
+        public void ReadDecimalMinTest()
+        {
+            var arr = new byte[16];
+            Serializer.Write(arr, decimal.MinValue);
+            var actual = Serializer.ReadDecimal(arr);
+            Assert.Equal(decimal.MinValue, actual);
+        }
+
+        [Fact]
+        public void ReadDecimalMaxTest()
+        {
+            var arr = new byte[16];
+            Serializer.Write(arr, decimal.MaxValue);
+            var actual = Serializer.ReadDecimal(arr);
+            Assert.Equal(decimal.MaxValue, actual);
+        }
+
+        [Fact]
+        public void ReadDecimalTest()
+        {
+            var arr = new byte[16];
+            Serializer.Write(arr, 5m);
+            var actual = Serializer.ReadDecimal(arr);
+            Assert.Equal(5m, actual);
         }
 
         [Fact]
