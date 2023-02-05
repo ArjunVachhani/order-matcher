@@ -35,7 +35,7 @@ namespace OrderMatcher.Types
             return _amount == other._amount;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Amount && ((Amount)obj)._amount == _amount;
         }

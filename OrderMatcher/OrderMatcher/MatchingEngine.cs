@@ -223,7 +223,7 @@ namespace OrderMatcher
         {
             if (Book.TryGetOrder(orderId, out Order? order))
             {
-                var quantityCancel = order.OpenQuantity;
+                var quantityCancel = order!.OpenQuantity;
                 _book.RemoveOrder(order);
                 if (order.IsTip)
                 {

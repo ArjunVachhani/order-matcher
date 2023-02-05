@@ -16,7 +16,7 @@ namespace OrderMatcher.Types
             _userId = userId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is UserId))
             {

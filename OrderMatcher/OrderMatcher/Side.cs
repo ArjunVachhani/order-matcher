@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace OrderMatcher
 {
-    internal class Side<T> where T : IPriceLevel, new()
+    internal class Side<T> where T : class, IPriceLevel, new()
     {
         private readonly SortedSet<T> _priceLevels;
         private readonly IComparer<Price> _priceComparer;
         private readonly T _priceLevelForSearch = new T();
 
-        private T _bestPriceLevel;
+        private T? _bestPriceLevel;
 
-        public T BestPriceLevel => _bestPriceLevel;
+        public T? BestPriceLevel => _bestPriceLevel;
         public int PriceLevelCount => _priceLevels.Count;
         public IEnumerable<T> PriceLevels => _priceLevels;
 
@@ -31,7 +31,7 @@ namespace OrderMatcher
         {
             bool removed = false;
             _priceLevelForSearch.SetPrice(price);
-            if (_priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel))
+            if (_priceLevels.TryGetValue(_priceLevelForSearch, out T? priceLevel))
             {
                 removed = priceLevel.RemoveOrder(order);
                 RemovePriceLevelIfEmpty(priceLevel);
@@ -41,7 +41,7 @@ namespace OrderMatcher
 
         public List<T>? RemovePriceLevelTill(Price price)
         {
-            List<T> priceLevels = null;
+            List<T>? priceLevels = null;
             if (_bestPriceLevel != null && _priceComparer.Compare(_bestPriceLevel.Price, price) <= 0)
             {
                 priceLevels = new List<T>();
@@ -69,8 +69,8 @@ namespace OrderMatcher
         public bool FillOrder(Order order, Quantity quantity)
         {
             _priceLevelForSearch.SetPrice(order.Price);
-            _priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel);
-            bool orderFilled = priceLevel.Fill(order, quantity);
+            _priceLevels.TryGetValue(_priceLevelForSearch, out T? priceLevel);
+            bool orderFilled = priceLevel!.Fill(order, quantity);
             RemovePriceLevelIfEmpty(priceLevel);
             return orderFilled;
         }
@@ -121,7 +121,7 @@ namespace OrderMatcher
         private T GetOrAddPriceLevel(Price price)
         {
             _priceLevelForSearch.SetPrice(price);
-            if (!_priceLevels.TryGetValue(_priceLevelForSearch, out T priceLevel))
+            if (!_priceLevels.TryGetValue(_priceLevelForSearch, out T? priceLevel))
             {
                 priceLevel = new T();
                 priceLevel.SetPrice(price);

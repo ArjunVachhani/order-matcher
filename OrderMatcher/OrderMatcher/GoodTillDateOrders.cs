@@ -70,7 +70,7 @@ namespace OrderMatcher
         void Remove(int time, OrderId orderId)
         {
             _goodTillDateOrders.TryGetValue(time, out var orderIds);
-            orderIds.Remove(orderId);
+            orderIds!.Remove(orderId);
             if (orderIds.Count == 0)
             {
                 _goodTillDateOrders.Remove(time);
