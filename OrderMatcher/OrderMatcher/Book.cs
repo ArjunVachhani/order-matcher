@@ -103,7 +103,7 @@ namespace OrderMatcher
             return priceLevels;
         }
 
-        internal bool TryGetOrder(OrderId orderId, out Order order)
+        internal bool TryGetOrder(OrderId orderId, out Order? order)
         {
             return _currentOrders.TryGetOrder(orderId, out order);
         }
