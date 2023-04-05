@@ -94,9 +94,9 @@ namespace OrderMatcher
                 return OrderMatchingResult.InvalidCancelOnForGTD;
             }
 
-            if (incomingOrder.CancelOn > 0 && (incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
+            if (incomingOrder.CancelOn > 0 && (incomingOrder.Price == 0 || incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
             {
-                return OrderMatchingResult.GoodTillDateCannotBeIOCorFOK;
+                return OrderMatchingResult.GoodTillDateCannotBeMarketOrIOCorFOK;
             }
 
             if (incomingOrder.Price == 0 && incomingOrder.OrderAmount != 0 && incomingOrder.OpenQuantity != 0)

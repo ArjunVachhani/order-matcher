@@ -17,7 +17,7 @@
         InvalidIcebergOrderTotalQuantity = 18,
         FillOrKillCannotBeStopOrder = 19,
         InvalidCancelOnForGTD = 20,
-        GoodTillDateCannotBeIOCorFOK = 21,
+        GoodTillDateCannotBeMarketOrIOCorFOK = 21,
         MarketOrderOnlySupportedOrderAmountOrQuantityNoBoth = 22,
         OrderAmountOnlySupportedForMarketBuyOrder = 23,
         QuantityAndTotalQuantityShouldBeMultipleOfStepSize = 24

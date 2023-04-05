@@ -47,6 +47,46 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
+        public void AddOrder_Rejects_OrderAmountOnlySupportedForMarketBuyOrder_ForStopLimitBuy()
+        {
+            Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 1, StopPrice = 2, OrderAmount = 1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(order1, 1);
+            Assert.Equal(OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder, accepted);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
+            mockTradeListener.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void AddOrder_Rejects_OrderAmountOnlySupportedForMarketBuyOrder_ForBookOrCancelBuy()
+        {
+            Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 1, OrderCondition = OrderCondition.BookOrCancel, OrderAmount = 1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(order1, 1);
+            Assert.Equal(OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder, accepted);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
+            mockTradeListener.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void AddOrder_Rejects_OrderAmountOnlySupportedForMarketBuyOrder_ForGTD()
+        {
+            Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 1, CancelOn = 1, OrderAmount = 1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(order1, 1);
+            Assert.Equal(OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder, accepted);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
+            mockTradeListener.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void AddOrder_Rejects_OrderAmountOnlySupportedForMarketBuyOrder_ForIceberg()
+        {
+            Order order1 = new Order { IsBuy = true, OrderId = 1, UserId = 1, Price = 1, OpenQuantity = 1, TipQuantity = 1, TotalQuantity = 10, OrderAmount = 1 };
+            OrderMatchingResult accepted = matchingEngine.AddOrder(order1, 1);
+            Assert.Equal(OrderMatchingResult.OrderAmountOnlySupportedForMarketBuyOrder, accepted);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
+            mockTradeListener.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public void AddOrder_Cancels_MarketOrderAmountIfNoSellAvailable()
         {
             Order order1 = new Order { IsBuy = true, Price = 0, OrderId = 1, UserId = 1, OrderAmount = 10 };

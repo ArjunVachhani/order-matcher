@@ -20,6 +20,24 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
+        public void AddOrder_RejectsOrder_MarketGoodTillDate()
+        {
+            Order order1 = new Order { IsBuy = true, OpenQuantity = 500, Price = 0, OrderId = 1, UserId = 1, CancelOn = 10 };
+            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
+
+            mockTradeListener.VerifyNoOtherCalls();
+            Assert.Equal(OrderMatchingResult.GoodTillDateCannotBeMarketOrIOCorFOK, acceptanceResult);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.AcceptedOrders);
+            Assert.DoesNotContain(order1.OrderId, matchingEngine.GoodTillDateOrders.SelectMany(x => x.Value));
+            Assert.Empty(matchingEngine.Book.BidSide);
+            Assert.Empty(matchingEngine.Book.AskSide);
+            Assert.Empty(matchingEngine.Book.StopAskSide);
+            Assert.Empty(matchingEngine.Book.StopBidSide);
+            Assert.Equal(500, order1.OpenQuantity);
+            Assert.Equal((ulong)0, order1.Sequence);
+        }
+
+        [Fact]
         public void AddOrder_Cancels_AlreadyPassedCancelledOn()
         {
             Order order1 = new Order { IsBuy = true, OpenQuantity = 500, Price = 10, OrderId = 1, UserId = 1, CancelOn = 1 };
