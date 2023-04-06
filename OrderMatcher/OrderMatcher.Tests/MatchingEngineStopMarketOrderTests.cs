@@ -157,147 +157,6 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void CancelOrder_Cancels_Triggered_Stop_Market_Order_Buy()
-        {
-            Order order1 = new Order { IsBuy = false, OpenQuantity = 600, Price = 10, OrderId = 1, UserId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
-
-            mockTradeListener.Verify(x => x.OnAccept(order1.OrderId, order1.UserId));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
-            Assert.Contains(order1, matchingEngine.CurrentOrders);
-            Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(600, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequence);
-
-            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2, UserId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
-
-            mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 500, null, null, 5000, 25));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
-            Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);
-            Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(0, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequence);
-
-            Order order3 = new Order { IsBuy = true, OpenQuantity = 600, Price = 0, OrderId = 3, UserId = 3, StopPrice = 10 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
-
-            mockTradeListener.Verify(x => x.OnAccept(order3.OrderId, order3.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(3, 1, 3, 1, 10, 100, 0, 12, null, null));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
-            Assert.Contains(order3, matchingEngine.CurrentOrders);
-            Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Single(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequence);
-
-            OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
-            mockTradeListener.Verify(x => x.OnCancel(3, 3, 500, 1000, 5, CancelReason.UserRequested));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.CancelAcepted, result4);
-            Assert.DoesNotContain(order3, matchingEngine.CurrentOrders);
-            Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequence);
-        }
-
-        [Fact]
-        public void CancelOrder_Cancels_Triggered_Stop_Market_Order_Sell()
-        {
-            Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1, UserId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
-
-            mockTradeListener.Verify(x => x.OnAccept(order1.OrderId, order1.UserId));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
-            Assert.Contains(order1, matchingEngine.CurrentOrders);
-            Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequence);
-
-            Order order2 = new Order { IsBuy = true, OpenQuantity = 600, Price = 11, OrderId = 2, UserId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
-
-            mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 500, 0, 10, null, null));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
-            Assert.Contains(order2, matchingEngine.CurrentOrders);
-            Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order2, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Single(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(100, order2.OpenQuantity);
-            Assert.Equal((ulong)2, order2.Sequence);
-
-            Order order3 = new Order { IsBuy = false, OpenQuantity = 600, Price = 0, OrderId = 3, UserId = 3, StopPrice = 10 };
-            OrderMatchingResult result3 = matchingEngine.AddOrder(order3, 3);
-
-            mockTradeListener.Verify(x => x.OnAccept(order3.OrderId, order3.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(3, 2, 3, 2, 11, 100, null, null, 6100, 27.2m));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
-            Assert.Contains(order3, matchingEngine.CurrentOrders);
-            Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order3, matchingEngine.Book.AskSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequence);
-
-            OrderMatchingResult result4 = matchingEngine.CancelOrder(3);
-
-            mockTradeListener.Verify(x => x.OnCancel(3, 3, 500, 1100, 5.5m, CancelReason.UserRequested));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
-            Assert.DoesNotContain(order3, matchingEngine.CurrentOrders);
-            Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.DoesNotContain(order3, matchingEngine.Book.AskSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequence);
-        }
-
-        [Fact]
         public void AddOrder_Stop_Market_Order_Entered_In_Stop_Book_Empty_Book_No_Market_Rate_Buy()
         {
             Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 0, OrderId = 1, UserId = 1, StopPrice = 9 };
@@ -484,18 +343,17 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnAccept(order3.OrderId, order3.UserId));
             mockTradeListener.Verify(x => x.OnTrade(3, 1, 3, 1, 10, 100, 0, 12, null, null));
+            mockTradeListener.Verify(x => x.OnCancel(3, 3, 500, 1000, 5, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
-            Assert.Contains(order3, matchingEngine.CurrentOrders);
+            Assert.DoesNotContain(order3, matchingEngine.CurrentOrders);
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order3, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Single(matchingEngine.Book.BidSide);
+            Assert.Empty(matchingEngine.Book.BidSide);
             Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(10, order3.Price);
-            Assert.Equal((ulong)2, order3.Sequence);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]
@@ -539,18 +397,17 @@ namespace OrderMatcher.Tests
 
             mockTradeListener.Verify(x => x.OnAccept(order3.OrderId, order3.UserId));
             mockTradeListener.Verify(x => x.OnTrade(3, 2, 3, 2, 11, 100, null, null, 6100, 27.2m));
+            mockTradeListener.Verify(x => x.OnCancel(3, 3, 500, 1100, 5.5m, CancelReason.MarketOrderNoLiquidity));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result3);
-            Assert.Contains(order3, matchingEngine.CurrentOrders);
+            Assert.DoesNotContain(order3, matchingEngine.CurrentOrders);
             Assert.Contains(order3.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order3, matchingEngine.Book.AskSide.SelectMany(x => x));
             Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
+            Assert.Empty(matchingEngine.Book.AskSide);
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
             Assert.Equal(500, order3.OpenQuantity);
-            Assert.Equal(11, order3.Price);
-            Assert.Equal((ulong)3, order3.Sequence);
+            Assert.Equal((ulong)0, order3.Sequence);
         }
 
         [Fact]

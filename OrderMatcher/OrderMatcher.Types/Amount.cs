@@ -35,6 +35,11 @@ namespace OrderMatcher.Types
             return _amount == other._amount;
         }
 
+        public override string ToString()
+        {
+            return _amount.ToString();
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is Amount && ((Amount)obj)._amount == _amount;
