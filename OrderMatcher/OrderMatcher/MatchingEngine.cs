@@ -239,7 +239,7 @@ namespace OrderMatcher
         private void MatchAndAddOrder(Order incomingOrder, OrderCondition? orderCondition = null)
         {
             Price previousMarketPrice = _marketPrice;
-            var matchResult = MatchWithOpenOrders(incomingOrder);
+            MatchWithOpenOrders(incomingOrder);
             if (orderCondition == OrderCondition.ImmediateOrCancel && !incomingOrder.IsFilled)
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ImmediateOrCancel);
@@ -248,15 +248,7 @@ namespace OrderMatcher
             {
                 if (incomingOrder.Price == 0)
                 {
-                    if (matchResult && incomingOrder.OpenQuantity > 0)
-                    {
-                        incomingOrder.Price = _marketPrice;
-                        _book.AddOrderOpenBook(incomingOrder);
-                    }
-                    else
-                    {
-                        _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
-                    }
+                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.MarketOrderNoLiquidity);
                 }
                 else
                 {
@@ -313,9 +305,8 @@ namespace OrderMatcher
             }
         }
 
-        private bool MatchWithOpenOrders(Order incomingOrder)
+        private void MatchWithOpenOrders(Order incomingOrder)
         {
-            bool anyMatchHappend = false;
             while (true)
             {
                 Order? restingOrder = _book.GetBestBuyOrderToMatch(!incomingOrder.IsBuy);
@@ -393,7 +384,6 @@ namespace OrderMatcher
 
                     _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, incomingOrder.UserId, restingOrder.UserId, matchPrice, maxQuantity, askRemainingQuanity, askFee, bidCost, bidFee);
                     _marketPrice = matchPrice;
-                    anyMatchHappend = true;
                 }
                 else
                 {
@@ -405,7 +395,6 @@ namespace OrderMatcher
                     break;
                 }
             }
-            return anyMatchHappend;
         }
 
         private bool AddTip(Order order)
