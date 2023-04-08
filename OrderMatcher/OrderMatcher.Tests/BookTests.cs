@@ -1117,7 +1117,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(9, book.BestStopAskPrice);
 
-            List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
+            var priceLevels = book.RemoveStopAsks(new Price(8));
             Assert.Equal(2, priceLevels.Count());
 
             List<Order> expectedResult = new List<Order> { order1, order2, order3 };
@@ -1152,7 +1152,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestStopAskPrice);
 
-            List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
+            var priceLevels = book.RemoveStopAsks(new Price(8));
             Assert.Null(priceLevels);
 
             Assert.Equal(7, book.BestStopAskPrice);
@@ -1185,7 +1185,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(7, book.BestStopAskPrice);
 
-            List<PriceLevel> priceLevels = book.RemoveStopAsks(new Price(8));
+            var priceLevels = book.RemoveStopAsks(new Price(8));
             Assert.Null(priceLevels);
 
             Assert.Equal(7, book.BestStopAskPrice);
@@ -1233,7 +1233,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(10, book.BestStopBidPrice);
 
-            List<PriceLevel> priceLevels = book.RemoveStopBids(new Price(11));
+            var priceLevels = book.RemoveStopBids(new Price(11));
             Assert.Equal(2, priceLevels.Count());
 
             Assert.Equal(12, book.BestStopBidPrice);
@@ -1269,7 +1269,7 @@ namespace OrderMatcher.Tests
 
             Assert.Equal(12, book.BestStopBidPrice);
 
-            List<PriceLevel> priceLevels = book.RemoveStopBids(new Price(11));
+            var priceLevels = book.RemoveStopBids(new Price(11));
             Assert.Null(priceLevels);
 
             Assert.Equal(12, book.BestStopBidPrice);
@@ -1287,7 +1287,7 @@ namespace OrderMatcher.Tests
         {
             Book book = new Book();
 
-            List<PriceLevel> priceLevels = book.RemoveStopBids(new Price(11));
+            var priceLevels = book.RemoveStopBids(new Price(11));
             Assert.Null(priceLevels);
 
             Assert.Null(book.BestStopBidPrice);

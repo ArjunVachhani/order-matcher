@@ -77,23 +77,23 @@ namespace OrderMatcher
             _goodTillDateOrders.Add(order);
         }
 
-        internal List<PriceLevel>? RemoveStopAsks(Price price)
+        internal IReadOnlyList<PriceLevel>? RemoveStopAsks(Price price)
         {
             return RemoveFromTracking(_stopAsks.RemovePriceLevelTill(price));
         }
 
-        internal List<PriceLevel>? RemoveStopBids(Price price)
+        internal IReadOnlyList<PriceLevel>? RemoveStopBids(Price price)
         {
             return RemoveFromTracking(_stopBids.RemovePriceLevelTill(price));
         }
 
-        private List<PriceLevel>? RemoveFromTracking(List<PriceLevel>? priceLevels)
+        private IReadOnlyList<PriceLevel>? RemoveFromTracking(IReadOnlyList<PriceLevel>? priceLevels)
         {
             if (priceLevels != null)
             {
-                foreach (var priceLevel in priceLevels)
+                for (int i = 0; i < priceLevels.Count; i++)
                 {
-                    foreach (var order in priceLevel)
+                    foreach (var order in priceLevels[i])
                     {
                         _currentOrders.Remove(order);
                         _goodTillDateOrders.Remove(order);

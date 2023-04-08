@@ -39,7 +39,7 @@ namespace OrderMatcher
             return removed;
         }
 
-        public List<T>? RemovePriceLevelTill(Price price)
+        public IReadOnlyList<T>? RemovePriceLevelTill(Price price)
         {
             List<T>? priceLevels = null;
             if (_bestPriceLevel != null && _priceComparer.Compare(_bestPriceLevel.Price, price) <= 0)

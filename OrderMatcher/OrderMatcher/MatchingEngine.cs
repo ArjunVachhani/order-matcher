@@ -8,7 +8,7 @@ namespace OrderMatcher
     {
         private readonly Book _book;
         private readonly HashSet<OrderId> _acceptedOrders;
-        private readonly Queue<List<PriceLevel>> _stopOrderQueue;
+        private readonly Queue<IReadOnlyList<PriceLevel>> _stopOrderQueue;
         private readonly ITradeListener _tradeListener;
         private readonly Quantity _stepSize;
         private readonly IFeeProvider _feeProvider;
@@ -46,7 +46,7 @@ namespace OrderMatcher
                 throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
 
             _book = new Book();
-            _stopOrderQueue = new Queue<List<PriceLevel>>();
+            _stopOrderQueue = new Queue<IReadOnlyList<PriceLevel>>();
             _acceptedOrders = new HashSet<OrderId>();
             _tradeListener = tradeListener;
             _feeProvider = feeProvider;
