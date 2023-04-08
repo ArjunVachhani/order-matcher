@@ -19,7 +19,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void CancelOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Should_Be_Cancel_Price_Sell()
+        public void Normal_Market_After_Match_Pending_Qty_Cancelled_Sell()
         {
             Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1, UserId = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
@@ -67,7 +67,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void CancelOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Should_Be_Cancel_Price_Buy()
+        public void Normal_Market_After_Match_Pending_Qty_Cancelled_Buy()
         {
             Order order1 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 10, OrderId = 1, UserId = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
@@ -447,80 +447,6 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void AddOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Price_Sell()
-        {
-            Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1, UserId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
-
-            mockTradeListener.Verify(x => x.OnAccept(order1.OrderId, order1.UserId));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
-            Assert.Contains(order1, matchingEngine.CurrentOrders);
-            Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.BidSide.SelectMany(x => x));
-            Assert.Single(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequence);
-
-            Order order2 = new Order { IsBuy = false, OpenQuantity = 1500, Price = 0, OrderId = 2, UserId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
-
-            mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 1000, null, null, 10000, 20));
-            mockTradeListener.Verify(x => x.OnCancel(2, 2, 500, 10000, 50, CancelReason.MarketOrderNoLiquidity));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
-            Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);
-            Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequence);
-        }
-
-        [Fact]
-        public void AddOrder_Normal_Market_After_Match_Enters_Pending_With_Limit_Price_Buy()
-        {
-            Order order1 = new Order { IsBuy = false, OpenQuantity = 1000, Price = 10, OrderId = 1, UserId = 1 };
-            OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
-
-            mockTradeListener.Verify(x => x.OnAccept(order1.OrderId, order1.UserId));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult);
-            Assert.Contains(order1, matchingEngine.CurrentOrders);
-            Assert.Contains(order1.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Contains(order1, matchingEngine.Book.AskSide.SelectMany(x => x));
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Single(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(1000, order1.OpenQuantity);
-            Assert.Equal((ulong)1, order1.Sequence);
-
-            Order order2 = new Order { IsBuy = true, OpenQuantity = 1500, Price = 0, OrderId = 2, UserId = 2 };
-            OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
-
-            mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 1000, 0, 20, null, null));
-            mockTradeListener.Verify(x => x.OnCancel(2, 2, 500, 10000, 50, CancelReason.MarketOrderNoLiquidity));
-            mockTradeListener.VerifyNoOtherCalls();
-            Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
-            Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);
-            Assert.Contains(order2.OrderId, matchingEngine.AcceptedOrders);
-            Assert.Empty(matchingEngine.Book.BidSide);
-            Assert.Empty(matchingEngine.Book.AskSide);
-            Assert.Empty(matchingEngine.Book.StopAskSide);
-            Assert.Empty(matchingEngine.Book.StopBidSide);
-            Assert.Equal(500, order2.OpenQuantity);
-            Assert.Equal((ulong)0, order2.Sequence);
-        }
-
-        [Fact]
         public void AddOrder_Normal_Market_Complex_Matching_Scenario()
         {
             Order order1 = new Order { IsBuy = true, OpenQuantity = 1000, Price = 10, OrderId = 1, UserId = 1 };
@@ -790,6 +716,5 @@ namespace OrderMatcher.Tests
             Assert.Equal(0, order16.OpenQuantity);
             Assert.Equal(500, order13.OpenQuantity);
         }
-
     }
 }

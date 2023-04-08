@@ -1,10 +1,6 @@
 ﻿using Moq;
 using OrderMatcher.Types;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace OrderMatcher.Tests
@@ -23,7 +19,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_With_Market_Rate_For_Buy()
+        public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_For_Buy()
         {
             Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1, UserId = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
@@ -90,7 +86,7 @@ namespace OrderMatcher.Tests
         }
 
         [Fact]
-        public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_With_Market_Rate_For_Sell()
+        public void CancelOrder_Stop_Limit_Order_Entered_In_Stop_Book_For_Sell()
         {
             Order order1 = new Order { IsBuy = false, OpenQuantity = 500, Price = 10, OrderId = 1, UserId = 1 };
             OrderMatchingResult acceptanceResult = matchingEngine.AddOrder(order1, 1);
@@ -1158,7 +1154,7 @@ namespace OrderMatcher.Tests
             Assert.Equal(500, order1.OpenQuantity);
             Assert.Equal((ulong)1, order1.Sequence);
 
-            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2, UserId = 2};
+            Order order2 = new Order { IsBuy = true, OpenQuantity = 500, Price = 11, OrderId = 2, UserId = 2 };
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 2);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
@@ -1359,6 +1355,5 @@ namespace OrderMatcher.Tests
             Assert.Empty(matchingEngine.Book.StopAskSide);
             Assert.Empty(matchingEngine.Book.StopBidSide);
         }
-
     }
 }
