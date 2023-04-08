@@ -64,7 +64,12 @@ namespace OrderMatcher
             if (incomingOrder == null)
                 throw new ArgumentNullException(nameof(incomingOrder));
 
-            if (incomingOrder.Price < 0 || (incomingOrder.OpenQuantity <= 0 && incomingOrder.OrderAmount == 0) || (incomingOrder.OpenQuantity == 0 && incomingOrder.OrderAmount <= 0) || incomingOrder.StopPrice < 0 || incomingOrder.TotalQuantity < 0)
+            if (incomingOrder.Price < 0 || incomingOrder.StopPrice < 0 || incomingOrder.OpenQuantity < 0 || incomingOrder.TipQuantity < 0 || incomingOrder.TotalQuantity < 0 || incomingOrder.OrderAmount < 0)
+            {
+                return OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity;
+            }
+
+            if (incomingOrder.Price < 0 || (incomingOrder.OpenQuantity <= 0 && incomingOrder.OrderAmount == 0 && incomingOrder.TotalQuantity == 0) || (incomingOrder.OpenQuantity == 0 && incomingOrder.OrderAmount <= 0 && incomingOrder.TotalQuantity == 0) || incomingOrder.StopPrice < 0 || incomingOrder.TotalQuantity < 0)
             {
                 return OrderMatchingResult.InvalidPriceQuantityStopPriceOrderAmountOrTotalQuantity;
             }
@@ -74,14 +79,14 @@ namespace OrderMatcher
                 return OrderMatchingResult.BookOrCancelCannotBeMarketOrStopOrder;
             }
 
-            if (incomingOrder.OpenQuantity % _stepSize != 0 || incomingOrder.TotalQuantity % _stepSize != 0)
+            if (incomingOrder.OpenQuantity % _stepSize != 0 || incomingOrder.TotalQuantity % _stepSize != 0 || incomingOrder.TipQuantity % _stepSize != 0)
             {
                 return OrderMatchingResult.QuantityAndTotalQuantityShouldBeMultipleOfStepSize;
             }
 
-            if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && (incomingOrder.StopPrice != 0))
+            if (incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel && (incomingOrder.StopPrice != 0 || incomingOrder.Price == 0))
             {
-                return OrderMatchingResult.ImmediateOrCancelCannotBeStopOrder;
+                return OrderMatchingResult.ImmediateOrCancelCannotBeMarketOrStopOrder;
             }
 
             if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.StopPrice != 0)
@@ -94,7 +99,7 @@ namespace OrderMatcher
                 return OrderMatchingResult.InvalidCancelOnForGTD;
             }
 
-            if (incomingOrder.CancelOn > 0 && (incomingOrder.Price == 0 || incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
+            if (incomingOrder.CancelOn > 0 && ((incomingOrder.Price == 0 && !(incomingOrder.Price == 0 && incomingOrder.StopPrice != 0)) || incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel))
             {
                 return OrderMatchingResult.GoodTillDateCannotBeMarketOrIOCorFOK;
             }
@@ -111,14 +116,13 @@ namespace OrderMatcher
 
             if (incomingOrder.TotalQuantity > 0)
             {
-                incomingOrder.OpenQuantity = incomingOrder.TipQuantity;
                 if (incomingOrder.OrderCondition == OrderCondition.FillOrKill || incomingOrder.OrderCondition == OrderCondition.ImmediateOrCancel)
                 {
                     return OrderMatchingResult.IcebergOrderCannotBeFOKorIOC;
                 }
-                if (incomingOrder.StopPrice != 0 || incomingOrder.Price == 0)
+                if (incomingOrder.Price == 0 || (incomingOrder.StopPrice != 0 && incomingOrder.Price == 0))
                 {
-                    return OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder;
+                    return OrderMatchingResult.IcebergOrderCannotBeMarketOrStopMarketOrder;
                 }
                 if (incomingOrder.TotalQuantity <= incomingOrder.TipQuantity)
                 {
@@ -139,7 +143,7 @@ namespace OrderMatcher
 
             Quantity? quantity = null;
             bool canBeFilled = false;
-            if (incomingOrder.IsBuy && incomingOrder.OpenQuantity == 0 && incomingOrder.StopPrice == 0)
+            if (incomingOrder.IsBuy && incomingOrder.OpenQuantity == 0 && incomingOrder.StopPrice == 0 && incomingOrder.OrderAmount > 0)
             {
                 var quantityAndFill = GetQuantity(incomingOrder.OrderAmount);
                 if (quantityAndFill.Quantity.HasValue)
@@ -152,25 +156,19 @@ namespace OrderMatcher
             CancelExpiredOrders(timestamp);
             if (incomingOrder.OrderCondition == OrderCondition.BookOrCancel && ((incomingOrder.IsBuy && _book.BestAskPrice <= incomingOrder.Price) || (!incomingOrder.IsBuy && incomingOrder.Price <= _book.BestBidPrice)))
             {
-                if (incomingOrder.TotalQuantity == 0)
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
-                else
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity + incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.BookOrCancel);
             }
             else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount == 0 && !_book.CheckCanFillOrder(incomingOrder.IsBuy, incomingOrder.OpenQuantity, incomingOrder.Price))
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.FillOrKill);
             }
-            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount != 0 && canBeFilled == false)
+            else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount > 0 && canBeFilled == false)
             {
                 _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, 0, 0, 0, CancelReason.FillOrKill);
             }
             else if (incomingOrder.CancelOn > 0 && incomingOrder.CancelOn <= timestamp)
             {
-                if (incomingOrder.TotalQuantity == 0)
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
-                else
-                    _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
+                _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.TotalQuantity + incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.ValidityExpired);
             }
             else
             {
@@ -185,7 +183,7 @@ namespace OrderMatcher
                 }
                 else
                 {
-                    if (incomingOrder.IsBuy && incomingOrder.OpenQuantity == 0)
+                    if (incomingOrder.IsBuy && incomingOrder.OpenQuantity == 0 && incomingOrder.OrderAmount > 0)
                     {
                         if (quantity.HasValue)
                         {
@@ -221,7 +219,7 @@ namespace OrderMatcher
 
         private OrderMatchingResult CancelOrder(OrderId orderId, CancelReason cancelReason)
         {
-            if (Book.TryGetOrder(orderId, out Order? order))
+            if (_book.TryGetOrder(orderId, out Order? order))
             {
                 var quantityCancel = order!.OpenQuantity;
                 _book.RemoveOrder(order);
@@ -426,16 +424,19 @@ namespace OrderMatcher
 
         private static Order GetTip(Order order)
         {
+            if (order.OpenQuantity > 0)
+                return order;
+
             var quantity = order.TipQuantity < order.TotalQuantity ? order.TipQuantity : order.TotalQuantity;
             var remainigTotalQuantity = order.TotalQuantity - quantity;
-            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId };
+            return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId, FeeId = order.FeeId, OrderCondition = order.OrderCondition, StopPrice = order.StopPrice };
         }
 
         private (Quantity? Quantity, bool CanFill) GetQuantity(Amount orderAmount)
         {
             bool dustRemaining = false;
             Quantity quantity = 0;
-            foreach (var level in Book.AskSide)
+            foreach (var level in _book.AskSide)
             {
                 foreach (var order in level)
                 {

@@ -91,12 +91,12 @@ namespace OrderMatcher.Tests
         public void Deserialize_Doesnotthrowexception()
         {
             Span<byte> bytes = stackalloc byte[MatchingEngineResultSerializer.MessageSize];
-            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = 16879, Result = OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, Timestamp = 132465 }, bytes);
+            MatchingEngineResultSerializer.Serialize(new MatchingEngineResult { OrderId = 16879, Result = OrderMatchingResult.IcebergOrderCannotBeMarketOrStopMarketOrder, Timestamp = 132465 }, bytes);
             var messageLength = BitConverter.ToInt32(bytes.Slice(0));
             Assert.Equal(24, messageLength);
             var result = MatchingEngineResultSerializer.Deserialize(bytes);
             Assert.Equal((ulong)16879, result.OrderId);
-            Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeStopOrMarketOrder, result.Result);
+            Assert.Equal(OrderMatchingResult.IcebergOrderCannotBeMarketOrStopMarketOrder, result.Result);
             Assert.Equal(132465, result.Timestamp);
         }
     }
