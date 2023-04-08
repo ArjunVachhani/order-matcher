@@ -13,10 +13,9 @@ namespace OrderMatcher
         private RangeTracker? _cached;
         private int _markAfterCompaction;
 
-#if DEBUG
         internal int RangesCount => _ranges.Count;
         internal IEnumerable<RangeTracker> Ranges => _ranges;
-#endif
+
         public OrderIdTracker(int rangeTrackerSize)
         {
             _rangeTrackerSize = rangeTrackerSize;
