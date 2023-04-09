@@ -190,10 +190,10 @@ namespace OrderMatcher.Performance
             OrderTriggerSerializer.Serialize(++messageSequence, orderId, userId, 123, bytes);
         }
 
-        public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, UserId incomingUserId, UserId restingUserId, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Amount? askFee, Amount? bidCost, Amount? bidFee)
+        public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, UserId incomingUserId, UserId restingUserId, bool incomingOrderSide, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Amount? askFee, Amount? bidCost, Amount? bidFee)
         {
             var bytes = new byte[FillSerializer.MessageSize];
-            FillSerializer.Serialize(++messageSequence, restingOrderId, incomingOrderId, restingUserId, incomingUserId, matchPrice, matchQuantiy, askRemainingQuantity, askFee, bidCost, bidFee, 123, bytes);
+            FillSerializer.Serialize(++messageSequence, restingOrderId, incomingOrderId, restingUserId, incomingUserId, incomingOrderSide, matchPrice, matchQuantiy, askRemainingQuantity, askFee, bidCost, bidFee, 123, bytes);
         }
     }
 }

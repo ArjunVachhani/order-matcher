@@ -62,7 +62,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 50, null, null, 500, 2.5m));
+            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, true, 10, 50, null, null, 500, 2.5m));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.Contains(order1.OrderId, matchingEngine.Book.AskSide.SelectMany(x => x).Select(x => x.OrderId).ToList());
