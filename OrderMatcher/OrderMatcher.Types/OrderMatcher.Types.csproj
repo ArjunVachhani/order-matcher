@@ -6,6 +6,7 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
 </Project>

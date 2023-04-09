@@ -1,12 +1,11 @@
-﻿namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types;
+
+public enum OrderCondition : byte
 {
-    public enum OrderCondition : byte
-    {
-        None = 0,
-        ImmediateOrCancel = 1,
-        BookOrCancel = 2,
-        FillOrKill = 4,
-    }
+    None = 0,
+    ImmediateOrCancel = 1,
+    BookOrCancel = 2,
+    FillOrKill = 4,
 }
 // 0000 0000  None
 // 0000 0001  ImmediateOrCancel
