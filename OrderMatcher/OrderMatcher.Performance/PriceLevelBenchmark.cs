@@ -1,9 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿namespace OrderMatcher.Performance;
 
-namespace OrderMatcher.Performance
+[MinColumn, MaxColumn, MeanColumn, MedianColumn]
+public class PriceLevelBenchmark
 {
-    [MinColumn, MaxColumn, MeanColumn, MedianColumn]
-    public class PriceLevelBenchmark
-    {
-    }
 }

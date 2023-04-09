@@ -1,7 +1,6 @@
-﻿namespace OrderMatcher
+﻿namespace OrderMatcher;
+
+public interface IFeeProvider
 {
-    public interface IFeeProvider
-    {
-        Fee GetFee(short feeId);
-    }
+    Fee GetFee(short feeId);
 }
