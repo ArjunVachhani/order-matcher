@@ -140,7 +140,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult result2 = matchingEngine.AddOrder(order2, 9);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(X => X.OnTrade(2, 1, 2, 1, 10, 500, 0, 10, 5000, 25));
+            mockTradeListener.Verify(X => X.OnTrade(2, 1, 2, 1, true, 10, 500, 0, 10, 5000, 25));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, result2);
             Assert.DoesNotContain(order1, matchingEngine.CurrentOrders);

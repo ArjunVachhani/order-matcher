@@ -41,7 +41,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 500, 0, 10, 5000, 25));
+            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, true, 10, 500, 0, 10, 5000, 25));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);
@@ -126,7 +126,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 500, 0, 10, 5000, 25));
+            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, true, 10, 500, 0, 10, 5000, 25));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);
@@ -175,7 +175,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult5 = matchingEngine.AddOrder(order5, 5);
 
             mockTradeListener.Verify(x => x.OnAccept(order5.OrderId, order5.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(5, 4, 5, 4, 10, 400, null, null, 4000, 20));
+            mockTradeListener.Verify(x => x.OnTrade(5, 4, 5, 4, true, 10, 400, null, null, 4000, 20));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult5);
             Assert.DoesNotContain(order5, matchingEngine.CurrentOrders);
@@ -212,7 +212,7 @@ namespace OrderMatcher.Tests
             OrderMatchingResult acceptanceResult2 = matchingEngine.AddOrder(order2, 2);
 
             mockTradeListener.Verify(x => x.OnAccept(order2.OrderId, order2.UserId));
-            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, 10, 500, 0, 10, 5000, 25));
+            mockTradeListener.Verify(x => x.OnTrade(2, 1, 2, 1, true, 10, 500, 0, 10, 5000, 25));
             mockTradeListener.VerifyNoOtherCalls();
             Assert.Equal(OrderMatchingResult.OrderAccepted, acceptanceResult2);
             Assert.DoesNotContain(order2, matchingEngine.CurrentOrders);

@@ -380,7 +380,7 @@ namespace OrderMatcher
                         }
                     }
 
-                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, incomingOrder.UserId, restingOrder.UserId, matchPrice, maxQuantity, askRemainingQuanity, askFee, bidCost, bidFee);
+                    _tradeListener?.OnTrade(incomingOrder.OrderId, restingOrder.OrderId, incomingOrder.UserId, restingOrder.UserId, incomingOrder.IsBuy, matchPrice, maxQuantity, askRemainingQuanity, askFee, bidCost, bidFee);
                     _marketPrice = matchPrice;
                 }
                 else
