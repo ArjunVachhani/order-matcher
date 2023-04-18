@@ -1,61 +1,79 @@
-﻿using OrderMatcher.Types;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿namespace OrderMatcher;
 
-namespace OrderMatcher
+public class PriceLevel : IPriceLevel
 {
-    public class PriceLevel : IEnumerable<Order>
+    private readonly SortedSet<Order> _orders;
+
+    private Price _price;
+
+    public int OrderCount => _orders.Count;
+    public Price Price => _price;
+    public Quantity Quantity
     {
-        private readonly SortedSet<Order> _orders;
-        private readonly Price _price;
-
-        public int OrderCount => _orders.Count;
-        public Price Price => _price;
-
-        private static readonly OrderSequenceComparer _orderSequenceComparer = new OrderSequenceComparer();
-
-        public PriceLevel(Price price)
+        get
         {
-            _price = price;
-            _orders = new SortedSet<Order>(_orderSequenceComparer);
-        }
-
-        internal void AddOrder(Order order)
-        {
-            _orders.Add(order);
-        }
-
-        internal bool RemoveOrder(Order order)
-        {
-            return _orders.Remove(order);
-        }
-
-        internal bool Fill(Order order, Quantity quantity)
-        {
-            if (order.OpenQuantity >= quantity)
+            Quantity totalQuantity = 0;
+            foreach (var order in _orders)
             {
-                order.OpenQuantity = order.OpenQuantity - quantity;
-                if (order.IsFilled)
-                {
-                    return _orders.Remove(order);
-                }
-                return false;
+                totalQuantity += order.OpenQuantity;
             }
-            else
+            return totalQuantity;
+        }
+    }
+
+    public PriceLevel()
+    {
+        _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
+    }
+
+    public PriceLevel(Price price)
+    {
+        _price = price;
+        _orders = new SortedSet<Order>(OrderSequenceComparer.Shared);
+    }
+
+    public void SetPrice(Price price)
+    {
+        if (_orders.Count > 0)
+            throw new OrderMatcherException($"Cannot set price because pricelevel has {_orders.Count} orders.");
+
+        _price = price;
+    }
+
+    public void AddOrder(Order order)
+    {
+        _orders.Add(order);
+    }
+
+    public bool RemoveOrder(Order order)
+    {
+        return _orders.Remove(order);
+    }
+
+    public bool Fill(Order order, Quantity quantity)
+    {
+        if (order.OpenQuantity >= quantity)
+        {
+            order.OpenQuantity = order.OpenQuantity - quantity;
+            if (order.IsFilled)
             {
-                throw new Exception(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
+                return _orders.Remove(order);
             }
+            return false;
         }
-
-        public IEnumerator<Order> GetEnumerator()
+        else
         {
-            return _orders.GetEnumerator();
+            throw new OrderMatcherException(Constant.ORDER_QUANTITY_IS_LESS_THEN_REQUESTED_FILL_QUANTITY);
         }
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _orders.GetEnumerator();
-        }
+    public IEnumerator<Order> GetEnumerator()
+    {
+        return _orders.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _orders.GetEnumerator();
     }
 }

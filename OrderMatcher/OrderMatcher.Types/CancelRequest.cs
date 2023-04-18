@@ -1,7 +1,6 @@
-﻿namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types;
+
+public class CancelRequest
 {
-    public class CancelRequest
-    {
-        public OrderId OrderId { get; set; }
-    }
+    public OrderId OrderId { get; set; }
 }

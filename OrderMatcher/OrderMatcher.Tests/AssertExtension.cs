@@ -1,26 +1,23 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 
-namespace OrderMatcher.Tests
+namespace OrderMatcher.Tests;
+
+public static class AssertHelper
 {
-    public static class AssertHelper
+    public static void SequentiallyEqual<T>(IEnumerable<T> collection1, IEnumerable<T> collection2)
     {
-        public static void SequentiallyEqual<T>(IEnumerable<T> collection1, IEnumerable<T> collection2)
+        if (collection1 == null && collection2 == null)
         {
-            if (collection1 == null && collection2 == null)
-            {
-                return;
-            }
+            return;
+        }
 
-            T[] arr1 = collection1.ToArray();
-            T[] arr2 = collection2.ToArray();
-            Assert.Equal(arr1.Length, arr2.Length);
+        T[] arr1 = collection1.ToArray();
+        T[] arr2 = collection2.ToArray();
+        Assert.Equal(arr1.Length, arr2.Length);
 
-            for (int i = 0; i < arr1.Length; i++)
-            {
-                Assert.StrictEqual(arr1[i], arr2[i]);
-            }
+        for (int i = 0; i < arr1.Length; i++)
+        {
+            Assert.StrictEqual(arr1[i], arr2[i]);
         }
     }
 }

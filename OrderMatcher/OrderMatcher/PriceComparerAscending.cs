@@ -1,26 +1,14 @@
-﻿using OrderMatcher.Types;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿namespace OrderMatcher;
 
-namespace OrderMatcher
+public class PriceComparerAscending : IComparer<Price>
 {
-    public class PriceComparerAscending : IComparer<Price>
+    private PriceComparerAscending() { }
+
+    public int Compare(Price x, Price y)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(Price x, Price y)
-        {
-            if (x < y)
-            {
-                return -1;
-            }
-            else if (x > y)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        return x.CompareTo(y);
     }
+
+    private static readonly PriceComparerAscending _shared = new PriceComparerAscending();
+    public static PriceComparerAscending Shared => _shared;
 }

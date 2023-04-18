@@ -1,80 +1,70 @@
-﻿using System;
+﻿namespace OrderMatcher.Types.Serializers;
 
-namespace OrderMatcher.Types.Serializers
+public class BookRequestSerializer : Serializer
 {
-    public class BookRequestSerializer : Serializer
+    private static readonly short version;
+    private static readonly int messageLengthOffset;
+    private static readonly int messageTypeOffset;
+    private static readonly int versionOffset;
+    private static readonly int levelCountOffset;
+
+
+    private static readonly int sizeOfMessageLength;
+    private static readonly int sizeOfMessage;
+    private static readonly int sizeOfVersion;
+    private static readonly int sizeOfMessagetType;
+    private static readonly int sizeOfLevelCount;
+
+    public static int MessageSize => sizeOfMessage;
+
+    static BookRequestSerializer()
     {
-        private static readonly short version;
-        private static readonly int messageLengthOffset;
-        private static readonly int messageTypeOffset;
-        private static readonly int versionOffset;
-        private static readonly int levelCountOffset;
+        sizeOfMessageLength = sizeof(int);
+        sizeOfVersion = sizeof(short);
+        sizeOfMessagetType = sizeof(MessageType);
+        sizeOfLevelCount = sizeof(int);
 
+        version = 1;
 
-        private static readonly int sizeOfMessageLength;
-        private static readonly int sizeOfMessage;
-        private static readonly int sizeOfVersion;
-        private static readonly int sizeOfMessagetType;
-        private static readonly int sizeOfLevelCount;
+        messageLengthOffset = 0;
+        messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
+        versionOffset = messageTypeOffset + sizeOfMessagetType;
+        levelCountOffset = versionOffset + sizeOfVersion;
+        sizeOfMessage = levelCountOffset + sizeOfLevelCount;
+    }
 
-        public static int MessageSize => sizeOfMessage;
+    public static void Serialize(BookRequest bookRequest, Span<byte> bytes)
+    {
+        if (bookRequest == null)
+            throw new ArgumentNullException(nameof(bookRequest));
 
-        static BookRequestSerializer()
-        {
-            sizeOfMessageLength = sizeof(int);
-            sizeOfVersion = sizeof(short);
-            sizeOfMessagetType = sizeof(MessageType);
-            sizeOfLevelCount = sizeof(int);
+        if (bytes.Length < MessageSize)
+            throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
-            version = 1;
+        Write(bytes.Slice(messageLengthOffset, 4), sizeOfMessage);
+        bytes[messageTypeOffset] = (byte)MessageType.BookRequest;
+        Write(bytes.Slice(versionOffset, 4), (int)version);
+        Write(bytes.Slice(levelCountOffset, 4), bookRequest.LevelCount);
+    }
 
-            messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
-            versionOffset = messageTypeOffset + sizeOfMessagetType;
-            levelCountOffset = versionOffset + sizeOfVersion;
-            sizeOfMessage = levelCountOffset + sizeOfLevelCount;
-        }
+    public static BookRequest Deserialize(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.Length != sizeOfMessage)
+            throw new OrderMatcherException("Book Request Message must be of Size : " + sizeOfMessage);
 
-        public static void Serialize(BookRequest bookRequest, Span<byte> bytes)
-        {
-            if (bookRequest == null)
-                throw new ArgumentNullException(nameof(bookRequest));
+        var messageType = (MessageType)(bytes[messageTypeOffset]);
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
+        if (messageType != MessageType.BookRequest)
+            throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            if (bytes.Length < MessageSize)
-                throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
+        var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+        if (messageVersion != version)
+            throw new OrderMatcherException(Constant.INVALID_VERSION);
 
-            Write(bytes.Slice(messageLengthOffset, 4), sizeOfMessage);
-            bytes[messageTypeOffset] = (byte)MessageType.BookRequest;
-            Write(bytes.Slice(versionOffset, 4), (int)version);
-            Write(bytes.Slice(levelCountOffset, 4), bookRequest.LevelCount);
-        }
+        var bookRequest = new BookRequest();
 
-        public static BookRequest Deserialize(ReadOnlySpan<byte> bytes)
-        {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
+        bookRequest.LevelCount = BitConverter.ToInt32(bytes.Slice(levelCountOffset));
 
-            if (bytes.Length != sizeOfMessage)
-                throw new Exception("Book Request Message must be of Size : " + sizeOfMessage);
-
-            var messageType = (MessageType)(bytes[messageTypeOffset]);
-
-            if (messageType != MessageType.BookRequest)
-                throw new Exception(Constant.INVALID_MESSAGE);
-
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != BookRequestSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
-
-            var bookRequest = new BookRequest();
-
-            bookRequest.LevelCount = BitConverter.ToInt32(bytes.Slice(levelCountOffset));
-
-            return bookRequest;
-        }
+        return bookRequest;
     }
 }
