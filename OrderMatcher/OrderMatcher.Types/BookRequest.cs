@@ -1,7 +1,6 @@
-﻿namespace OrderMatcher.Types
+﻿namespace OrderMatcher.Types;
+
+public class BookRequest
 {
-    public class BookRequest
-    {
-        public int LevelCount { get; set; }
-    }
+    public int LevelCount { get; set; }
 }

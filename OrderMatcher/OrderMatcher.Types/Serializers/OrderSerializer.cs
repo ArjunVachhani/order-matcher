@@ -1,148 +1,138 @@
-﻿using System;
+﻿namespace OrderMatcher.Types.Serializers;
 
-namespace OrderMatcher.Types.Serializers
+public class OrderSerializer : Serializer
 {
-    public class OrderSerializer : Serializer
+    private static readonly short version;
+    private static readonly int messageLengthOffset;
+    private static readonly int messageTypeOffset;
+    private static readonly int versionOffset;
+    private static readonly int sideOffset;
+    private static readonly int orderConditionOffset;
+    private static readonly int orderIdOffset;
+    private static readonly int userIdOffset;
+    private static readonly int priceOffset;
+    private static readonly int quantityOffset;
+    private static readonly int stopPriceOffset;
+    private static readonly int totalQuantityOffset;
+    private static readonly int cancelOnOffset;
+    private static readonly int orderAmountOffset;
+    private static readonly int feeIdOffset;
+    private static readonly int costOffset;
+    private static readonly int feeOffset;
+
+    private static readonly int sizeOfMessageLength;
+    private static readonly int sizeOfMessage;
+    private static readonly int sizeOfMessagetType;
+    private static readonly int sizeOfOrderId;
+    private static readonly int sizeOfUserId;
+    private static readonly int sizeOfVersion;
+    private static readonly int sizeOfSide;
+    private static readonly int sizeOfCancelOn;
+    private static readonly int sizeOfOrderAmount;
+    private static readonly int sizeOfFeeId;
+    private static readonly int sizeOfCost;
+    private static readonly int sizeOfFee;
+
+    public static int MessageSize => sizeOfMessage;
+
+    static OrderSerializer()
     {
-        private static readonly short version;
-        private static readonly int messageLengthOffset;
-        private static readonly int messageTypeOffset;
-        private static readonly int versionOffset;
-        private static readonly int sideOffset;
-        private static readonly int orderConditionOffset;
-        private static readonly int orderIdOffset;
-        private static readonly int userIdOffset;
-        private static readonly int priceOffset;
-        private static readonly int quantityOffset;
-        private static readonly int stopPriceOffset;
-        private static readonly int totalQuantityOffset;
-        private static readonly int cancelOnOffset;
-        private static readonly int orderAmountOffset;
-        private static readonly int feeIdOffset;
-        private static readonly int costOffset;
-        private static readonly int feeOffset;
+        sizeOfMessageLength = sizeof(int);
+        sizeOfOrderId = OrderId.SizeOfOrderId;
+        sizeOfUserId = UserId.SizeOfUserId;
+        sizeOfVersion = sizeof(short);
+        sizeOfSide = sizeof(bool);
+        sizeOfCancelOn = sizeof(int);
+        sizeOfMessagetType = sizeof(MessageType);
+        sizeOfOrderAmount = Amount.SizeOfAmount;
+        sizeOfFeeId = sizeof(short);
+        sizeOfCost = Amount.SizeOfAmount;
+        sizeOfFee = Amount.SizeOfAmount;
+        version = 1;
 
-        private static readonly int sizeOfMessageLength;
-        private static readonly int sizeOfMessage;
-        private static readonly int sizeOfMessagetType;
-        private static readonly int sizeOfOrderId;
-        private static readonly int sizeOfUserId;
-        private static readonly int sizeOfVersion;
-        private static readonly int sizeOfSide;
-        private static readonly int sizeOfCancelOn;
-        private static readonly int sizeOfOrderAmount;
-        private static readonly int sizeOfFeeId;
-        private static readonly int sizeOfCost;
-        private static readonly int sizeOfFee;
+        messageLengthOffset = 0;
+        messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
+        versionOffset = messageTypeOffset + sizeOfMessagetType;
+        sideOffset = versionOffset + sizeOfVersion;
+        orderConditionOffset = sideOffset + sizeOfSide;
+        orderIdOffset = orderConditionOffset + sizeof(OrderCondition);
+        userIdOffset = orderIdOffset + sizeOfOrderId;
+        priceOffset = userIdOffset + sizeOfUserId;
+        quantityOffset = priceOffset + Price.SizeOfPrice;
+        stopPriceOffset = quantityOffset + Quantity.SizeOfQuantity;
+        totalQuantityOffset = stopPriceOffset + Price.SizeOfPrice;
+        cancelOnOffset = totalQuantityOffset + Quantity.SizeOfQuantity;
+        orderAmountOffset = cancelOnOffset + sizeOfCancelOn;
+        feeIdOffset = orderAmountOffset + sizeOfOrderAmount;
+        costOffset = feeIdOffset + sizeOfFeeId;
+        feeOffset = costOffset + sizeOfCost;
+        sizeOfMessage = feeOffset + sizeOfFee;
+    }
 
-        public static int MessageSize => sizeOfMessage;
+    public static void Serialize(Order order, Span<byte> bytes)
+    {
+        if (order == null)
+            throw new ArgumentNullException(nameof(order));
 
-        static OrderSerializer()
-        {
-            sizeOfMessageLength = sizeof(int);
-            sizeOfOrderId = OrderId.SizeOfOrderId;
-            sizeOfUserId = UserId.SizeOfUserId;
-            sizeOfVersion = sizeof(short);
-            sizeOfSide = sizeof(bool);
-            sizeOfCancelOn = sizeof(int);
-            sizeOfMessagetType = sizeof(MessageType);
-            sizeOfOrderAmount = Quantity.SizeOfQuantity;
-            sizeOfFeeId = sizeof(short);
-            sizeOfCost = Quantity.SizeOfQuantity;
-            sizeOfFee = Quantity.SizeOfQuantity;
-            version = 1;
+        if (bytes.Length < sizeOfMessage)
+            throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
 
-            messageLengthOffset = 0;
-            messageTypeOffset = messageLengthOffset + sizeOfMessageLength;
-            versionOffset = messageTypeOffset + sizeOfMessagetType;
-            sideOffset = versionOffset + sizeOfVersion;
-            orderConditionOffset = sideOffset + sizeOfSide;
-            orderIdOffset = orderConditionOffset + sizeof(OrderCondition);
-            userIdOffset = orderIdOffset + sizeOfOrderId;
-            priceOffset = userIdOffset + sizeOfUserId;
-            quantityOffset = priceOffset + Price.SizeOfPrice;
-            stopPriceOffset = quantityOffset + Quantity.SizeOfQuantity;
-            totalQuantityOffset = stopPriceOffset + Price.SizeOfPrice;
-            cancelOnOffset = totalQuantityOffset + Quantity.SizeOfQuantity;
-            orderAmountOffset = cancelOnOffset + sizeOfCancelOn;
-            feeIdOffset = orderAmountOffset + sizeOfOrderAmount;
-            costOffset = feeIdOffset + sizeOfFeeId;
-            feeOffset = costOffset + sizeOfCost;
-            sizeOfMessage = feeOffset + sizeOfFee;
-        }
+        Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
+        bytes[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
+        Write(bytes.Slice(versionOffset), version);
+        Write(bytes.Slice(sideOffset), order.IsBuy);
+        bytes[orderConditionOffset] = (byte)order.OrderCondition;
+        order.OrderId.WriteBytes(bytes.Slice(orderIdOffset));
+        order.UserId.WriteBytes(bytes.Slice(userIdOffset));
+        Price.WriteBytes(bytes.Slice(priceOffset), order.Price);
 
-        public static void Serialize(Order order, Span<byte> bytes)
-        {
-            if (order == null)
-                throw new ArgumentNullException(nameof(order));
+        if (order.TipQuantity > 0 && order.TotalQuantity > 0)
+            Quantity.WriteBytes(bytes.Slice(quantityOffset), order.TipQuantity);
+        else
+            Quantity.WriteBytes(bytes.Slice(quantityOffset), order.OpenQuantity);
 
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
+        Price.WriteBytes(bytes.Slice(stopPriceOffset), order.StopPrice);
+        Quantity.WriteBytes(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
+        Write(bytes.Slice(cancelOnOffset), order.CancelOn);
+        Amount.WriteBytes(bytes.Slice(orderAmountOffset), order.OrderAmount);
+        Write(bytes.Slice(feeIdOffset), order.FeeId);
+        Amount.WriteBytes(bytes.Slice(costOffset), order.Cost);
+        Amount.WriteBytes(bytes.Slice(feeOffset), order.Fee);
+    }
 
-            if (bytes.Length < sizeOfMessage)
-                throw new ArgumentException(Constant.INVALID_SIZE, nameof(bytes));
+    public static Order Deserialize(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.Length != sizeOfMessage)
+            throw new OrderMatcherException("Order Message must be of Size : " + sizeOfMessage);
 
-            Write(bytes.Slice(messageLengthOffset), sizeOfMessage);
-            bytes[messageTypeOffset] = (byte)MessageType.NewOrderRequest;
-            Write(bytes.Slice(versionOffset), version);
-            Write(bytes.Slice(sideOffset), order.IsBuy);
-            bytes[orderConditionOffset] = (byte)order.OrderCondition;
-            order.OrderId.WriteBytes(bytes.Slice(orderIdOffset));
-            order.UserId.WriteBytes(bytes.Slice(userIdOffset));
-            Price.WriteBytes(bytes.Slice(priceOffset), order.Price);
+        var messageType = (MessageType)(bytes[messageTypeOffset]);
 
-            if (order.TipQuantity > 0 && order.TotalQuantity > 0)
-                Quantity.WriteBytes(bytes.Slice(quantityOffset), order.TipQuantity);
-            else
-                Quantity.WriteBytes(bytes.Slice(quantityOffset), order.OpenQuantity);
+        if (messageType != MessageType.NewOrderRequest)
+            throw new OrderMatcherException(Constant.INVALID_MESSAGE);
 
-            Price.WriteBytes(bytes.Slice(stopPriceOffset), order.StopPrice);
-            Quantity.WriteBytes(bytes.Slice(totalQuantityOffset), order.TotalQuantity);
-            Write(bytes.Slice(cancelOnOffset), order.CancelOn);
-            Quantity.WriteBytes(bytes.Slice(orderAmountOffset), order.OrderAmount);
-            Write(bytes.Slice(feeIdOffset), order.FeeId);
-            Quantity.WriteBytes(bytes.Slice(costOffset), order.Cost);
-            Quantity.WriteBytes(bytes.Slice(feeOffset), order.Fee);
-        }
+        var messageVersion = BitConverter.ToInt16(bytes.Slice(versionOffset));
+        if (messageVersion != version)
+            throw new OrderMatcherException(Constant.INVALID_VERSION);
 
-        public static Order Deserialize(ReadOnlySpan<byte> bytes)
-        {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
+        var order = new Order();
 
-            if (bytes.Length != sizeOfMessage)
-                throw new Exception("Order Message must be of Size : " + sizeOfMessage);
+        order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
+        order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
+        order.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
+        order.UserId = UserId.ReadUserId(bytes.Slice(userIdOffset));
+        order.Price = Price.ReadPrice(bytes.Slice(priceOffset));
+        order.OpenQuantity = Quantity.ReadQuantity(bytes.Slice(quantityOffset));
+        order.StopPrice = Price.ReadPrice(bytes.Slice(stopPriceOffset));
 
-            var messageType = (MessageType)(bytes[messageTypeOffset]);
+        order.TotalQuantity = Quantity.ReadQuantity(bytes.Slice(totalQuantityOffset));
+        if (order.TotalQuantity > 0)
+            order.TipQuantity = order.OpenQuantity;
 
-            if (messageType != MessageType.NewOrderRequest)
-                throw new Exception(Constant.INVALID_MESSAGE);
-
-            var version = BitConverter.ToInt16(bytes.Slice(versionOffset));
-
-            if (version != OrderSerializer.version)
-                throw new Exception(Constant.INVALID_VERSION);
-
-            var order = new Order();
-
-            order.IsBuy = BitConverter.ToBoolean(bytes.Slice(sideOffset));
-            order.OrderCondition = (OrderCondition)bytes[orderConditionOffset];
-            order.OrderId = OrderId.ReadOrderId(bytes.Slice(orderIdOffset));
-            order.UserId = UserId.ReadUserId(bytes.Slice(userIdOffset));
-            order.Price = Price.ReadPrice(bytes.Slice(priceOffset));
-            order.OpenQuantity = Quantity.ReadQuantity(bytes.Slice(quantityOffset));
-            order.StopPrice = Price.ReadPrice(bytes.Slice(stopPriceOffset));
-
-            order.TotalQuantity = Quantity.ReadQuantity(bytes.Slice(totalQuantityOffset));
-            if (order.TotalQuantity > 0)
-                order.TipQuantity = order.OpenQuantity;
-
-            order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
-            order.OrderAmount = Quantity.ReadQuantity(bytes.Slice(orderAmountOffset));
-            order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
-            order.Cost = Quantity.ReadQuantity(bytes.Slice(costOffset));
-            order.Fee = Quantity.ReadQuantity(bytes.Slice(feeOffset));
-            return order;
-        }
+        order.CancelOn = BitConverter.ToInt32(bytes.Slice(cancelOnOffset));
+        order.OrderAmount = Amount.ReadAmount(bytes.Slice(orderAmountOffset));
+        order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
+        order.Cost = Amount.ReadAmount(bytes.Slice(costOffset));
+        order.Fee = Amount.ReadAmount(bytes.Slice(feeOffset));
+        return order;
     }
 }

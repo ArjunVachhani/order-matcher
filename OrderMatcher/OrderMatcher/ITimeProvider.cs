@@ -1,10 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace OrderMatcher
+namespace OrderMatcher;
+
+public interface ITimeProvider
 {
-    public interface ITimeProvider
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int GetSecondsFromEpoch();
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    int GetSecondsFromEpoch();
 }

@@ -1,24 +1,20 @@
-﻿using BenchmarkDotNet.Attributes;
-using System;
+﻿namespace OrderMatcher.Performance;
 
-namespace OrderMatcher.Performance
+[MemoryDiagnoser]
+[MinColumn, MaxColumn, MeanColumn, MedianColumn]
+public class SpanBenchmark
 {
-    [MemoryDiagnoser]
-    [MinColumn, MaxColumn, MeanColumn, MedianColumn]
-    public class SpanBenchmark
+    [Benchmark]
+    public void Slice()
     {
-        [Benchmark]
-        public void Slice()
-        {
-            Span<byte> bytes = stackalloc byte[10];
-            bytes.Slice(3);
-        }
+        Span<byte> bytes = stackalloc byte[10];
+        bytes.Slice(3);
+    }
 
-        [Benchmark]
-        public void SliceWithLength()
-        {
-            Span<byte> bytes = stackalloc byte[10];
-            bytes.Slice(3, 4);
-        }
+    [Benchmark]
+    public void SliceWithLength()
+    {
+        Span<byte> bytes = stackalloc byte[10];
+        bytes.Slice(3, 4);
     }
 }
