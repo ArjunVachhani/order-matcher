@@ -158,7 +158,7 @@ public class MatchingEngine
         {
             _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, incomingOrder.OpenQuantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.FillOrKill);
         }
-        else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount > 0 && canBeFilled == false)
+        else if (incomingOrder.OrderCondition == OrderCondition.FillOrKill && incomingOrder.OrderAmount > 0 && !canBeFilled)
         {
             _tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, 0, 0, 0, CancelReason.FillOrKill);
         }
@@ -430,14 +430,18 @@ public class MatchingEngine
 
     private (Quantity? Quantity, bool CanFill) GetQuantity(Amount orderAmount)
     {
-        bool dustRemaining = false;
+        var dustRemaining = false;
+        var trig = false;
         Quantity quantity = 0;
         foreach (var level in _book.AskSide)
         {
             foreach (var order in level)
             {
                 if (orderAmount == 0)
-                    goto outOfLoop;
+                {
+                    trig = true;
+                    break;
+                }
 
                 var amount = order.OpenQuantity * order.Price;
                 if (amount <= orderAmount)
@@ -450,24 +454,22 @@ public class MatchingEngine
                     dustRemaining = true;
                     var q = (orderAmount / order.Price);
                     q = q - (q % _stepSize);
-                    if (q > 0)
+                    if (q <= 0)
                     {
-                        quantity += q;
-                        orderAmount -= (q * order.Price);
+                        trig = true;
+                        break;
                     }
-                    else
-                    {
-                        goto outOfLoop;
-                    }
+
+                    quantity += q;
+                    orderAmount -= (q * order.Price);
                 }
             }
+
+            if (trig) break;
         }
 
-    outOfLoop:
-        var fill = orderAmount == 0 || dustRemaining == true;
-        if (quantity > 0)
-            return (quantity, fill);
-        else
-            return (null, fill);
+        var fill = orderAmount == 0 || dustRemaining;
+
+        return (quantity > 0 ? quantity : null, fill);
     }
 }
