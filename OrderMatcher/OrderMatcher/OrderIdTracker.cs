@@ -1,6 +1,6 @@
 ﻿namespace OrderMatcher;
 
-public class OrderIdTracker
+public class OrderIdTracker : IEnumerable<OrderId>
 {
     private readonly SortedSet<RangeTracker> _ranges = new SortedSet<RangeTracker>(new RangeTrackerComparer());
     private readonly RangeTracker _rangeForSearch = new RangeTracker(0, 1);
@@ -11,6 +11,8 @@ public class OrderIdTracker
 
     internal int RangesCount => _ranges.Count;
     internal IEnumerable<RangeTracker> Ranges => _ranges;
+
+    public OrderIdTracker() : this(256) { }
 
     public OrderIdTracker(int rangeTrackerSize)
     {
@@ -93,9 +95,49 @@ public class OrderIdTracker
             _ranges.Remove(rangesToRemove[i]);
         }
     }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public void Clear()
+    {
+        _ranges.Clear();
+        _cached = null;
+        _markAfterCompaction = 0;
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public void TrimExcess()
+    {
+        Compact();
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public bool Contains(OrderId orderId)
+    {
+        return IsMarked(orderId);
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public bool Add(OrderId orderId)
+    {
+        return TryMark(orderId);
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public IEnumerator<OrderId> GetEnumerator()
+    {
+        foreach (var range in Ranges)
+            foreach (var orderId in range)
+                yield return orderId;
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
-internal class RangeTracker
+internal class RangeTracker : IEnumerable<OrderId>
 {
     private readonly OrderId _bitArrayStartOrderId;
     private BitArray? _bitArray;
@@ -173,6 +215,24 @@ internal class RangeTracker
     public void ExtendMarkToOrderId(OrderId toOrderId)
     {
         ToOrderId = toOrderId;
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    public IEnumerator<OrderId> GetEnumerator()
+    {
+        for (OrderId i = FromOrderId; i <= ToOrderId; i++)
+        {
+            if (IsMarked(i))
+                yield return i;
+            else
+                continue;
+        }
+    }
+
+    [Obsolete("Added to support drop in replacement of HashSet<OrderId>")]
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
 

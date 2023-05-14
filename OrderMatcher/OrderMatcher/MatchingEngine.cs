@@ -3,7 +3,7 @@
 public class MatchingEngine
 {
     private readonly Book _book;
-    private readonly HashSet<OrderId> _acceptedOrders;
+    private readonly OrderIdTracker _acceptedOrders;
     private readonly Queue<IReadOnlyList<PriceLevel>> _stopOrderQueue;
     private readonly ITradeListener _tradeListener;
     private readonly Quantity _stepSize;
@@ -43,7 +43,7 @@ public class MatchingEngine
 
         _book = new Book();
         _stopOrderQueue = new Queue<IReadOnlyList<PriceLevel>>();
-        _acceptedOrders = new HashSet<OrderId>();
+        _acceptedOrders = new ();
         _tradeListener = tradeListener;
         _feeProvider = feeProvider;
         _quoteCurrencyDecimalPlaces = quoteCurrencyDecimalPlaces;
