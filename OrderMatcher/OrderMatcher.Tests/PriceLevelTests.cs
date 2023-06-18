@@ -214,4 +214,42 @@ public class PriceLevelTests
         Assert.Equal(1, priceLevel.OrderCount);
         Assert.Equal(100, priceLevel.Price);
     }
+
+    [Theory]
+    [InlineData(10, 0, 0, 1, 9)]
+    [InlineData(10, 10, 10, 10, 10)]
+    [InlineData(10, 10, 10, 1, 10)]
+    [InlineData(10, 10, 10, 11, 9)]
+    [InlineData(10, 10, 10, 20, 10)]
+    public void DecrementQuantityTests(int openQuantity, int tipQuanitity, int totalQuantity, int quantityToDecrement, int expectedPriceLevelQuantity)
+    {
+        PriceLevel priceLevel = new PriceLevel(100);
+        Order order1 = new Order()
+        {
+            IsBuy = true,
+            OrderId = 1,
+            UserId = 1,
+            Price = 100,
+            Sequence = 1,
+            OpenQuantity = openQuantity,
+            TotalQuantity = totalQuantity,
+            TipQuantity = tipQuanitity
+        };
+        priceLevel.AddOrder(order1);
+
+        Order order2 = new Order()
+        {
+            IsBuy = true,
+            OrderId = 2,
+            UserId = 2,
+            Price = 100,
+            Sequence = 2,
+            OpenQuantity = openQuantity,
+            TotalQuantity = totalQuantity,
+            TipQuantity = tipQuanitity
+        };
+        priceLevel.DecrementQuantity(order1, quantityToDecrement);
+        Assert.Equal(expectedPriceLevelQuantity, priceLevel.Quantity);
+        priceLevel.DecrementQuantity(order2, quantityToDecrement);
+    }
 }

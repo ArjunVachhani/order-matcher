@@ -36,6 +36,15 @@ internal class Side<T> where T : class, IPriceLevel, new()
         return removed;
     }
 
+    public void DecrementQuantity(Order order, Quantity quantityToDecrement)
+    {
+        _priceLevelForSearch.SetPrice(order.Price);
+        if (_priceLevels.TryGetValue(_priceLevelForSearch, out T? priceLevel))
+        {
+            priceLevel.DecrementQuantity(order, quantityToDecrement);
+        }
+    }
+
     public IReadOnlyList<T>? RemovePriceLevelTill(Price price)
     {
         List<T>? priceLevels = null;

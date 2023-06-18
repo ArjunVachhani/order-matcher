@@ -9,5 +9,6 @@ public enum CancelReason : byte
     BookOrCancel = 5,
     ValidityExpired = 6,
     MarketOrderCannotMatchLessThanStepSize = 7,
-    InvalidOrder = 8
+    InvalidOrder = 8,
+    SelfMatch = 9,
 }
