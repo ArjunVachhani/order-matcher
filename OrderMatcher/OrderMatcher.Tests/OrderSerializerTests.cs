@@ -2,7 +2,7 @@
 
 public class OrderSerializerTests
 {
-    private static readonly int messageSize = 143;
+    private static readonly int messageSize = 144;
 
     [Fact]
     public void Serialize_Doesnotthrowexception_Min()
@@ -23,7 +23,8 @@ public class OrderSerializerTests
             FeeId = short.MinValue,
             Cost = Amount.MinValue,
             Fee = Amount.MinValue,
-            OpenQuantity = Quantity.MinValue
+            OpenQuantity = Quantity.MinValue,
+            SelfMatchAction = SelfMatchAction.Match,
         };
         OrderSerializer.Serialize(orderWrapper, bytes);
     }
@@ -47,7 +48,8 @@ public class OrderSerializerTests
             FeeId = short.MaxValue,
             Cost = Amount.MaxValue,
             Fee = Amount.MaxValue,
-            OpenQuantity = Quantity.MaxValue
+            OpenQuantity = Quantity.MaxValue,
+            SelfMatchAction = SelfMatchAction.Decrement,
         };
         OrderSerializer.Serialize(orderWrapper, bytes);
     }
@@ -111,7 +113,8 @@ public class OrderSerializerTests
             FeeId = short.MinValue,
             Cost = Amount.MinValue,
             Fee = Amount.MinValue,
-            OpenQuantity = Quantity.MinValue
+            OpenQuantity = Quantity.MinValue,
+            SelfMatchAction = SelfMatchAction.Match,
         };
         OrderSerializer.Serialize(inputOrder, bytes);
         var messageLength = BitConverter.ToInt32(bytes.Slice(0));
@@ -131,6 +134,7 @@ public class OrderSerializerTests
         Assert.Equal(short.MinValue, order.FeeId);
         Assert.Equal(Amount.MinValue, order.Cost);
         Assert.Equal(Amount.MinValue, order.Fee);
+        Assert.Equal(SelfMatchAction.Match, order.SelfMatchAction);
     }
 
     [Fact]
@@ -152,7 +156,8 @@ public class OrderSerializerTests
             FeeId = short.MaxValue,
             Cost = Amount.MaxValue,
             Fee = Amount.MaxValue,
-            OpenQuantity = Quantity.MaxValue
+            OpenQuantity = Quantity.MaxValue,
+            SelfMatchAction = SelfMatchAction.Decrement,
         };
         OrderSerializer.Serialize(orderWrapper, bytes);
         var messageLength = BitConverter.ToInt32(bytes.Slice(0));
@@ -172,13 +177,14 @@ public class OrderSerializerTests
         Assert.Equal(short.MaxValue, order.FeeId);
         Assert.Equal(Amount.MaxValue, order.Cost);
         Assert.Equal(Amount.MaxValue, order.Fee);
+        Assert.Equal(SelfMatchAction.Decrement, order.SelfMatchAction);
     }
 
     [Fact]
     public void Deserialize_Doesnotthrowexception()
     {
         Span<byte> bytes = stackalloc byte[OrderSerializer.MessageSize];
-        var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546, UserId = 841549 };
+        var orderWrapper = new Order() { StopPrice = 9534, TotalQuantity = 7878234, TipQuantity = 2356, OrderCondition = OrderCondition.ImmediateOrCancel, OrderAmount = 12345.6789m, CancelOn = 12345678, IsBuy = true, OrderId = 56789, Price = 404, FeeId = 69, Cost = 253.15m, Fee = 8649.123m, OpenQuantity = 546, UserId = 841549, SelfMatchAction = SelfMatchAction.CancelNewest };
         OrderSerializer.Serialize(orderWrapper, bytes);
         var messageLength = BitConverter.ToInt32(bytes.Slice(0));
         Assert.Equal(messageSize, messageLength);
@@ -198,5 +204,6 @@ public class OrderSerializerTests
         Assert.Equal((Amount)253.15m, order.Cost);
         Assert.Equal((Amount)8649.123m, order.Fee);
         Assert.Equal((Quantity)2356, order.OpenQuantity);
+        Assert.Equal(SelfMatchAction.CancelNewest, order.SelfMatchAction);
     }
 }
