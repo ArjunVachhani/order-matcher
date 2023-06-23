@@ -67,6 +67,14 @@ public class PriceLevel : IPriceLevel
         }
     }
 
+    public void DecrementQuantity(Order order, Quantity quantityToDecrement)
+    {
+        if (_orders.TryGetValue(order, out var orderToUpdate))
+        {
+            orderToUpdate.DecrementQuantity(quantityToDecrement);
+        }
+    }
+
     public IEnumerator<Order> GetEnumerator()
     {
         return _orders.GetEnumerator();

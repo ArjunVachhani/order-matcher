@@ -62,6 +62,19 @@ public class QuantityTrackingPriceLevel : IPriceLevel
         }
     }
 
+    public void DecrementQuantity(Order order, Quantity quantityToDecrement)
+    {
+        if (_orders.TryGetValue(order, out var orderToUpdate))
+        {
+            var previousOpenQuantity = orderToUpdate.OpenQuantity;
+            if (orderToUpdate.DecrementQuantity(quantityToDecrement))
+            {
+                _quantity -= previousOpenQuantity;
+                _quantity += orderToUpdate.OpenQuantity;
+            }
+        }
+    }
+
     public Order? First
     {
         get { return _orders.Min; }

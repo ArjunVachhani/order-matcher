@@ -9,4 +9,5 @@ internal interface IPriceLevel : IEnumerable<Order>
     bool RemoveOrder(Order order);
     void SetPrice(Price price);
     bool Fill(Order order, Quantity quantity);
+    void DecrementQuantity(Order order, Quantity quantityToDecrement);
 }

@@ -15,6 +15,8 @@ public enum MessageType : byte
     Book = 104,
     OrderTrigger = 105,
     OrderAccept = 106,
+    DecrementQuantity = 107,
+    SelfMatch = 108,
 
     GeneralPurpose1 = 201,
     GeneralPurpose2 = 202,
