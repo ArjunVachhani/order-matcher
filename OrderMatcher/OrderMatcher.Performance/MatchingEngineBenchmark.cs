@@ -179,10 +179,18 @@ class FakeTradeListener : ITradeListener
         CancelledOrderSerializer.Serialize(++messageSequence, orderId, userId, remainingQuantity, cost, fee, cancelReason, 123, bytes);
     }
 
+    public void OnDecrement(OrderId orderId, UserId userId, Quantity quantityDecremented)
+    {//TODO
+    }
+
     public void OnOrderTriggered(OrderId orderId, UserId userId)
     {
         var bytes = new byte[OrderTriggerSerializer.MessageSize];
         OrderTriggerSerializer.Serialize(++messageSequence, orderId, userId, 123, bytes);
+    }
+
+    public void OnSelfMatch(OrderId incomingOrderId, OrderId restingOrderId, UserId userId)
+    {//TODO
     }
 
     public void OnTrade(OrderId incomingOrderId, OrderId restingOrderId, UserId incomingUserId, UserId restingUserId, bool incomingOrderSide, Price matchPrice, Quantity matchQuantiy, Quantity? askRemainingQuantity, Amount? askFee, Amount? bidCost, Amount? bidFee)

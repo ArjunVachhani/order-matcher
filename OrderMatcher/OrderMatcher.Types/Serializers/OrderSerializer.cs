@@ -19,6 +19,7 @@ public class OrderSerializer : Serializer
     private static readonly int feeIdOffset;
     private static readonly int costOffset;
     private static readonly int feeOffset;
+    private static readonly int selfMatchActionOffset;
 
     private static readonly int sizeOfMessageLength;
     private static readonly int sizeOfMessage;
@@ -66,7 +67,10 @@ public class OrderSerializer : Serializer
         feeIdOffset = orderAmountOffset + sizeOfOrderAmount;
         costOffset = feeIdOffset + sizeOfFeeId;
         feeOffset = costOffset + sizeOfCost;
-        sizeOfMessage = feeOffset + sizeOfFee;
+        selfMatchActionOffset = feeOffset + sizeOfFee;
+        sizeOfMessage = selfMatchActionOffset + sizeof(SelfMatchAction);
+        if (sizeof(OrderCondition) != sizeof(byte) || sizeof(SelfMatchAction) != sizeof(byte))
+            throw new OrderMatcherException("Size of OrderCondition and SelfMatchAction must be 1 byte.");
     }
 
     public static void Serialize(Order order, Span<byte> bytes)
@@ -98,6 +102,7 @@ public class OrderSerializer : Serializer
         Write(bytes.Slice(feeIdOffset), order.FeeId);
         Amount.WriteBytes(bytes.Slice(costOffset), order.Cost);
         Amount.WriteBytes(bytes.Slice(feeOffset), order.Fee);
+        bytes[selfMatchActionOffset] = (byte)order.SelfMatchAction;
     }
 
     public static Order Deserialize(ReadOnlySpan<byte> bytes)
@@ -133,6 +138,7 @@ public class OrderSerializer : Serializer
         order.FeeId = BitConverter.ToInt16(bytes.Slice(feeIdOffset));
         order.Cost = Amount.ReadAmount(bytes.Slice(costOffset));
         order.Fee = Amount.ReadAmount(bytes.Slice(feeOffset));
+        order.SelfMatchAction = (SelfMatchAction)bytes[selfMatchActionOffset];
         return order;
     }
 }

@@ -36,10 +36,10 @@ public class MatchingEngine
     public MatchingEngine(ITradeListener tradeListener, IFeeProvider feeProvider, Quantity stepSize, int quoteCurrencyDecimalPlaces = 0)
     {
         if (quoteCurrencyDecimalPlaces < 0)
-            throw new NotSupportedException($"Invalid value of {nameof(quoteCurrencyDecimalPlaces)}");
+            throw new OrderMatcherException($"Invalid value of {nameof(quoteCurrencyDecimalPlaces)}");
 
         if (stepSize < 0)
-            throw new NotSupportedException($"Invalid value of {nameof(stepSize)}");
+            throw new OrderMatcherException($"Invalid value of {nameof(stepSize)}");
 
         _book = new Book();
         _stopOrderQueue = new Queue<IReadOnlyList<PriceLevel>>();
@@ -311,6 +311,62 @@ public class MatchingEngine
 
             if ((incomingOrder.IsBuy && (restingOrder.Price <= incomingOrder.Price || incomingOrder.Price == 0)) || (!incomingOrder.IsBuy && (restingOrder.Price >= incomingOrder.Price)))
             {
+                if (incomingOrder.UserId == restingOrder.UserId && incomingOrder.SelfMatchAction != SelfMatchAction.Match)
+                {
+                    _tradeListener?.OnSelfMatch(incomingOrder.OrderId, restingOrder.OrderId, incomingOrder.UserId);
+                    if (incomingOrder.SelfMatchAction == SelfMatchAction.CancelNewest)
+                    {
+                        CancelIncomingOrder(incomingOrder, _tradeListener);
+                        break;
+                    }
+                    else if (incomingOrder.SelfMatchAction == SelfMatchAction.CancelOldest)
+                    {
+                        CancelOrder(restingOrder.OrderId, CancelReason.SelfMatch);
+                        continue;
+                    }
+                    else if (incomingOrder.SelfMatchAction == SelfMatchAction.Decrement)
+                    {
+                        var incomingOrderQuantity = incomingOrder.IsTip ? incomingOrder.OpenQuantity + incomingOrder.TotalQuantity : incomingOrder.OpenQuantity;
+                        var restingOrderQuantity = restingOrder.IsTip ? restingOrder.OpenQuantity + restingOrder.TotalQuantity : restingOrder.OpenQuantity;
+                        if (incomingOrderQuantity > restingOrderQuantity)
+                        {
+                            DecrementQuantity(incomingOrder, restingOrderQuantity, _tradeListener, null);
+                            CancelOrder(restingOrder.OrderId, CancelReason.SelfMatch);
+                            continue;
+                        }
+                        else if (restingOrderQuantity > incomingOrderQuantity)
+                        {
+                            DecrementQuantity(restingOrder, incomingOrderQuantity, _tradeListener, _book);
+                            CancelIncomingOrder(incomingOrder, _tradeListener);
+                            break;
+                        }
+                        else
+                        {
+                            CancelOrder(restingOrder.OrderId, CancelReason.SelfMatch);
+                            CancelIncomingOrder(incomingOrder, _tradeListener);
+                            break;
+                        }
+                    }
+
+                    static void DecrementQuantity(Order order, Quantity quantityToDecrement, ITradeListener? tradeListener, Book? orderBook)
+                    {
+                        if (orderBook != null)
+                            orderBook?.DecrementQuantity(order, quantityToDecrement);
+                        else
+                            order.DecrementQuantity(quantityToDecrement);
+
+                        tradeListener?.OnDecrement(order.OrderId, order.UserId, quantityToDecrement);
+                    }
+
+                    static void CancelIncomingOrder(Order incomingOrder, ITradeListener? tradeListener)
+                    {
+                        var quantity = incomingOrder.IsTip ? incomingOrder.OpenQuantity + incomingOrder.TotalQuantity : incomingOrder.OpenQuantity;
+                        tradeListener?.OnCancel(incomingOrder.OrderId, incomingOrder.UserId, quantity, incomingOrder.Cost, incomingOrder.Fee, CancelReason.SelfMatch);
+                        incomingOrder.OpenQuantity = 0;
+                        incomingOrder.TotalQuantity = 0;
+                    }
+                }
+
                 Price matchPrice = restingOrder.Price;
                 Quantity maxQuantity;
                 if (incomingOrder.OpenQuantity > 0)
@@ -425,7 +481,7 @@ public class MatchingEngine
 
         var quantity = order.TipQuantity < order.TotalQuantity ? order.TipQuantity : order.TotalQuantity;
         var remainigTotalQuantity = order.TotalQuantity - quantity;
-        return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId, FeeId = order.FeeId, OrderCondition = order.OrderCondition, StopPrice = order.StopPrice };
+        return new Order { IsBuy = order.IsBuy, Price = order.Price, OrderId = order.OrderId, OpenQuantity = quantity, CancelOn = order.CancelOn, Cost = order.Cost, Fee = order.Fee, TipQuantity = order.TipQuantity, TotalQuantity = remainigTotalQuantity, UserId = order.UserId, FeeId = order.FeeId, OrderCondition = order.OrderCondition, StopPrice = order.StopPrice, SelfMatchAction = order.SelfMatchAction };
     }
 
     private (Quantity? Quantity, bool CanFill) GetQuantity(Amount orderAmount)

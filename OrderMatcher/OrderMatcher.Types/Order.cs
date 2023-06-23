@@ -17,6 +17,7 @@ public class Order
     public Amount OrderAmount { get; set; }
     public Price StopPrice { get; set; }
     public OrderCondition OrderCondition { get; set; }
+    public SelfMatchAction SelfMatchAction { get; set; }
     public bool IsFilled
     {
         get
@@ -47,6 +48,23 @@ public class Order
         }
 
         return base.Equals(obj);
+    }
+
+    public bool DecrementQuantity(Quantity quantityToDecrement)
+    {
+        var orderTotalQuantity = IsTip ? OpenQuantity + TotalQuantity : OpenQuantity;
+        if (orderTotalQuantity <= quantityToDecrement || quantityToDecrement <= 0)
+            return false;
+
+        if (IsTip)
+        {
+            var t = quantityToDecrement > TotalQuantity ? TotalQuantity : quantityToDecrement;
+            TotalQuantity -= t;
+            quantityToDecrement -= t;
+        }
+
+        OpenQuantity -= quantityToDecrement;
+        return true;
     }
 
     public override int GetHashCode()

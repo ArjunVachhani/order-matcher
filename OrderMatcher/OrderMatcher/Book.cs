@@ -127,6 +127,12 @@ public class Book
         return isBuy ? _bids.BestPriceLevel?.First : _asks.BestPriceLevel?.First;
     }
 
+    internal void DecrementQuantity(Order order, Quantity quantityToDecrement)
+    {
+        var side = order.IsBuy ? _bids: _asks;
+        side.DecrementQuantity(order, quantityToDecrement);
+    }
+
     internal bool CheckCanFillOrder(bool isBuy, Quantity requestedQuantity, Price limitPrice)
     {
         var side = isBuy ? _asks : _bids;

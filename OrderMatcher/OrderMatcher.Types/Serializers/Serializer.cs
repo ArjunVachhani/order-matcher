@@ -177,6 +177,10 @@ public abstract class Serializer
             return MessageType.OrderAccept;
         else if ((MessageType)data[4] == MessageType.OrderTrigger && messageSize == OrderTriggerSerializer.MessageSize)
             return MessageType.OrderTrigger;
+        else if ((MessageType)data[4] == MessageType.SelfMatch && messageSize == SelfMatchSerializer.MessageSize)
+            return MessageType.OrderTrigger;
+        else if ((MessageType)data[4] == MessageType.DecrementQuantity && messageSize == DecrementQuantitySerializer.MessageSize)
+            return MessageType.OrderTrigger;
         else if ((MessageType)data[4] == MessageType.Book)
             return MessageType.Book;
 
