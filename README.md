@@ -3,19 +3,21 @@
 
 ![](https://github.com/ArjunVachhani/order-matcher/workflows/.NET%20Core/badge.svg?branch=master)
 
-Order Matching Engine / Trading Engine
+order-matcher is a simple and fast library to build crypto-currency exchange, stock exchange or commodity exchange. order-matcher matches buy and sell orders using price-time priority algorithm. order-matcher supports multiple order types and able to excecute upto 1 million messages per seconds.
 
- - Built with .Net Core, can run on **linux and windows**
  - Support multiple order types
 	 - Limit 
 	 - Market  
-	 - Stop Loss  / Stop Limit
+	 - Stop Loss
+  	 - Stop Limit
+  - Supports multiple options on order
 	 - Immediate or Cancel(IOC) 
-	 - Fill or kill(FOK) 
-	 - Good till Date(GTD) 
+	 - Fill or kill(FOK)
 	 - Iceberg
+	 - Good till Date(GTD) 
+  	 - Self Trade Prevention 	
        
-
+**1 Million orders per seconds on AWS c6a.xlarge instance**
 
 **Supports integer & real numbers/decimal for price and quantity**
 
