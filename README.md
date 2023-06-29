@@ -11,6 +11,7 @@ order-matcher is a simple and fast library to build crypto-currency exchange, st
 	 - Stop Loss
   	 - Stop Limit
   - Supports multiple options on order
+	 - Book or Cancel
 	 - Immediate or Cancel(IOC) 
 	 - Fill or kill(FOK)
 	 - Iceberg
