@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using System.Threading;
 
 namespace OrderMatcher.Performance;
 
@@ -6,36 +7,56 @@ class Program
 {
     static void Main(string[] args)
     {
-        BenchmarkRunner.Run<BookRequestDeserializeBenchmark>();
-        BenchmarkRunner.Run<BookRequestSerializeBenchmark>();
-        BenchmarkRunner.Run<CancelRequestDeserializeBenchmark>();
-        BenchmarkRunner.Run<CancelRequestSerializeBenchmark>();
-        BenchmarkRunner.Run<FillDeserializeBenchmark>();
-        BenchmarkRunner.Run<FillSerializeBenchmark>();
-        BenchmarkRunner.Run<OrderBookDeserializeBenchmark>();
-        BenchmarkRunner.Run<OrderBookSerializeBenchmark>();
-        BenchmarkRunner.Run<OrderCancelledDeserializeBenchmark>();
-        BenchmarkRunner.Run<OrderCancelledSerializeBenchmark>();
-        BenchmarkRunner.Run<OrderDeserializeBenchmark>();
-        BenchmarkRunner.Run<OrderSerializeBenchmark>();
-        BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
-        BenchmarkRunner.Run<OrderTriggerDeserializeBenchmark>();
-        BenchmarkRunner.Run<OrderTriggerSerializeBenchmark>();
-        BenchmarkRunner.Run<PriceLevelBenchmark>();
-        BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
-        BenchmarkRunner.Run<SpanBenchmark>();
-        BenchmarkRunner.Run<MatchingEngineBenchmark>();
+        Console.WriteLine($"Choose {Environment.NewLine}1 Load Runner {Environment.NewLine}2 Benchmark");
+        int.TryParse(Console.ReadLine(), out var choice);
+
+        if (choice == 1)
+        {
+            //use dotnet-counters to collect and monitor 
+            LoadRunner loadRunner = new LoadRunner(100_000, 5, 3);
+            Thread t = new Thread(loadRunner.Run);
+            var cancellationTokenSource = new CancellationTokenSource();
+            t.Start(cancellationTokenSource.Token);
+            Console.WriteLine("Press any key to stop");
+            Console.ReadLine();
+            cancellationTokenSource.Cancel();
+            t.Join();
+        }
+        else
+        {
+
+            BenchmarkRunner.Run<BookRequestDeserializeBenchmark>();
+            BenchmarkRunner.Run<BookRequestSerializeBenchmark>();
+            BenchmarkRunner.Run<CancelRequestDeserializeBenchmark>();
+            BenchmarkRunner.Run<CancelRequestSerializeBenchmark>();
+            BenchmarkRunner.Run<FillDeserializeBenchmark>();
+            BenchmarkRunner.Run<FillSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderBookDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderBookSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderCancelledDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderCancelledSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderSerializeBenchmark>();
+            BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
+            BenchmarkRunner.Run<OrderTriggerDeserializeBenchmark>();
+            BenchmarkRunner.Run<OrderTriggerSerializeBenchmark>();
+            BenchmarkRunner.Run<PriceLevelBenchmark>();
+            BenchmarkRunner.Run<OrderSequenceComparerBenchmark>();
+            BenchmarkRunner.Run<SpanBenchmark>();
+            BenchmarkRunner.Run<MatchingEngineBenchmark>();
 
 
-        //TODO check for aggresive inline performance improvement
-        //TODO check no foreach statement
-        //TODO avoid inheritance / interface / virtual function
-        //TODO order class field vs property performance
-        //TODO performance check before and after getHashCode on Order, Price, Quantity, Cost
-        //TODO check for data structure available O(1) O(log n)
-        //TODO check for memory usage
-        //TODO check use of property should be avoided as much as possible
-        //TODO GC ??
+            //TODO check for aggresive inline performance improvement
+            //TODO check no foreach statement
+            //TODO avoid inheritance / interface / virtual function
+            //TODO order class field vs property performance
+            //TODO performance check before and after getHashCode on Order, Price, Quantity, Cost
+            //TODO check for data structure available O(1) O(log n)
+            //TODO check for memory usage
+            //TODO check use of property should be avoided as much as possible
+            //TODO GC ??
+
+        }
     }
 }
 
