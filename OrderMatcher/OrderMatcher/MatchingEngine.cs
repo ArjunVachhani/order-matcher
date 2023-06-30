@@ -379,13 +379,13 @@ public class MatchingEngine
                     throw new OrderMatcherException(Constant.NOT_EXPECTED);
                 }
 
-                var cost = Math.Round(maxQuantity * matchPrice, _quoteCurrencyDecimalPlaces);
+                var cost = (maxQuantity * matchPrice).Round(_quoteCurrencyDecimalPlaces);
                 restingOrder.Cost += cost;
                 incomingOrder.Cost += cost;
                 var incomingFee = _feeProvider.GetFee(incomingOrder.FeeId);
                 var restingFee = _feeProvider.GetFee(restingOrder.FeeId);
-                restingOrder.Fee += Math.Round((cost * restingFee.MakerFee) / 100, _quoteCurrencyDecimalPlaces);
-                incomingOrder.Fee += Math.Round((cost * incomingFee.TakerFee) / 100, _quoteCurrencyDecimalPlaces);
+                restingOrder.Fee += ((cost * restingFee.MakerFee) / 100).Round(_quoteCurrencyDecimalPlaces);
+                incomingOrder.Fee += ((cost * incomingFee.TakerFee) / 100).Round(_quoteCurrencyDecimalPlaces);
                 bool orderFilled = _book.FillOrder(restingOrder, maxQuantity);
                 bool isRestingTipAdded = false;
                 if (orderFilled && restingOrder.IsTip)
