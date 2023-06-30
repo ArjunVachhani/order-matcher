@@ -11,6 +11,11 @@ public readonly struct Quantity : IEquatable<Quantity>, IComparable<Quantity>
         _quantity = quantity;
     }
 
+    public static Amount operator *(Quantity q, Price p)
+    {
+        return new Amount(q._quantity * p.GetPrice());
+    }
+
     public static Quantity operator -(Quantity a, Quantity b)
     {
         return a._quantity - b._quantity;
@@ -19,6 +24,11 @@ public readonly struct Quantity : IEquatable<Quantity>, IComparable<Quantity>
     public static Quantity operator +(Quantity a, Quantity b)
     {
         return a._quantity + b._quantity;
+    }
+
+    public static Quantity operator %(Quantity a, Quantity b)
+    {
+        return a._quantity % b._quantity;
     }
 
     public static implicit operator Quantity(decimal quantity)

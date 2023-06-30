@@ -5,10 +5,12 @@
 [MinColumn, MaxColumn, MeanColumn, MedianColumn, AllStatisticsColumn]
 public class MatchingEngineBenchmark
 {
+    private readonly static Quantity stepSize = new Quantity(0.00000001m);
+
     [Benchmark]
     public void CreateMatchingEngine()
     {
-        MatchingEngine engine = new MatchingEngine(null, null, 0.00000001m, 8);
+        MatchingEngine engine = new MatchingEngine(null, null, stepSize, 8);
     }
 
     [Benchmark]
@@ -36,7 +38,7 @@ public class MatchingEngineBenchmark
     [Benchmark]
     public void AddOrder()
     {
-        MatchingEngine engine = new MatchingEngine(null, null, 0.00000001m, 8);
+        MatchingEngine engine = new MatchingEngine(null, null, stepSize, 8);
         Order order = new Order()
         {
             CancelOn = 0,
@@ -63,7 +65,7 @@ public class MatchingEngineBenchmark
     [Benchmark]
     public void AddAndCancelOrder()
     {
-        MatchingEngine engine = new MatchingEngine(null, null, 0.00000001m, 8);
+        MatchingEngine engine = new MatchingEngine(null, null, stepSize, 8);
         Order order = new Order()
         {
             CancelOn = 0,
@@ -95,7 +97,7 @@ public class MatchingEngineBenchmark
     [Benchmark]
     public void TenAddOrder()
     {
-        MatchingEngine engine = new MatchingEngine(new FakeTradeListener(), new FakeFeeProvider(), 0.00000001m, 8);
+        MatchingEngine engine = new MatchingEngine(new FakeTradeListener(), new FakeFeeProvider(), stepSize, 8);
         for (var i = 0; i < 10; i++)
         {
             Order order = new Order()
@@ -124,7 +126,7 @@ public class MatchingEngineBenchmark
     [Benchmark]
     public void TenAddAndCancel()
     {
-        MatchingEngine engine = new MatchingEngine(new FakeTradeListener(), new FakeFeeProvider(), 0.00000001m, 8);
+        MatchingEngine engine = new MatchingEngine(new FakeTradeListener(), new FakeFeeProvider(), stepSize, 8);
         for (var i = 1; i <= 10; i++)
         {
             Order order = new Order()

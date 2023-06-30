@@ -26,6 +26,12 @@ public readonly struct Price : IEquatable<Price>, IComparable<Price>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal decimal GetPrice()
+    {
+        return _price;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(Price a, Price b)
     {
         return a._price > b._price;
