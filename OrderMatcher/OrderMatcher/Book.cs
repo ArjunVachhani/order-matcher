@@ -139,7 +139,7 @@ public class Book
         return side.CheckCanBeFilled(requestedQuantity, limitPrice);
     }
 
-    internal bool CheckCanFillMarketOrderAmount(bool isBuy, Quantity orderAmount)
+    internal bool CheckCanFillMarketOrderAmount(bool isBuy, Amount orderAmount)
     {
         var side = isBuy ? _asks : _bids;
         return side.CheckMarketOrderAmountCanBeFilled(orderAmount);

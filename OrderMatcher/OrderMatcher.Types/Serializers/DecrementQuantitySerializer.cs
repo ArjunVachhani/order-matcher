@@ -46,7 +46,7 @@ public class DecrementQuantitySerializer : Serializer
         Write(bytes.Slice(versionOffset), version);
         Write(bytes.Slice(orderIdOffset), orderId);
         Write(bytes.Slice(userIdOffset), userId);
-        Write(bytes.Slice(quantityToDecrementOffset), quantityToDecrement);
+        quantityToDecrement.WriteBytes(bytes.Slice(quantityToDecrementOffset));
         Write(bytes.Slice(messageSequenceOffset), messageSequence);
     }
 

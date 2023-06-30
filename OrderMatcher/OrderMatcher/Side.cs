@@ -102,7 +102,7 @@ internal class Side<T> where T : class, IPriceLevel, new()
         return false;
     }
 
-    public bool CheckMarketOrderAmountCanBeFilled(Quantity orderAmount)
+    public bool CheckMarketOrderAmountCanBeFilled(Amount orderAmount)
     {
         Amount cummulativeOrderAmount = 0;
         foreach (var priceLevel in _priceLevels)

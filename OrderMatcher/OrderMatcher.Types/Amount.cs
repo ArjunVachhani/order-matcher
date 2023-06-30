@@ -47,6 +47,36 @@ public readonly struct Amount : IEquatable<Amount>, IComparable<Amount>
         return 92834 + _amount.GetHashCode();
     }
 
+    public static Amount operator -(Amount left, Amount right)
+    {
+        return new Amount(left._amount - right._amount);
+    }
+
+    public static Amount operator +(Amount left, Amount right)
+    {
+        return new Amount(left._amount + right._amount);
+    }
+
+    public static Quantity operator /(Amount amount, Price price)
+    {
+        return new Quantity(amount._amount / price.GetPrice());
+    }
+
+    public static Amount operator /(Amount amount, int d)
+    {
+        return new Amount(amount._amount / d);
+    }
+
+    public static Amount operator *(Amount amount, decimal d)
+    {
+        return new Amount(amount._amount * d);
+    }
+
+    public Amount Round(int decimalPlaces)
+    {
+        return Math.Round(_amount, decimalPlaces);
+    }
+
     public static bool operator <(Amount left, Amount right)
     {
         return left._amount < right._amount;
