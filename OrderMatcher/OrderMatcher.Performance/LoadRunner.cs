@@ -129,6 +129,10 @@ namespace OrderMatcher.Performance
         public void OnAccept(OrderId orderId, UserId userId) { }
 
         public void OnOrderTriggered(OrderId orderId, UserId userId) { }
+
+        public void OnSelfMatch(OrderId incomingOrderId, OrderId restingOrderId, UserId userId) { }
+
+        public void OnDecrement(OrderId orderId, UserId userId, Quantity quantityDecremented) { }
     }
 
     class PerfFeeProvider : IFeeProvider
