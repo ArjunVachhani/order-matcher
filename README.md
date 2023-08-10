@@ -33,6 +33,11 @@ order-matcher is a simple and fast library to build crypto-currency exchange, st
 
 [3. Frequently Asked Questions(FAQ)](https://github.com/ArjunVachhani/order-matcher/wiki/FAQ----Frequently-Asked-Questions)
 
+## Project Development Status : Actively maintained. 
+
+## Community
+Questions and pull requests are welcomed. 
+
 ## Code
 ```csharp
 
