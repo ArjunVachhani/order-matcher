@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <LangVersion>10</LangVersion>
   </PropertyGroup>
@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.4" />
-    <PackageReference Include="MessagePack" Version="2.4.59" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageReference Include="MessagePack" Version="2.5.171" />
   </ItemGroup>
 
 </Project>
