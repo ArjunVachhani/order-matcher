@@ -2,9 +2,6 @@ name: .NET Core
 
 on: [push, pull_request]
 
-env:
-  dotnet_sdk_version: '6.0.x'
-
 jobs:
   build:
 
@@ -12,13 +9,14 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
+        dotnet_sdk_version: ['6.0.x', '8.0.x']
 
     steps:
     - uses: actions/checkout@master
       
     - uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: ${{ env.dotnet_sdk_version }} # SDK Version to use.
+        dotnet-version: ${{ matrix.dotnet_sdk_version }} # SDK Version to use.
     
     - name: Restore Nuget packages
       run: dotnet restore ./OrderMatcher/OrderMatcher.sln
